@@ -1,8 +1,7 @@
 
 "use client"
 
-import * as React from "process"
-import ReactExports from "react"
+import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -16,26 +15,26 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { UserPlus, RefreshCw } from "lucide-react"
 
 export default function SignupPage() {
-  const [formData, setFormData] = ReactExports.useState({
+  const [formData, setFormData] = React.useState({
     name: "",
     email: "",
     phone: "",
     password: ""
   })
-  const [loading, setLoading] = ReactExports.useState(false)
+  const [loading, setLoading] = React.useState(false)
   const router = useRouter()
   const { toast } = useToast()
   const auth = useAuth()
   const { user, loading: authLoading } = useUser()
 
   // Redirect if already logged in
-  ReactExports.useEffect(() => {
+  React.useEffect(() => {
     if (!authLoading && user) {
       router.push('/dashboard')
     }
   }, [user, authLoading, router])
 
-  const handleSignup = async (e: ReactExports.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
