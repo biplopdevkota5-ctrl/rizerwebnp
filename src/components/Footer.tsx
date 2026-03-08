@@ -3,7 +3,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Phone, Mail, MapPin, MessageCircle } from "lucide-react"
+import { Phone, Mail, MapPin, MessageCircle, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Footer() {
@@ -27,6 +27,10 @@ export function Footer() {
             <p className="text-sm text-muted-foreground leading-relaxed font-medium">
               Empowering individuals and businesses in Nepal with world-class websites at unbeatable prices. Developed by Biplop Devkota at Rizer Studio.
             </p>
+            <Link href="/admin" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
+              <ShieldCheck className="w-3 h-3" />
+              Management Portal
+            </Link>
           </div>
           
           <div>

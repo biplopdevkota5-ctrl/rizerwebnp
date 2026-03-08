@@ -5,7 +5,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { PlusCircle, User as UserIcon, LogOut } from "lucide-react"
+import { PlusCircle, User as UserIcon, LogOut, ShieldCheck, Menu } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useUser, useAuth } from "@/firebase"
 import { signOut } from "firebase/auth"
@@ -30,12 +30,11 @@ export function Navbar() {
     if (timerRef.current) clearTimeout(timerRef.current)
     
     if (nextCount >= 10) {
-      e.preventDefault() // Stop normal navigation to home
+      e.preventDefault() 
       setLogoClicks(0)
       router.push('/admin')
     } else {
       setLogoClicks(nextCount)
-      // Set a timer to reset clicks after 3 seconds of inactivity
       timerRef.current = setTimeout(() => setLogoClicks(0), 3000)
     }
   }
@@ -74,6 +73,16 @@ export function Navbar() {
             <PlusCircle className="w-4 h-4" />
             Request Website
           </Link>
+          <Link 
+            href="/admin" 
+            className={cn(
+              "flex items-center gap-2 text-sm font-bold transition-all hover:text-primary py-1",
+              pathname === '/admin' ? "text-primary border-b-2 border-primary" : "text-muted-foreground"
+            )}
+          >
+            <ShieldCheck className="w-4 h-4" />
+            Admin
+          </Link>
           <div className="h-6 w-px bg-white/10 mx-2" />
         </div>
 
@@ -101,6 +110,12 @@ export function Navbar() {
               </Link>
             </div>
           )}
+          
+          <Link href="/menu" className="md:hidden">
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <Menu className="w-6 h-6" />
+            </Button>
+          </Link>
         </div>
       </div>
     </nav>
