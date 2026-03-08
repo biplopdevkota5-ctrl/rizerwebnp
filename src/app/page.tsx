@@ -65,7 +65,7 @@ export default function Home() {
               <h1 className="text-5xl md:text-7xl font-headline font-bold leading-tight tracking-tighter text-foreground">
                 Create Your <span className="text-primary italic">Dream Website</span> at Cheap Price
               </h1>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-body font-medium">
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-body font-bold">
                 Premium quality designs, glassmorphism effects, and ultra-smooth animations. Get your professional website today without breaking the bank.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
@@ -92,7 +92,7 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-16 space-y-4">
               <h2 className="text-3xl md:text-5xl font-headline font-bold text-foreground">Why Choose RIZERWEBNP?</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto font-medium">We combine cutting-edge technology with affordable pricing to deliver websites that stand out.</p>
+              <p className="text-muted-foreground max-w-2xl mx-auto font-bold">We combine cutting-edge technology with affordable pricing to deliver websites that stand out.</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -104,10 +104,10 @@ export default function Home() {
                 { icon: CheckCircle2, title: "Affordable", desc: "Starting at just $29, we have a plan for every budget and requirement." },
                 { icon: Sparkles, title: "Custom Effects", desc: "Glassmorphism, parallax, and custom animations tailored to your brand." },
               ].map((feature, i) => (
-                <div key={i} className="p-8 rounded-2xl glass hover:border-primary/50 transition-all group cursor-default">
+                <div key={i} className="p-8 rounded-2xl glass hover:border-primary/50 transition-all group cursor-default shadow-xl">
                   <feature.icon className="w-12 h-12 text-primary mb-6 group-hover:scale-110 transition-transform" />
                   <h3 className="text-xl font-headline font-bold mb-3 text-foreground">{feature.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed font-medium">{feature.desc}</p>
+                  <p className="text-muted-foreground text-sm leading-relaxed font-bold">{feature.desc}</p>
                 </div>
               ))}
             </div>
@@ -119,7 +119,7 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-16 space-y-4">
               <h2 className="text-3xl md:text-5xl font-headline font-bold text-foreground">What Our Clients Say</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto font-medium italic">Verified reviews from satisfied clients.</p>
+              <p className="text-muted-foreground max-w-2xl mx-auto font-bold italic text-lg">Verified reviews from satisfied clients.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {displayReviews.map((t, i) => (
@@ -127,7 +127,7 @@ export default function Home() {
                   key={i} 
                   className={cn(
                     "p-8 rounded-2xl glass border border-white/10 hover:border-primary/50 transition-all duration-500 group relative animate-fade-in",
-                    i % 2 === 0 ? "animate-float" : ""
+                    i % 2 === 0 ? "animate-float" : "animate-float-slow"
                   )}
                   style={{ animationDelay: `${i * 200}ms` }}
                 >
@@ -136,20 +136,20 @@ export default function Home() {
                       <Star key={star} className="w-5 h-5 fill-accent text-accent" />
                     ))}
                     {t.rating % 1 !== 0 && <StarHalf className="w-5 h-5 fill-accent text-accent" />}
-                    <span className="ml-2 text-sm font-bold text-accent">{t.rating} / 5</span>
+                    <span className="ml-2 text-sm font-black text-accent">{t.rating} / 5</span>
                   </div>
                   
-                  <p className="text-foreground/90 font-medium italic mb-8 relative z-10 leading-relaxed text-lg">
+                  <p className="text-foreground font-bold italic mb-8 relative z-10 leading-relaxed text-lg">
                     "{t.text}"
                   </p>
                   
                   <div className="flex items-center gap-4 pt-6 border-t border-white/10">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary text-xl shadow-inner uppercase">
+                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-black text-primary text-xl shadow-inner uppercase border border-primary/30">
                       {t.userName?.[0] || "?"}
                     </div>
                     <div>
                       <h4 className="font-bold text-foreground">{t.userName}</h4>
-                      <p className="text-sm text-muted-foreground font-semibold">Verified Client</p>
+                      <p className="text-sm text-muted-foreground font-black uppercase tracking-wider">Verified Client</p>
                     </div>
                   </div>
                 </div>
@@ -157,7 +157,7 @@ export default function Home() {
             </div>
             <div className="mt-12 text-center">
               <Link href="/request">
-                <Button variant="outline" className="rounded-full glass text-primary font-bold">
+                <Button variant="outline" className="rounded-full glass text-primary font-black shadow-lg hover:scale-105 transition-transform">
                   Submit Your Own Review
                 </Button>
               </Link>
@@ -171,10 +171,10 @@ export default function Home() {
             <div className="rounded-3xl bg-primary p-12 text-center text-primary-foreground space-y-6 overflow-hidden relative shadow-2xl">
               <div className="relative z-10">
                 <h2 className="text-4xl md:text-6xl font-headline font-bold">Ready to Start Your Project?</h2>
-                <p className="text-lg font-medium opacity-90 max-w-xl mx-auto">Submit your requirements and get a professional response within 24 hours.</p>
+                <p className="text-lg font-bold opacity-90 max-w-xl mx-auto">Submit your requirements and get a professional response within 24 hours.</p>
                 <div className="pt-6">
                   <Link href="/request">
-                    <Button size="lg" variant="secondary" className="h-14 px-10 rounded-full font-bold text-lg hover:scale-105 transition-transform">
+                    <Button size="lg" variant="secondary" className="h-14 px-10 rounded-full font-black text-lg hover:scale-105 transition-transform shadow-2xl">
                       Launch My Website Now
                     </Button>
                   </Link>

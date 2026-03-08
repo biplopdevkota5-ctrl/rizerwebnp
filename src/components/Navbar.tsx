@@ -7,22 +7,18 @@ import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { LayoutGrid, PlusCircle, User as UserIcon, LogOut, Menu, X, Shield } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { User } from "@/lib/types"
+import { useUser, useAuth } from "@/firebase"
+import { signOut } from "firebase/auth"
 
 export function Navbar() {
-  const [user, setUser] = React.useState<User | null>(null)
+  const { user } = useUser()
+  const auth = useAuth()
   const [isOpen, setIsOpen] = React.useState(false)
   const pathname = usePathname()
   const router = useRouter()
 
-  React.useEffect(() => {
-    const savedUser = localStorage.getItem('rizerweb_user')
-    if (savedUser) setUser(JSON.parse(savedUser))
-  }, [])
-
-  const handleLogout = () => {
-    localStorage.removeItem('rizerweb_user')
-    setUser(null)
+  const handleLogout = async () => {
+    await signOut(auth)
     router.push('/')
   }
 
@@ -57,11 +53,11 @@ export function Navbar() {
           <div className="h-6 w-px bg-border mx-2" />
           {user ? (
             <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
+              <Link href="/dashboard" className="text-sm font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-2">
                 <UserIcon className="w-4 h-4" />
-                Dashboard
+                {user.displayName || "Dashboard"}
               </Link>
-              <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground">
+              <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground font-bold">
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
               </Button>
@@ -69,15 +65,15 @@ export function Navbar() {
           ) : (
             <div className="flex items-center gap-4">
               <Link href="/auth/login">
-                <Button variant="ghost" size="sm">Login</Button>
+                <Button variant="ghost" size="sm" className="font-bold">Login</Button>
               </Link>
               <Link href="/auth/signup">
-                <Button size="sm">Get Started</Button>
+                <Button size="sm" className="font-bold">Get Started</Button>
               </Link>
             </div>
           )}
           <Link href="/admin">
-            <Button variant="outline" size="icon" className="w-8 h-8">
+            <Button variant="outline" size="icon" className="w-8 h-8 glass">
               <Shield className="w-4 h-4" />
             </Button>
           </Link>
@@ -94,7 +90,7 @@ export function Navbar() {
         <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur-md animate-in slide-in-from-top duration-300">
           <div className="container px-4 py-6 flex flex-col gap-4">
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)} className="flex items-center gap-3 text-lg font-medium p-2 hover:bg-accent rounded-md">
+              <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)} className="flex items-center gap-3 text-lg font-bold p-2 hover:bg-accent rounded-md">
                 <link.icon className="w-5 h-5 text-primary" />
                 {link.label}
               </Link>
@@ -102,11 +98,11 @@ export function Navbar() {
             <div className="h-px bg-border my-2" />
             {user ? (
               <>
-                <Link href="/dashboard" onClick={() => setIsOpen(false)} className="flex items-center gap-3 text-lg font-medium p-2 hover:bg-accent rounded-md">
+                <Link href="/dashboard" onClick={() => setIsOpen(false)} className="flex items-center gap-3 text-lg font-bold p-2 hover:bg-accent rounded-md">
                   <UserIcon className="w-5 h-5 text-primary" />
                   Dashboard
                 </Link>
-                <Button onClick={handleLogout} className="w-full justify-start text-lg font-medium p-6" variant="ghost">
+                <Button onClick={handleLogout} className="w-full justify-start text-lg font-bold p-6" variant="ghost">
                   <LogOut className="w-5 h-5 mr-3 text-destructive" />
                   Logout
                 </Button>
@@ -114,10 +110,10 @@ export function Navbar() {
             ) : (
               <div className="flex flex-col gap-2">
                 <Link href="/auth/login" onClick={() => setIsOpen(false)}>
-                  <Button variant="outline" className="w-full">Login</Button>
+                  <Button variant="outline" className="w-full font-bold">Login</Button>
                 </Link>
                 <Link href="/auth/signup" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full">Sign Up</Button>
+                  <Button className="w-full font-bold">Sign Up</Button>
                 </Link>
               </div>
             )}
