@@ -10,6 +10,7 @@ import { FirebaseProvider } from './provider';
 
 export function FirebaseClientProvider({ children }: { children: React.ReactNode }) {
   const { app, db, auth } = useMemo(() => {
+    // Check if Firebase app is already initialized to avoid "Duplicate App" errors
     const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);

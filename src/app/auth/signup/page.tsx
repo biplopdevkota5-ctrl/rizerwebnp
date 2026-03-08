@@ -1,7 +1,8 @@
 
 "use client"
 
-import * as React from "react"
+import * as React from "process"
+import ReactExports from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -15,26 +16,26 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { UserPlus, RefreshCw } from "lucide-react"
 
 export default function SignupPage() {
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = ReactExports.useState({
     name: "",
     email: "",
     phone: "",
     password: ""
   })
-  const [loading, setLoading] = React.useState(false)
+  const [loading, setLoading] = ReactExports.useState(false)
   const router = useRouter()
   const { toast } = useToast()
   const auth = useAuth()
-  const { user } = useUser()
+  const { user, loading: authLoading } = useUser()
 
   // Redirect if already logged in
-  React.useEffect(() => {
-    if (user) {
+  ReactExports.useEffect(() => {
+    if (!authLoading && user) {
       router.push('/dashboard')
     }
-  }, [user, router])
+  }, [user, authLoading, router])
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleSignup = async (e: ReactExports.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
@@ -54,6 +55,8 @@ export default function SignupPage() {
       setLoading(false)
     }
   }
+
+  if (authLoading) return null
 
   return (
     <div className="min-h-screen flex flex-col">

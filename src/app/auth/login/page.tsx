@@ -21,14 +21,14 @@ export default function LoginPage() {
   const router = useRouter()
   const { toast } = useToast()
   const auth = useAuth()
-  const { user } = useUser()
+  const { user, loading: authLoading } = useUser()
 
   // Redirect if already logged in
   React.useEffect(() => {
-    if (user) {
+    if (!authLoading && user) {
       router.push('/dashboard')
     }
-  }, [user, router])
+  }, [user, authLoading, router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,6 +48,8 @@ export default function LoginPage() {
       setLoading(false)
     }
   }
+
+  if (authLoading) return null
 
   return (
     <div className="min-h-screen flex flex-col">
