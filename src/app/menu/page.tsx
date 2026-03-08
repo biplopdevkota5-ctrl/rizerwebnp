@@ -145,7 +145,7 @@ export default function MobileMenuPage() {
                 <Info className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-bold text-sm mb-1 uppercase tracking-wider text-foreground">Gaidakot Studio</h4>
+                <h4 className="font-bold text-sm mb-1 uppercase tracking-wider text-foreground">Rizer Studio</h4>
                 <p className="text-xs text-muted-foreground leading-relaxed font-medium">
                   Professional web services by Biplop Devkota. Dedicated to delivering premium digital experiences in Nepal.
                 </p>
