@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -33,7 +34,8 @@ export default function MobileMenuPage() {
   const WHATSAPP_MESSAGE = encodeURIComponent("Hello, Rizer Web NP. I Need Support.")
 
   const isAdmin = React.useMemo(() => {
-    return user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase())
+    if (!user?.email) return false;
+    return ADMIN_EMAILS.some(email => email.toLowerCase() === user.email?.toLowerCase());
   }, [user])
 
   const handleLogout = async () => {

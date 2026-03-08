@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -23,7 +24,8 @@ export function Navbar() {
   const router = useRouter()
   
   const isAdmin = React.useMemo(() => {
-    return user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase())
+    if (!user?.email) return false;
+    return ADMIN_EMAILS.some(email => email.toLowerCase() === user.email?.toLowerCase());
   }, [user])
 
   const handleLogout = async () => {
@@ -69,9 +71,9 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           {isAdmin && (
             <Link href="/admin">
-              <Button variant="ghost" size="sm" className="hidden sm:flex items-center gap-2 text-accent hover:text-accent/80 hover:bg-accent/10 font-black uppercase text-[10px] tracking-widest mr-2">
+              <Button variant="ghost" size="sm" className="items-center gap-2 text-accent hover:text-accent/80 hover:bg-accent/10 font-black uppercase text-[10px] tracking-widest mr-1">
                 <ShieldCheck className="w-4 h-4" />
-                Admin Panel
+                <span className="hidden xs:inline">Admin Portal</span>
               </Button>
             </Link>
           )}
