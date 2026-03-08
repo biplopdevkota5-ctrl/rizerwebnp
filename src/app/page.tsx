@@ -23,8 +23,7 @@ export default function Home() {
   // Announcements: Fetch the latest active one
   const announcementsQuery = useMemoFirebase(() => {
     if (!db || !mounted) return null
-    // Simple order by is safer for cross-device sync without index lag
-    return query(collection(db, "announcements"), orderBy("createdAt", "desc"), limit(10))
+    return query(collection(db, "announcements"), orderBy("createdAt", "desc"), limit(5))
   }, [db, mounted])
   const { data: announcementsData } = useCollection(announcementsQuery)
   
@@ -62,10 +61,10 @@ export default function Home() {
     <div className="flex flex-col min-h-screen selection:bg-primary/30 selection:text-primary overflow-x-hidden">
       {/* Dynamic Announcement Banner */}
       {activeAnnouncement && (
-        <div className="bg-primary text-primary-foreground py-3 px-4 text-center text-xs sm:text-sm font-bold animate-fade-in sticky top-0 z-[110] border-b border-white/10 shadow-lg">
-          <div className="container mx-auto flex items-center justify-center gap-2">
-            <Megaphone className="w-4 h-4 shrink-0 text-accent animate-pulse" />
-            <span className="tracking-tight">{activeAnnouncement.content}</span>
+        <div className="bg-primary text-primary-foreground py-4 px-4 text-center text-xs sm:text-sm font-black animate-fade-in sticky top-0 z-[110] border-b border-white/10 shadow-2xl">
+          <div className="container mx-auto flex items-center justify-center gap-3">
+            <Megaphone className="w-5 h-5 shrink-0 text-accent animate-bounce" />
+            <span className="tracking-tight uppercase">{activeAnnouncement.content}</span>
           </div>
         </div>
       )}

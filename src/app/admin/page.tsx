@@ -255,7 +255,7 @@ export default function AdminPage() {
                     </TableHeader>
                     <TableBody>
                       {!reviews || reviews.length === 0 ? (
-                        <TableRow><TableCell colSpan={3} className="text-center py-20 text-muted-foreground">No reviews yet.</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={3} className="text-center py-20 text-muted-foreground">No reviews yet.</TableRow></TableCell>
                       ) : reviews.map((rev) => (
                         <TableRow key={rev.id} className="border-white/5 hover:bg-white/5">
                           <TableCell className="pl-8 font-bold">{rev.userName}</TableCell>
