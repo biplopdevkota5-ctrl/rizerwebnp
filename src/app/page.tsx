@@ -7,27 +7,32 @@ import { Button } from "@/components/ui/button"
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { FloatingButton } from "@/components/FloatingButton"
-import { CheckCircle2, Zap, Shield, Globe, Cpu, Sparkles, Star, Megaphone, ArrowRight } from "lucide-react"
+import { CheckCircle2, Zap, Shield, Globe, Cpu, Sparkles, Star, Megaphone, ArrowRight, RefreshCw } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, query, where, orderBy, limit } from "firebase/firestore"
 
 export default function Home() {
+  const [mounted, setMounted] = React.useState(false)
   const db = useFirestore()
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
   
   // Fetch Announcements
   const announcementsQuery = useMemoFirebase(() => {
     if (!db) return null
     return query(collection(db, "announcements"), where("isActive", "==", true), orderBy("createdAt", "desc"), limit(1))
   }, [db])
-  const { data: announcements } = useCollection(announcementsQuery)
+  const { data: announcements, isLoading: isAnnouncementsLoading } = useCollection(announcementsQuery)
 
   // Fetch Approved Reviews
   const reviewsQuery = useMemoFirebase(() => {
     if (!db) return null
     return query(collection(db, "reviews"), where("status", "==", "approved"), orderBy("createdAt", "desc"), limit(6))
   }, [db])
-  const { data: reviews } = useCollection(reviewsQuery)
+  const { data: reviews, isLoading: isReviewsLoading } = useCollection(reviewsQuery)
 
   const defaultTestimonials = [
     { userName: "Anish Sharma", rating: 4.5, text: "RIZERWEBNP transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
@@ -36,6 +41,15 @@ export default function Home() {
   ]
 
   const displayReviews = reviews?.length ? reviews : defaultTestimonials
+
+  // Prevent hydration mismatch by waiting for mount
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+        <RefreshCw className="w-10 h-10 animate-spin text-primary opacity-20" />
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col min-h-screen selection:bg-primary/30 selection:text-primary overflow-x-hidden">
@@ -133,7 +147,7 @@ export default function Home() {
                   )}
                 >
                   <div className="flex gap-1 mb-6">
-                    {Array.from({ length: 5 }).map((_, starIdx) => {
+                    {Array.from({ length:  starVal <= Math.floor(t.rating) ? 5 : 5 }).map((_, starIdx) => {
                       const starVal = starIdx + 1;
                       const isFull = starVal <= Math.floor(t.rating);
                       return (

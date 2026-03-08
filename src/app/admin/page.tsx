@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -12,10 +13,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
-import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList } from "lucide-react"
+import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList, RefreshCw } from "lucide-react"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, doc, updateDoc, deleteDoc, addDoc, query, orderBy } from "firebase/firestore"
 import { cn } from "@/lib/utils"
+import { errorEmitter } from "@/firebase/error-emitter"
+import { FirestorePermissionError } from "@/firebase/errors"
 
 const ADMIN_PASSWORD = "090102030405"
 
@@ -57,42 +60,82 @@ export default function AdminPage() {
 
   const handleUpdateStatus = (id: string, newStatus: string) => {
     if (!db) return
-    updateDoc(doc(db, "requests", id), { status: newStatus })
+    const docRef = doc(db, "requests", id);
+    updateDoc(docRef, { status: newStatus }).catch(async (error) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: docRef.path,
+        operation: 'update',
+        requestResourceData: { status: newStatus }
+      }));
+    });
     toast({ title: "Status Updated", description: "Request status sync with Firestore." })
   }
 
   const handleDeleteRequest = (id: string) => {
     if (!db || !confirm("Delete permanently?")) return
-    deleteDoc(doc(db, "requests", id))
+    const docRef = doc(db, "requests", id);
+    deleteDoc(docRef).catch(async (error) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: docRef.path,
+        operation: 'delete'
+      }));
+    });
     toast({ title: "Deleted", description: "Request removed from database." })
   }
 
   const handleReviewStatus = (id: string, newStatus: string) => {
     if (!db) return
-    updateDoc(doc(db, "reviews", id), { status: newStatus })
+    const docRef = doc(db, "reviews", id);
+    updateDoc(docRef, { status: newStatus }).catch(async (error) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: docRef.path,
+        operation: 'update',
+        requestResourceData: { status: newStatus }
+      }));
+    });
     toast({ title: "Review Updated", description: `Marked as ${newStatus}` })
   }
 
   const handleDeleteReview = (id: string) => {
     if (!db || !confirm("Delete review?")) return
-    deleteDoc(doc(db, "reviews", id))
+    const docRef = doc(db, "reviews", id);
+    deleteDoc(docRef).catch(async (error) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: docRef.path,
+        operation: 'delete'
+      }));
+    });
   }
 
   const handleAddAnnouncement = () => {
     if (!db || !announcementInput) return
-    addDoc(collection(db, "announcements"), {
+    const payload = {
       content: announcementInput,
       isActive: true,
       type: "info",
       createdAt: new Date().toISOString()
-    })
+    };
+    addDoc(collection(db, "announcements"), payload).catch(async (error) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: 'announcements',
+        operation: 'create',
+        requestResourceData: payload
+      }));
+    });
     setAnnouncementInput("")
     toast({ title: "Announcement Posted", description: "Now visible on home page." })
   }
 
   const toggleAnnouncement = (id: string, current: boolean) => {
     if (!db) return
-    updateDoc(doc(db, "announcements", id), { isActive: !current })
+    const docRef = doc(db, "announcements", id);
+    updateDoc(docRef, { isActive: !current }).catch(async (error) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: docRef.path,
+        operation: 'update',
+        requestResourceData: { isActive: !current }
+      }));
+    });
   }
 
   if (!isAuthorized) {

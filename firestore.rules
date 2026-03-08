@@ -1,3 +1,4 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -16,23 +17,22 @@ service cloud.firestore {
       return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
-    // --- Public Access Collections (v14 - Explicit Public Read) ---
-    // These rules allow the homepage to function for unauthenticated visitors.
-    // Explicitly using get/list for clarity.
+    // --- Public Access Collections (v15 - Forced Deployment) ---
+    // Allow everyone to read content for the homepage.
 
     match /announcements/{announcementId} {
-      allow get, list: if true;
+      allow read: if true;
       allow write: if isAdmin();
     }
 
     match /reviews/{reviewId} {
-      allow get, list: if true;
+      allow read: if true;
       allow create: if isSignedIn();
       allow update, delete: if isAdmin();
     }
 
     match /website_types/{typeId} {
-      allow get, list: if true;
+      allow read: if true;
       allow write: if isAdmin();
     }
 
