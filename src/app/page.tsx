@@ -19,29 +19,39 @@ export default function Home() {
     setMounted(true)
   }, [])
   
-  // Fetch Announcements
+  // Fetch Announcements - Public Read
   const announcementsQuery = useMemoFirebase(() => {
     if (!db) return null
-    return query(collection(db, "announcements"), where("isActive", "==", true), orderBy("createdAt", "desc"), limit(1))
+    return query(
+      collection(db, "announcements"), 
+      where("isActive", "==", true), 
+      orderBy("createdAt", "desc"), 
+      limit(1)
+    )
   }, [db])
   const { data: announcements } = useCollection(announcementsQuery)
 
-  // Fetch Approved Reviews
+  // Fetch Approved Reviews - Public Read
   const reviewsQuery = useMemoFirebase(() => {
     if (!db) return null
-    return query(collection(db, "reviews"), where("status", "==", "approved"), orderBy("createdAt", "desc"), limit(6))
+    return query(
+      collection(db, "reviews"), 
+      where("status", "==", "approved"), 
+      orderBy("createdAt", "desc"), 
+      limit(6)
+    )
   }, [db])
   const { data: reviews } = useCollection(reviewsQuery)
 
   const defaultTestimonials = [
-    { userName: "Anish Sharma", rating: 4.5, text: "RIZERWEBNP transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
-    { userName: "Sita Gurung", rating: 4.5, text: "My portfolio looks futuristic and high-end. Biplop is a true professional developer who understands design." },
-    { userName: "Rahul KC", rating: 4.5, text: "Unbeatable price for such a premium feel. Highly recommend the custom features and animations!" },
+    { userName: "Anish Sharma", rating: 5, text: "RIZERWEBNP transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
+    { userName: "Sita Gurung", rating: 5, text: "My portfolio looks futuristic and high-end. Biplop is a true professional developer who understands design." },
+    { userName: "Rahul KC", rating: 5, text: "Unbeatable price for such a premium feel. Highly recommend the custom features and animations!" },
   ]
 
   const displayReviews = reviews?.length ? reviews : defaultTestimonials
 
-  // Prevent hydration mismatch by waiting for mount
+  // Prevent hydration mismatch
   if (!mounted) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background">
@@ -177,13 +187,6 @@ export default function Home() {
                   </div>
                 </div>
               ))}
-            </div>
-            <div className="mt-12 text-center">
-              <Link href="/request">
-                <Button variant="outline" className="rounded-full glass border-white/10 text-foreground font-bold hover:scale-105 transition-all">
-                  Submit Your Own Review
-                </Button>
-              </Link>
             </div>
           </div>
         </section>
