@@ -3,7 +3,7 @@ import { Instagram, Github, Mail, Phone, MapPin, Twitter, MessageCircle } from "
 import { Button } from "@/components/ui/button"
 
 export function Footer() {
-  const WHATSAPP_NUMBER = "9779805602394"
+  const WHATSAPP_NUMBER = "9805602394"
 
   return (
     <footer className="border-t border-border/40 bg-background/90 backdrop-blur-md py-16">
@@ -58,7 +58,7 @@ export function Footer() {
             <p className="text-sm text-muted-foreground font-medium">
               Have questions? Chat with us directly on WhatsApp for instant support.
             </p>
-            <Link href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank">
+            <Link href={`https://wa.me/977${WHATSAPP_NUMBER}`} target="_blank">
               <Button className="w-full rounded-full font-bold shadow-lg h-12 gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white border-none">
                 <MessageCircle className="w-5 h-5" />
                 Contact on WhatsApp

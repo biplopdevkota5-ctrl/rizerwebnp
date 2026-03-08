@@ -52,33 +52,32 @@ export function Navbar() {
           <div className="h-6 w-px bg-white/10 mx-2" />
         </div>
 
-        {/* Auth Actions - Visible on all screens, replaced hamburger on mobile */}
-        <div className="flex items-center gap-2 sm:gap-4">
+        {/* Auth Actions - Direct access, no hamburger */}
+        <div className="flex items-center gap-2">
           {user ? (
             <div className="flex items-center gap-2 sm:gap-4">
               <Link href="/dashboard" className="text-sm font-bold text-foreground hover:text-primary transition-colors flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <UserIcon className="w-4 h-4 text-primary" />
                 </div>
-                <span className="hidden lg:inline">{user.displayName || "Dashboard"}</span>
-                <span className="lg:hidden text-xs">Dashboard</span>
+                <span className="hidden sm:inline">{user.displayName || "Dashboard"}</span>
               </Link>
               <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground font-bold hover:text-destructive p-2 h-auto">
                 <LogOut className="w-4 h-4" />
               </Button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <Link href="/auth/login">
-                <Button variant="ghost" size="sm" className="font-bold h-9 px-3 text-sm">Login</Button>
+                <Button variant="ghost" size="sm" className="font-bold h-9 px-2 sm:px-3 text-xs sm:text-sm">Login</Button>
               </Link>
               <Link href="/auth/signup">
-                <Button size="sm" className="font-bold rounded-full h-9 px-4 sm:px-6 text-sm shadow-lg shadow-primary/20">Sign Up</Button>
+                <Button size="sm" className="font-bold rounded-full h-9 px-3 sm:px-6 text-xs sm:text-sm shadow-lg shadow-primary/20">Sign Up</Button>
               </Link>
             </div>
           )}
           
-          <Link href="/admin" className="hidden sm:block">
+          <Link href="/admin" className="hidden lg:block">
             <Button variant="outline" size="icon" className="w-8 h-8 glass rounded-full border-white/10">
               <Shield className="w-4 h-4" />
             </Button>
