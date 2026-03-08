@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -17,8 +16,6 @@ import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList, RefreshCw, AlertCi
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, doc, updateDoc, deleteDoc, addDoc, query, orderBy } from "firebase/firestore"
 import { cn } from "@/lib/utils"
-import { errorEmitter } from "@/firebase/error-emitter"
-import { FirestorePermissionError } from "@/firebase/errors"
 
 const ADMIN_PASSWORD = "090102030405"
 
@@ -34,7 +31,6 @@ export default function AdminPage() {
     setMounted(true)
   }, [])
 
-  // Memoized queries with strict guards
   const requestsQuery = useMemoFirebase(() => 
     (db && isAuthorized && mounted) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
     [db, isAuthorized, mounted]
@@ -57,104 +53,70 @@ export default function AdminPage() {
     e.preventDefault()
     if (password === ADMIN_PASSWORD) {
       setIsAuthorized(true)
-      toast({ title: "Admin Authorized", description: "Welcome back, Biplop." })
+      toast({ title: "Authorized", description: "Admin access granted." })
     } else {
-      toast({ title: "Access Denied", description: "Incorrect admin password", variant: "destructive" })
+      toast({ title: "Access Denied", description: "Incorrect password.", variant: "destructive" })
     }
   }
 
-  const handleUpdateStatus = (id: string, newStatus: string) => {
+  const handleUpdateStatus = async (id: string, newStatus: string) => {
     if (!db) return
-    const docRef = doc(db, "requests", id);
-    updateDoc(docRef, { status: newStatus }).catch((error) => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: docRef.path,
-        operation: 'update',
-        requestResourceData: { status: newStatus }
-      }));
-    });
+    try {
+      await updateDoc(doc(db, "requests", id), { status: newStatus })
+      toast({ title: "Updated", description: "Request status changed." })
+    } catch (err) {
+      console.error(err)
+    }
   }
 
-  const handleDeleteRequest = (id: string) => {
-    if (!db || !confirm("Delete permanently?")) return
-    const docRef = doc(db, "requests", id);
-    deleteDoc(docRef).catch((error) => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: docRef.path,
-        operation: 'delete'
-      }));
-    });
+  const handleDeleteRequest = async (id: string) => {
+    if (!db || !confirm("Delete this request?")) return
+    try {
+      await deleteDoc(doc(db, "requests", id))
+      toast({ title: "Deleted", description: "Request removed." })
+    } catch (err) {
+      console.error(err)
+    }
   }
 
-  const handleReviewStatus = (id: string, newStatus: string) => {
+  const handleReviewStatus = async (id: string, newStatus: string) => {
     if (!db) return
-    const docRef = doc(db, "reviews", id);
-    updateDoc(docRef, { status: newStatus }).catch((error) => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: docRef.path,
-        operation: 'update',
-        requestResourceData: { status: newStatus }
-      }));
-    });
+    try {
+      await updateDoc(doc(db, "reviews", id), { status: newStatus })
+      toast({ title: "Updated", description: "Review status changed." })
+    } catch (err) {
+      console.error(err)
+    }
   }
 
-  const handleDeleteReview = (id: string) => {
-    if (!db || !confirm("Delete review?")) return
-    const docRef = doc(db, "reviews", id);
-    deleteDoc(docRef).catch((error) => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: docRef.path,
-        operation: 'delete'
-      }));
-    });
-  }
-
-  const handleAddAnnouncement = () => {
+  const handleAddAnnouncement = async () => {
     if (!db || !announcementInput) return
-    const payload = {
-      content: announcementInput,
-      isActive: true,
-      createdAt: new Date().toISOString()
-    };
-    addDoc(collection(db, "announcements"), payload).then(() => {
+    try {
+      await addDoc(collection(db, "announcements"), {
+        content: announcementInput,
+        isActive: true,
+        createdAt: new Date().toISOString()
+      })
       setAnnouncementInput("")
-      toast({ title: "Success", description: "Announcement posted." })
-    }).catch((error) => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: 'announcements',
-        operation: 'create',
-        requestResourceData: payload
-      }));
-    });
-  }
-
-  const toggleAnnouncement = (id: string, current: boolean) => {
-    if (!db) return
-    const docRef = doc(db, "announcements", id);
-    updateDoc(docRef, { isActive: !current }).catch((error) => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: docRef.path,
-        operation: 'update',
-        requestResourceData: { isActive: !current }
-      }));
-    });
+      toast({ title: "Published", description: "New announcement live." })
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   const formatDate = (dateValue: any) => {
-    if (!mounted || !dateValue) return "No date";
+    if (!dateValue) return "N/A"
     try {
-      const d = typeof dateValue === 'string' ? new Date(dateValue) : 
-                (dateValue.toDate ? dateValue.toDate() : new Date(dateValue));
-      return isNaN(d.getTime()) ? "Invalid Date" : d.toLocaleDateString();
-    } catch (e) {
-      return "Format error";
+      const d = dateValue?.toDate ? dateValue.toDate() : new Date(dateValue)
+      return isNaN(d.getTime()) ? "Invalid" : d.toLocaleDateString()
+    } catch {
+      return "Format Error"
     }
   }
 
-  // Hydration guard
   if (!mounted) return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background">
-      <RefreshCw className="w-10 h-10 animate-spin text-primary opacity-20" />
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <RefreshCw className="w-8 h-8 animate-spin text-primary opacity-50" />
     </div>
   )
 
@@ -162,40 +124,35 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center p-4">
-          <Card className="w-full max-w-md glass border-primary/30 shadow-2xl">
+        <main className="flex-1 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md glass border-primary/20">
             <CardHeader className="text-center">
               <ShieldCheck className="w-12 h-12 text-primary mx-auto mb-4" />
-              <CardTitle className="font-headline text-2xl font-bold">Admin Portal</CardTitle>
-              <CardDescription>RIZERWEBNP Management System</CardDescription>
+              <CardTitle className="text-2xl font-headline font-bold">Admin Portal</CardTitle>
+              <CardDescription>Enter password to manage RIZERWEBNP</CardDescription>
             </CardHeader>
-            <form onSubmit={handleLogin}>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Enter Admin Password</Label>
-                    <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} className="glass" required />
-                  </div>
-                  <Button type="submit" className="w-full shadow-lg">Authorize Access</Button>
+            <CardContent>
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="password">Admin Password</Label>
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    value={password} 
+                    onChange={e => setPassword(e.target.value)} 
+                    className="bg-background" 
+                    required 
+                  />
                 </div>
-              </CardContent>
-            </form>
+                <Button type="submit" className="w-full">Authorize</Button>
+              </form>
+            </CardContent>
           </Card>
-        </div>
+        </main>
         <Footer />
       </div>
     )
   }
-
-  const ErrorDisplay = ({ error }: { error: any }) => (
-    <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
-      <AlertCircle className="w-12 h-12 text-destructive opacity-50" />
-      <div className="space-y-1">
-        <p className="font-bold text-destructive">Data Access Error</p>
-        <p className="text-sm text-muted-foreground max-w-xs">{error?.message || "Verify your Firebase permissions."}</p>
-      </div>
-    </div>
-  )
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -204,184 +161,130 @@ export default function AdminPage() {
         <div className="container mx-auto px-4">
           <div className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-4xl font-headline font-bold">Admin Management</h1>
-              <p className="text-muted-foreground">SuperAdmin Control Panel</p>
+              <h1 className="text-3xl font-headline font-bold">Admin Management</h1>
+              <p className="text-muted-foreground">Control Panel</p>
             </div>
-            <div className="flex gap-2">
-              <Badge variant="outline" className="text-primary border-primary bg-primary/10 px-4 py-1">Biplop Devkota (SuperAdmin)</Badge>
-              <Button variant="ghost" size="sm" onClick={() => setIsAuthorized(false)}>Logout</Button>
-            </div>
+            <Button variant="outline" size="sm" onClick={() => setIsAuthorized(false)}>Logout</Button>
           </div>
 
-          <Tabs defaultValue="requests" className="space-y-8">
-            <TabsList className="glass border-primary/20 p-1 h-auto flex-wrap justify-start">
-              <TabsTrigger value="requests" className="data-[state=active]:bg-primary">
-                <ClipboardList className="w-4 h-4 mr-2" /> Requests
-              </TabsTrigger>
-              <TabsTrigger value="reviews" className="data-[state=active]:bg-primary">
-                <Star className="w-4 h-4 mr-2" /> Reviews
-              </TabsTrigger>
-              <TabsTrigger value="announcements" className="data-[state=active]:bg-primary">
-                <Megaphone className="w-4 h-4 mr-2" /> Announcements
-              </TabsTrigger>
+          <Tabs defaultValue="requests" className="space-y-6">
+            <TabsList className="bg-muted p-1">
+              <TabsTrigger value="requests"><ClipboardList className="w-4 h-4 mr-2" /> Requests</TabsTrigger>
+              <TabsTrigger value="reviews"><Star className="w-4 h-4 mr-2" /> Reviews</TabsTrigger>
+              <TabsTrigger value="announcements"><Megaphone className="w-4 h-4 mr-2" /> Announcements</TabsTrigger>
             </TabsList>
 
             <TabsContent value="requests">
-              <Card className="glass border-border/50 overflow-hidden">
-                <CardHeader>
-                  <CardTitle className="font-headline text-2xl">Client Requests</CardTitle>
-                </CardHeader>
-                <CardContent className="overflow-x-auto">
-                  {requestsError ? (
-                    <ErrorDisplay error={requestsError} />
-                  ) : requestsLoading ? (
-                    <div className="flex justify-center py-20"><RefreshCw className="animate-spin" /></div>
-                  ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Client</TableHead>
-                          <TableHead>Website</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
+              <Card className="glass overflow-hidden">
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Client</TableHead>
+                        <TableHead>Service</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Action</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {requests?.map((req) => (
+                        <TableRow key={req.id}>
+                          <TableCell>
+                            <div className="font-bold">{req.fullName || "Guest"}</div>
+                            <div className="text-[10px] text-muted-foreground uppercase">{formatDate(req.createdAt)}</div>
+                          </TableCell>
+                          <TableCell className="capitalize">{req.websiteType}</TableCell>
+                          <TableCell>
+                            <Select value={req.status} onValueChange={(val) => handleUpdateStatus(req.id, val)}>
+                              <SelectTrigger className="w-[110px] h-8 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="processing">Processing</SelectItem>
+                                <SelectItem value="completed">Completed</SelectItem>
+                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteRequest(req.id)} className="text-destructive">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {requests?.map((req: any) => (
-                          <TableRow key={req.id}>
-                            <TableCell>
-                              <div className="font-medium">{req.fullName || req.userName || "N/A"}</div>
-                              <div className="text-xs text-muted-foreground">{formatDate(req.createdAt)}</div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="font-medium">{req.title || "Untitled"}</div>
-                              <div className="text-xs text-muted-foreground">{req.websiteType} • {req.budget}</div>
-                            </TableCell>
-                            <TableCell>
-                              <Select value={req.status} onValueChange={(val) => handleUpdateStatus(req.id, val)}>
-                                <SelectTrigger className="w-[120px] h-8 text-xs glass">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="pending">Pending</SelectItem>
-                                  <SelectItem value="processing">Processing</SelectItem>
-                                  <SelectItem value="completed">Completed</SelectItem>
-                                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Button variant="ghost" size="icon" onClick={() => handleDeleteRequest(req.id)} className="text-destructive">
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                        {requests?.length === 0 && (
-                          <TableRow>
-                            <TableCell colSpan={4} className="text-center py-12 text-muted-foreground">No requests found.</TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  )}
+                      ))}
+                    </TableBody>
+                  </Table>
                 </CardContent>
               </Card>
             </TabsContent>
 
             <TabsContent value="reviews">
-              <Card className="glass border-border/50 overflow-hidden">
-                <CardHeader>
-                  <CardTitle className="font-headline text-2xl">Manage Reviews</CardTitle>
-                </CardHeader>
-                <CardContent className="overflow-x-auto">
-                  {reviewsError ? (
-                    <ErrorDisplay error={reviewsError} />
-                  ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Author</TableHead>
-                          <TableHead>Review</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
+              <Card className="glass">
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Author</TableHead>
+                        <TableHead>Review</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {reviews?.map((rev) => (
+                        <TableRow key={rev.id}>
+                          <TableCell className="font-bold">{rev.userName}</TableCell>
+                          <TableCell className="max-w-xs truncate">{rev.text}</TableCell>
+                          <TableCell>
+                            <Select value={rev.status} onValueChange={(val) => handleReviewStatus(rev.id, val)}>
+                              <SelectTrigger className="w-[110px] h-8 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="approved">Approved</SelectItem>
+                                <SelectItem value="rejected">Rejected</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {reviews?.map((rev: any) => (
-                          <TableRow key={rev.id}>
-                            <TableCell className="font-medium">{rev.userName}</TableCell>
-                            <TableCell className="max-w-md truncate">{rev.text}</TableCell>
-                            <TableCell>
-                              <Select value={rev.status} onValueChange={(val) => handleReviewStatus(rev.id, val)}>
-                                <SelectTrigger className="w-[120px] h-8 text-xs glass">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="pending">Pending</SelectItem>
-                                  <SelectItem value="approved">Approved</SelectItem>
-                                  <SelectItem value="rejected">Rejected</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Button variant="ghost" size="icon" onClick={() => handleDeleteReview(rev.id)} className="text-destructive">
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  )}
+                      ))}
+                    </TableBody>
+                  </Table>
                 </CardContent>
               </Card>
             </TabsContent>
 
             <TabsContent value="announcements">
-              {announcementsError ? (
-                <ErrorDisplay error={announcementsError} />
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  <Card className="glass col-span-1">
-                    <CardHeader>
-                      <CardTitle>Post New Announcement</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <Label>Content</Label>
-                      <Input 
-                        placeholder="e.g. 50% discount this week!" 
-                        value={announcementInput} 
-                        onChange={e => setAnnouncementInput(e.target.value)}
-                        className="glass"
-                      />
-                      <Button onClick={handleAddAnnouncement} className="w-full">Publish</Button>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="glass lg:col-span-2">
-                    <CardHeader>
-                      <CardTitle>History</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Table>
-                        <TableBody>
-                          {announcements?.map((ann: any) => (
-                            <TableRow key={ann.id}>
-                              <TableCell className={cn("font-medium", !ann.isActive && "opacity-40")}>{ann.content}</TableCell>
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="sm" onClick={() => toggleAnnouncement(ann.id, ann.isActive)}>
-                                  {ann.isActive ? "Deactivate" : "Activate"}
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="glass">
+                  <CardHeader><CardTitle>Post Announcement</CardTitle></CardHeader>
+                  <CardContent className="space-y-4">
+                    <Input 
+                      placeholder="Special offer description..." 
+                      value={announcementInput} 
+                      onChange={e => setAnnouncementInput(e.target.value)}
+                    />
+                    <Button onClick={handleAddAnnouncement} className="w-full">Publish</Button>
+                  </CardContent>
+                </Card>
+                <Card className="glass">
+                  <CardHeader><CardTitle>Active History</CardTitle></CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {announcements?.map(ann => (
+                        <div key={ann.id} className="p-3 bg-muted rounded-lg flex justify-between items-center">
+                          <span className="text-sm font-medium">{ann.content}</span>
+                          <Badge variant={ann.isActive ? "default" : "outline"}>
+                            {ann.isActive ? "Live" : "Ended"}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </div>

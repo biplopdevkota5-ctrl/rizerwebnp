@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -27,7 +26,7 @@
     --radius: 0.75rem;
   }
   .dark {
-    --background: 232 17% 7%; /* Slightly deeper background */
+    --background: 232 17% 7%;
     --foreground: 232 10% 100%;
     --card: 232 17% 10%;
     --card-foreground: 232 10% 100%;
@@ -59,36 +58,23 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-headline tracking-tight text-foreground;
   }
-  p {
-    @apply leading-relaxed;
-  }
 }
 
-/* Made glass more solid as per user request for "non-transparent" feel */
+/* Enhanced solid glass for better contrast and no transparency lag */
 .glass {
-  @apply bg-background/95 backdrop-blur-3xl border border-white/20 shadow-2xl;
+  @apply bg-card border border-white/10 shadow-2xl;
 }
 
 .gradient-bg {
-  background: radial-gradient(circle at top left, hsla(240, 39%, 52%, 0.1), transparent 40%),
-              radial-gradient(circle at bottom right, hsla(207, 83%, 63%, 0.1), transparent 40%);
+  background: radial-gradient(circle at top left, hsla(240, 39%, 52%, 0.15), transparent 40%),
+              radial-gradient(circle at bottom right, hsla(207, 83%, 63%, 0.15), transparent 40%);
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes float {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(1deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
-}
-
 .animate-fade-in {
-  animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-float {
-  animation: float 4s ease-in-out infinite;
+  animation: fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
