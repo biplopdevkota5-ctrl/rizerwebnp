@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Instagram, Github, Mail, Phone, MapPin, Twitter, MessageCircle } from "lucide-react"
+import { Phone, Mail, MapPin, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Footer() {

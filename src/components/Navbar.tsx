@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { LayoutGrid, PlusCircle, User as UserIcon, LogOut, Shield } from "lucide-react"
+import { LayoutGrid, PlusCircle, User as UserIcon, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useUser, useAuth } from "@/firebase"
 import { signOut } from "firebase/auth"
@@ -14,6 +14,30 @@ export function Navbar() {
   const auth = useAuth()
   const pathname = usePathname()
   const router = useRouter()
+  
+  // Secret Admin Access Logic
+  const [logoClicks, setLogoClicks] = React.useState(0)
+  const clickTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    // We prevent default if we are about to trigger the secret navigation
+    // but usually, we just let the link work normally unless it's the 10th click.
+    const newCount = logoClicks + 1
+    
+    if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current)
+    
+    if (newCount >= 10) {
+      e.preventDefault()
+      setLogoClicks(0)
+      router.push('/admin')
+      return
+    }
+
+    setLogoClicks(newCount)
+    clickTimeoutRef.current = setTimeout(() => {
+      setLogoClicks(0)
+    }, 3000) // Reset clicks after 3 seconds of inactivity
+  }
 
   const handleLogout = async () => {
     await signOut(auth)
@@ -28,7 +52,11 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-[100] w-full border-b border-white/10 bg-background shadow-md">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group shrink-0">
+        <Link 
+          href="/" 
+          onClick={handleLogoClick}
+          className="flex items-center gap-2 group shrink-0 transition-transform active:scale-95"
+        >
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold group-hover:scale-110 transition-transform shadow-lg shadow-primary/20">R</div>
           <span className="font-headline font-bold text-xl tracking-tight text-foreground hidden sm:inline">RIZER WEB <span className="text-primary">APP</span></span>
           <span className="font-headline font-bold text-xl tracking-tight text-foreground sm:hidden">RIZER</span>
@@ -52,7 +80,7 @@ export function Navbar() {
           <div className="h-6 w-px bg-white/10 mx-2" />
         </div>
 
-        {/* Auth Actions - Visible on all screens, NO hamburger menu */}
+        {/* Auth Actions - Direct buttons, no hamburger menu */}
         <div className="flex items-center gap-2">
           {user ? (
             <div className="flex items-center gap-2 sm:gap-4">
@@ -60,7 +88,7 @@ export function Navbar() {
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <UserIcon className="w-4 h-4 text-primary" />
                 </div>
-                <span className="hidden xs:inline">{user.displayName || "Dashboard"}</span>
+                <span className="hidden xs:inline">{user.displayName || user.email?.split('@')[0] || "Dashboard"}</span>
               </Link>
               <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground font-bold hover:text-destructive p-2 h-auto">
                 <LogOut className="w-4 h-4" />
@@ -76,12 +104,6 @@ export function Navbar() {
               </Link>
             </div>
           )}
-          
-          <Link href="/admin" className="hidden lg:block ml-2">
-            <Button variant="outline" size="icon" className="w-8 h-8 glass rounded-full border-white/10">
-              <Shield className="w-4 h-4" />
-            </Button>
-          </Link>
         </div>
       </div>
     </nav>
