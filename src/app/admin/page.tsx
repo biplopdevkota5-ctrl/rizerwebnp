@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -27,13 +26,23 @@ export default function AdminPage() {
   const { toast } = useToast()
   const db = useFirestore()
 
-  const requestsQuery = useMemoFirebase(() => db ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, [db])
+  // Only fetch data if authorized to prevent permission errors
+  const requestsQuery = useMemoFirebase(() => 
+    (db && isAuthorized) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
+    [db, isAuthorized]
+  )
   const { data: requests } = useCollection(requestsQuery)
 
-  const reviewsQuery = useMemoFirebase(() => db ? query(collection(db, "reviews"), orderBy("createdAt", "desc")) : null, [db])
+  const reviewsQuery = useMemoFirebase(() => 
+    (db && isAuthorized) ? query(collection(db, "reviews"), orderBy("createdAt", "desc")) : null, 
+    [db, isAuthorized]
+  )
   const { data: reviews } = useCollection(reviewsQuery)
 
-  const announcementsQuery = useMemoFirebase(() => db ? query(collection(db, "announcements"), orderBy("createdAt", "desc")) : null, [db])
+  const announcementsQuery = useMemoFirebase(() => 
+    (db && isAuthorized) ? query(collection(db, "announcements"), orderBy("createdAt", "desc")) : null, 
+    [db, isAuthorized]
+  )
   const { data: announcements } = useCollection(announcementsQuery)
 
   const handleLogin = (e: React.FormEvent) => {
