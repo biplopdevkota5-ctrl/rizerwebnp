@@ -16,16 +16,16 @@ service cloud.firestore {
       return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
-    // --- Public Access Collections (Redeploy Trigger: v2) ---
+    // --- Public Access Collections (Redeploy Trigger: v5 - Forced Public Access) ---
 
     match /announcements/{announcementId} {
-      // Allow everyone to read announcements for the homepage
+      // Explicitly allow read (get and list) for everyone
       allow read: if true;
       allow write: if isAdmin();
     }
 
     match /reviews/{reviewId} {
-      // Explicitly allow read (get and list) for everyone (authenticated or not)
+      // Explicitly allow read (get and list) for everyone
       allow read: if true;
       allow create: if isSignedIn();
       allow update, delete: if isAdmin();
