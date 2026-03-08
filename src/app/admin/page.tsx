@@ -23,28 +23,33 @@ import { FirestorePermissionError } from "@/firebase/errors"
 const ADMIN_PASSWORD = "090102030405"
 
 export default function AdminPage() {
+  const [mounted, setMounted] = React.useState(false)
   const [isAuthorized, setIsAuthorized] = React.useState(false)
   const [password, setPassword] = React.useState("")
   const [announcementInput, setAnnouncementInput] = React.useState("")
   const { toast } = useToast()
   const db = useFirestore()
 
-  // Only fetch data if authorized to prevent permission errors
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Only fetch data if authorized and mounted to prevent hydration/permission crashes
   const requestsQuery = useMemoFirebase(() => 
-    (db && isAuthorized) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
-    [db, isAuthorized]
+    (db && isAuthorized && mounted) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
+    [db, isAuthorized, mounted]
   )
-  const { data: requests } = useCollection(requestsQuery)
+  const { data: requests, isLoading: requestsLoading } = useCollection(requestsQuery)
 
   const reviewsQuery = useMemoFirebase(() => 
-    (db && isAuthorized) ? query(collection(db, "reviews"), orderBy("createdAt", "desc")) : null, 
-    [db, isAuthorized]
+    (db && isAuthorized && mounted) ? query(collection(db, "reviews"), orderBy("createdAt", "desc")) : null, 
+    [db, isAuthorized, mounted]
   )
   const { data: reviews } = useCollection(reviewsQuery)
 
   const announcementsQuery = useMemoFirebase(() => 
-    (db && isAuthorized) ? query(collection(db, "announcements"), orderBy("createdAt", "desc")) : null, 
-    [db, isAuthorized]
+    (db && isAuthorized && mounted) ? query(collection(db, "announcements"), orderBy("createdAt", "desc")) : null, 
+    [db, isAuthorized, mounted]
   )
   const { data: announcements } = useCollection(announcementsQuery)
 
@@ -61,7 +66,7 @@ export default function AdminPage() {
   const handleUpdateStatus = (id: string, newStatus: string) => {
     if (!db) return
     const docRef = doc(db, "requests", id);
-    updateDoc(docRef, { status: newStatus }).catch(async (error) => {
+    updateDoc(docRef, { status: newStatus }).catch((error) => {
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: docRef.path,
         operation: 'update',
@@ -74,7 +79,7 @@ export default function AdminPage() {
   const handleDeleteRequest = (id: string) => {
     if (!db || !confirm("Delete permanently?")) return
     const docRef = doc(db, "requests", id);
-    deleteDoc(docRef).catch(async (error) => {
+    deleteDoc(docRef).catch((error) => {
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: docRef.path,
         operation: 'delete'
@@ -86,7 +91,7 @@ export default function AdminPage() {
   const handleReviewStatus = (id: string, newStatus: string) => {
     if (!db) return
     const docRef = doc(db, "reviews", id);
-    updateDoc(docRef, { status: newStatus }).catch(async (error) => {
+    updateDoc(docRef, { status: newStatus }).catch((error) => {
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: docRef.path,
         operation: 'update',
@@ -99,7 +104,7 @@ export default function AdminPage() {
   const handleDeleteReview = (id: string) => {
     if (!db || !confirm("Delete review?")) return
     const docRef = doc(db, "reviews", id);
-    deleteDoc(docRef).catch(async (error) => {
+    deleteDoc(docRef).catch((error) => {
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: docRef.path,
         operation: 'delete'
@@ -112,10 +117,9 @@ export default function AdminPage() {
     const payload = {
       content: announcementInput,
       isActive: true,
-      type: "info",
       createdAt: new Date().toISOString()
     };
-    addDoc(collection(db, "announcements"), payload).catch(async (error) => {
+    addDoc(collection(db, "announcements"), payload).catch((error) => {
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: 'announcements',
         operation: 'create',
@@ -129,7 +133,7 @@ export default function AdminPage() {
   const toggleAnnouncement = (id: string, current: boolean) => {
     if (!db) return
     const docRef = doc(db, "announcements", id);
-    updateDoc(docRef, { isActive: !current }).catch(async (error) => {
+    updateDoc(docRef, { isActive: !current }).catch((error) => {
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: docRef.path,
         operation: 'update',
@@ -137,6 +141,19 @@ export default function AdminPage() {
       }));
     });
   }
+
+  const formatDate = (dateValue: any) => {
+    if (!dateValue) return "No date";
+    try {
+      const d = typeof dateValue === 'string' ? new Date(dateValue) : 
+                (dateValue.toDate ? dateValue.toDate() : new Date(dateValue));
+      return isNaN(d.getTime()) ? "Invalid Date" : d.toLocaleDateString();
+    } catch (e) {
+      return "Format error";
+    }
+  }
+
+  if (!mounted) return null
 
   if (!isAuthorized) {
     return (
@@ -154,7 +171,7 @@ export default function AdminPage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="password">Enter Admin Password</Label>
-                    <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} className="glass" />
+                    <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} className="glass" required />
                   </div>
                   <Button type="submit" className="w-full shadow-lg">Authorize Access</Button>
                 </div>
@@ -184,7 +201,7 @@ export default function AdminPage() {
           </div>
 
           <Tabs defaultValue="requests" className="space-y-8">
-            <TabsList className="glass border-primary/20 p-1">
+            <TabsList className="glass border-primary/20 p-1 h-auto flex-wrap justify-start">
               <TabsTrigger value="requests" className="data-[state=active]:bg-primary">
                 <ClipboardList className="w-4 h-4 mr-2" /> Requests
               </TabsTrigger>
@@ -197,11 +214,11 @@ export default function AdminPage() {
             </TabsList>
 
             <TabsContent value="requests">
-              <Card className="glass border-border/50">
+              <Card className="glass border-border/50 overflow-hidden">
                 <CardHeader>
                   <CardTitle className="font-headline text-2xl">Client Requests</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -215,11 +232,11 @@ export default function AdminPage() {
                       {requests?.map((req: any) => (
                         <TableRow key={req.id}>
                           <TableCell>
-                            <div className="font-medium">{req.userName}</div>
-                            <div className="text-xs text-muted-foreground">{new Date(req.createdAt).toLocaleDateString()}</div>
+                            <div className="font-medium">{req.fullName || req.userName || "N/A"}</div>
+                            <div className="text-xs text-muted-foreground">{formatDate(req.createdAt)}</div>
                           </TableCell>
                           <TableCell>
-                            <div className="font-medium">{req.title}</div>
+                            <div className="font-medium">{req.title || "Untitled"}</div>
                             <div className="text-xs text-muted-foreground">{req.websiteType} • {req.budget}</div>
                           </TableCell>
                           <TableCell>
@@ -242,6 +259,11 @@ export default function AdminPage() {
                           </TableCell>
                         </TableRow>
                       ))}
+                      {!requestsLoading && requests?.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-center py-12 text-muted-foreground">No requests found.</TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </CardContent>
@@ -249,11 +271,11 @@ export default function AdminPage() {
             </TabsContent>
 
             <TabsContent value="reviews">
-              <Card className="glass border-border/50">
+              <Card className="glass border-border/50 overflow-hidden">
                 <CardHeader>
                   <CardTitle className="font-headline text-2xl">Manage Reviews</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>

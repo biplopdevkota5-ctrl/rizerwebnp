@@ -1,10 +1,11 @@
+
 "use client"
 
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { LayoutGrid, PlusCircle, User as UserIcon, LogOut, Menu, ShieldCheck } from "lucide-react"
+import { LayoutGrid, PlusCircle, User as UserIcon, LogOut, ShieldCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useUser, useAuth } from "@/firebase"
 import { signOut } from "firebase/auth"
@@ -69,8 +70,8 @@ export function Navbar() {
               </Button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <Link href="/auth/login" className="hidden xs:block">
+            <div className="flex items-center gap-3">
+              <Link href="/auth/login">
                 <Button variant="ghost" size="sm" className="font-bold h-9 px-4">Login</Button>
               </Link>
               <Link href="/auth/signup">
@@ -79,15 +80,11 @@ export function Navbar() {
             </div>
           )}
           
-          <Link href="/menu" className="md:hidden">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Menu className="w-6 h-6" />
-            </Button>
-          </Link>
+          <div className="h-6 w-px bg-white/10 mx-1 hidden xs:block" />
 
-          {/* Admin Portal Button - Visible to Everyone but Password Protected on the page */}
+          {/* Admin Portal Button - Accessible to everyone with password but Shield icon for clear indication */}
           <Link href="/admin">
-            <Button variant="ghost" size="icon" className="text-accent hover:text-accent/80 hover:bg-accent/10 rounded-full">
+            <Button variant="ghost" size="icon" className="text-accent hover:text-accent/80 hover:bg-accent/10 rounded-full transition-all">
               <ShieldCheck className="w-6 h-6" />
               <span className="sr-only">Admin Portal</span>
             </Button>
