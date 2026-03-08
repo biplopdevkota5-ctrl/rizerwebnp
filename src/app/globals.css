@@ -37,13 +37,13 @@
     --secondary: 232 17% 18%;
     --secondary-foreground: 232 10% 98%;
     --muted: 232 17% 16%;
-    --muted-foreground: 232 10% 80%; /* Increased lightness for readability */
+    --muted-foreground: 232 10% 85%; /* High contrast for visibility */
     --accent: 207 83% 63%; /* #52A8ED */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 232 17% 25%;
-    --input: 232 17% 25%;
+    --border: 232 17% 30%; /* More visible border */
+    --input: 232 17% 30%;
     --ring: 240 39% 52%;
   }
 }
@@ -64,19 +64,37 @@
 }
 
 .glass {
-  @apply bg-background/85 backdrop-blur-xl border border-white/10 shadow-2xl;
+  @apply bg-background/95 backdrop-blur-2xl border border-white/20 shadow-2xl;
 }
 
 .gradient-bg {
-  background: radial-gradient(circle at top left, hsla(240, 39%, 52%, 0.15), transparent 40%),
-              radial-gradient(circle at bottom right, hsla(207, 83%, 63%, 0.15), transparent 40%);
+  background: radial-gradient(circle at top left, hsla(240, 39%, 52%, 0.2), transparent 40%),
+              radial-gradient(circle at bottom right, hsla(207, 83%, 63%, 0.2), transparent 40%);
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
 .animate-fade-in {
-  animation: fade-in 0.6s ease-out forwards;
+  animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.staggered-entry {
+  opacity: 0;
+}
+
+.staggered-entry.visible {
+  animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
