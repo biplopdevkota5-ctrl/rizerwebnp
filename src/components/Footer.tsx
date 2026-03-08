@@ -1,7 +1,10 @@
 import Link from "next/link"
-import { Instagram, Github, Mail, Phone, MapPin, Twitter } from "lucide-react"
+import { Instagram, Github, Mail, Phone, MapPin, Twitter, MessageCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export function Footer() {
+  const WHATSAPP_NUMBER = "9805602394"
+
   return (
     <footer className="border-t border-border/40 bg-background/90 backdrop-blur-md py-16">
       <div className="container mx-auto px-4">
@@ -21,8 +24,8 @@ export function Footer() {
             <ul className="space-y-4 text-sm text-muted-foreground font-medium">
               <li><Link href="/types" className="hover:text-primary transition-colors">Website Types</Link></li>
               <li><Link href="/request" className="hover:text-primary transition-colors">Request a Site</Link></li>
-              <li><Link href="/#faq" className="hover:text-primary transition-colors">FAQ</Link></li>
-              <li><Link href="/#pricing" className="hover:text-primary transition-colors">Pricing</Link></li>
+              <li><Link href="/#testimonials-section" className="hover:text-primary transition-colors">Testimonials</Link></li>
+              <li><Link href="/dashboard" className="hover:text-primary transition-colors">Client Dashboard</Link></li>
             </ul>
           </div>
 
@@ -33,7 +36,7 @@ export function Footer() {
                 <div className="p-2 rounded-full bg-primary/10">
                   <Phone className="w-4 h-4 text-primary" />
                 </div>
-                9805602394
+                {WHATSAPP_NUMBER}
               </li>
               <li className="flex items-center gap-3">
                 <div className="p-2 rounded-full bg-primary/10">
@@ -50,19 +53,17 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h4 className="font-headline font-bold mb-6 text-foreground text-lg">Follow Us</h4>
-            <div className="flex gap-4">
-              <Link href="#" className="p-3 rounded-full bg-secondary hover:bg-primary hover:text-white transition-all shadow-sm">
-                <Twitter className="w-5 h-5" />
-              </Link>
-              <Link href="#" className="p-3 rounded-full bg-secondary hover:bg-primary hover:text-white transition-all shadow-sm">
-                <Instagram className="w-5 h-5" />
-              </Link>
-              <Link href="#" className="p-3 rounded-full bg-secondary hover:bg-primary hover:text-white transition-all shadow-sm">
-                <Github className="w-5 h-5" />
-              </Link>
-            </div>
+          <div className="space-y-6">
+            <h4 className="font-headline font-bold text-foreground text-lg">Quick Connect</h4>
+            <p className="text-sm text-muted-foreground font-medium">
+              Have questions? Chat with us directly on WhatsApp for instant support.
+            </p>
+            <Link href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank">
+              <Button className="w-full rounded-full font-bold shadow-lg h-12 gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white border-none">
+                <MessageCircle className="w-5 h-5" />
+                Contact on WhatsApp
+              </Button>
+            </Link>
           </div>
         </div>
         
