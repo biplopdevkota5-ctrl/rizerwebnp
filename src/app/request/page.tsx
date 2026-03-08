@@ -122,38 +122,38 @@ function RequestFormContent() {
     if (!db) return
     setLoading(true)
 
+    let userIp = "Unknown";
+    try {
+      const ipRes = await fetch('https://api.ipify.org?format=json');
+      const ipData = await ipRes.json();
+      userIp = ipData.ip;
+    } catch (ipError) {
+      console.warn("Could not fetch IP address:", ipError);
+    }
+
     const payload = {
       ...formData,
       userId: user?.uid || 'guest',
       userName: formData.fullName,
       status: 'pending',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      ipAddress: userIp
     };
 
-    // 1. Write to Admin Database (Global Requests)
     const adminRequestsCol = collection(db, "requests");
-    
-    // 2. Write to User Personal Database
     const userRequestsCol = user 
       ? collection(db, "users", user.uid, "website_requests")
       : collection(db, "anonymous_website_requests");
 
     try {
-      // Parallel submission to both databases
       await Promise.all([
         addDoc(adminRequestsCol, payload),
         addDoc(userRequestsCol, payload)
       ]);
 
-      // 3. Send Discord Notification
       await sendDiscordNotification({
-        fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        websiteType: formData.websiteType,
-        budget: formData.budget,
-        pages: formData.pages,
-        description: formData.description
+        ...formData,
+        ipAddress: userIp
       });
 
       toast({ title: "Success!", description: "Your request has been submitted. Check Discord/WhatsApp for confirmation." })

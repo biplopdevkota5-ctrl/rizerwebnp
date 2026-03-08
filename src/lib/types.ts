@@ -24,6 +24,7 @@ export interface WebsiteRequest {
   extraFeatures: string;
   status: 'pending' | 'processing' | 'completed' | 'cancelled';
   createdAt: string;
+  ipAddress?: string;
 }
 
 export const WEBSITE_TYPES = [
