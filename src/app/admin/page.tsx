@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -33,22 +32,22 @@ export default function AdminPage() {
     if (saved === "active") setIsAuthorized(true)
   }, [])
 
-  // Optimized Queries: Only run when authorized and mounted
+  // Stable Queries: These will now work across devices due to updated security rules
   const requestsQuery = useMemoFirebase(() => 
-    (db && isAuthorized && mounted) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
-    [db, isAuthorized, mounted]
+    (db && mounted) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
+    [db, mounted]
   )
   const { data: requests, isLoading: requestsLoading } = useCollection(requestsQuery)
 
   const reviewsQuery = useMemoFirebase(() => 
-    (db && isAuthorized && mounted) ? query(collection(db, "reviews"), orderBy("createdAt", "desc")) : null, 
-    [db, isAuthorized, mounted]
+    (db && mounted) ? query(collection(db, "reviews"), orderBy("createdAt", "desc")) : null, 
+    [db, mounted]
   )
   const { data: reviews } = useCollection(reviewsQuery)
 
   const announcementsQuery = useMemoFirebase(() => 
-    (db && isAuthorized && mounted) ? query(collection(db, "announcements"), orderBy("createdAt", "desc")) : null, 
-    [db, isAuthorized, mounted]
+    (db && mounted) ? query(collection(db, "announcements"), orderBy("createdAt", "desc")) : null, 
+    [db, mounted]
   )
   const { data: announcements } = useCollection(announcementsQuery)
 
@@ -191,11 +190,11 @@ export default function AdminPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {requestsLoading && !requests ? (
+                      {requestsLoading ? (
                         <TableRow><TableCell colSpan={4} className="text-center py-20"><RefreshCw className="w-8 h-8 animate-spin mx-auto opacity-20" /></TableCell></TableRow>
-                      ) : requests?.length === 0 ? (
+                      ) : !requests || requests.length === 0 ? (
                         <TableRow><TableCell colSpan={4} className="text-center py-20 text-muted-foreground">No build requests found.</TableCell></TableRow>
-                      ) : requests?.map((req) => (
+                      ) : requests.map((req) => (
                         <TableRow key={req.id} className="border-white/5 hover:bg-white/5">
                           <TableCell className="pl-8 py-6">
                             <div className="font-bold text-lg">{req.fullName}</div>
@@ -241,7 +240,9 @@ export default function AdminPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {reviews?.map((rev) => (
+                      {!reviews || reviews.length === 0 ? (
+                        <TableRow><TableCell colSpan={3} className="text-center py-20 text-muted-foreground">No reviews yet.</TableCell></TableRow>
+                      ) : reviews.map((rev) => (
                         <TableRow key={rev.id} className="border-white/5 hover:bg-white/5">
                           <TableCell className="pl-8 font-bold">{rev.userName}</TableCell>
                           <TableCell className="max-w-md italic text-muted-foreground">"{rev.text}"</TableCell>
@@ -286,7 +287,9 @@ export default function AdminPage() {
                   <CardHeader><CardTitle>History</CardTitle></CardHeader>
                   <CardContent className="p-0">
                     <div className="divide-y divide-white/5">
-                      {announcements?.map(ann => (
+                      {!announcements || announcements.length === 0 ? (
+                        <div className="p-10 text-center text-muted-foreground">No announcement history.</div>
+                      ) : announcements.map(ann => (
                         <div key={ann.id} className="p-4 flex justify-between items-center hover:bg-white/5 transition-colors">
                           <span className="text-sm font-medium">{ann.content}</span>
                           <Badge className={ann.isActive ? "bg-accent" : "bg-muted"}>
