@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { FloatingButton } from "@/components/FloatingButton"
-import { CheckCircle2, Zap, Shield, Globe, Cpu, Sparkles, Star, ArrowRight, RefreshCw } from "lucide-react"
+import { CheckCircle2, Zap, Shield, Globe, Cpu, Sparkles, Star, ArrowRight, RefreshCw, Megaphone } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
-import { collection, query, limit, where } from "firebase/firestore"
+import { collection, query, limit, where, orderBy } from "firebase/firestore"
 
 export default function Home() {
   const [mounted, setMounted] = React.useState(false)
@@ -20,6 +20,18 @@ export default function Home() {
     setMounted(true)
   }, [])
   
+  // Announcements: Fetch the latest active one
+  const announcementsQuery = useMemoFirebase(() => {
+    if (!db || !mounted) return null
+    // Simple order by is safer for cross-device sync without index lag
+    return query(collection(db, "announcements"), orderBy("createdAt", "desc"), limit(10))
+  }, [db, mounted])
+  const { data: announcementsData } = useCollection(announcementsQuery)
+  
+  const activeAnnouncement = React.useMemo(() => {
+    return announcementsData?.find(a => a.isActive)
+  }, [announcementsData])
+
   // Reviews: Stable query
   const reviewsQuery = useMemoFirebase(() => {
     if (!db || !mounted) return null
@@ -31,7 +43,6 @@ export default function Home() {
     if (!mounted) return []
     if (rawReviews && rawReviews.length > 0) return rawReviews
     
-    // Fallback static reviews if database is empty or loading
     return [
       { id: "1", userName: "Anish Sharma", rating: 5, text: "RIZERWEBNP transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
       { id: "2", userName: "Sita Gurung", rating: 5, text: "My portfolio looks futuristic and high-end. Biplop is a true professional developer who understands design." },
@@ -49,6 +60,16 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen selection:bg-primary/30 selection:text-primary overflow-x-hidden">
+      {/* Dynamic Announcement Banner */}
+      {activeAnnouncement && (
+        <div className="bg-primary text-primary-foreground py-3 px-4 text-center text-xs sm:text-sm font-bold animate-fade-in sticky top-0 z-[110] border-b border-white/10 shadow-lg">
+          <div className="container mx-auto flex items-center justify-center gap-2">
+            <Megaphone className="w-4 h-4 shrink-0 text-accent animate-pulse" />
+            <span className="tracking-tight">{activeAnnouncement.content}</span>
+          </div>
+        </div>
+      )}
+
       <Navbar />
       
       <main className="flex-1">

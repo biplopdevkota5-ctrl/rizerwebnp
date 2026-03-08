@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -33,20 +34,20 @@ export default function AdminPage() {
   }, [])
 
   const requestsQuery = useMemoFirebase(() => 
-    (db && mounted) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
-    [db, mounted]
+    (db && mounted && isAuthorized) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
+    [db, mounted, isAuthorized]
   )
   const { data: requests, isLoading: requestsLoading } = useCollection(requestsQuery)
 
   const reviewsQuery = useMemoFirebase(() => 
-    (db && mounted) ? query(collection(db, "reviews"), orderBy("createdAt", "desc")) : null, 
-    [db, mounted]
+    (db && mounted && isAuthorized) ? query(collection(db, "reviews"), orderBy("createdAt", "desc")) : null, 
+    [db, mounted, isAuthorized]
   )
   const { data: reviews } = useCollection(reviewsQuery)
 
   const announcementsQuery = useMemoFirebase(() => 
-    (db && mounted) ? query(collection(db, "announcements"), orderBy("createdAt", "desc")) : null, 
-    [db, mounted]
+    (db && mounted && isAuthorized) ? query(collection(db, "announcements"), orderBy("createdAt", "desc")) : null, 
+    [db, mounted, isAuthorized]
   )
   const { data: announcements } = useCollection(announcementsQuery)
 
@@ -106,6 +107,16 @@ export default function AdminPage() {
       })
       setAnnouncementInput("")
       toast({ title: "Live", description: "Notice published to homepage." })
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleDeleteAnnouncement = async (id: string) => {
+    if (!db || !confirm("Permanently delete this announcement?")) return
+    try {
+      await deleteDoc(doc(db, "announcements", id))
+      toast({ title: "Deleted", description: "Announcement removed from history." })
     } catch (err) {
       console.error(err)
     }
@@ -294,10 +305,23 @@ export default function AdminPage() {
                         <div className="p-10 text-center text-muted-foreground">No announcement history.</div>
                       ) : announcements.map(ann => (
                         <div key={ann.id} className="p-4 flex justify-between items-center hover:bg-white/5 transition-colors">
-                          <span className="text-sm font-medium">{ann.content}</span>
-                          <Badge className={ann.isActive ? "bg-accent" : "bg-muted"}>
-                            {ann.isActive ? "Active" : "Archived"}
-                          </Badge>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium">{ann.content}</span>
+                            <span className="text-[10px] text-muted-foreground">{new Date(ann.createdAt).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge className={ann.isActive ? "bg-accent" : "bg-muted"}>
+                              {ann.isActive ? "Active" : "Archived"}
+                            </Badge>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => handleDeleteAnnouncement(ann.id)} 
+                              className="text-destructive hover:bg-destructive/10 h-8 w-8 rounded-lg"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
                       ))}
                     </div>
