@@ -15,8 +15,9 @@ import { useToast } from "@/hooks/use-toast"
 import { Sparkles, Send, MessageCircle, Star } from "lucide-react"
 import { WEBSITE_TYPES } from "@/lib/types"
 import { aiDesignSuggestion } from "@/ai/flows/ai-design-suggestion-flow"
-import { useFirestore } from "@/firebase"
+import { useFirestore, useUser } from "@/firebase"
 import { collection, addDoc } from "firebase/firestore"
+import { cn } from "@/lib/utils"
 
 const WHATSAPP_NUM = "9805602394"
 
@@ -25,8 +26,8 @@ export default function RequestPage() {
   const router = useRouter()
   const { toast } = useToast()
   const db = useFirestore()
+  const { user } = useUser()
   
-  const [user, setUser] = React.useState<any>(null)
   const [loading, setLoading] = React.useState(false)
   const [aiLoading, setAiLoading] = React.useState(false)
 
@@ -52,13 +53,16 @@ export default function RequestPage() {
   })
 
   React.useEffect(() => {
-    const savedUser = localStorage.getItem('rizerweb_user')
-    if (savedUser) {
-      const u = JSON.parse(savedUser)
-      setUser(u)
-      setFormData(prev => ({ ...prev, fullName: u.name, email: u.email, phone: u.phone, whatsapp: u.phone }))
+    if (user) {
+      setFormData(prev => ({ 
+        ...prev, 
+        fullName: user.displayName || "", 
+        email: user.email || "", 
+        phone: prev.phone || "", 
+        whatsapp: prev.whatsapp || "" 
+      }))
     }
-  }, [])
+  }, [user])
 
   const handleAiSuggestion = async () => {
     if (!formData.description) {
@@ -83,11 +87,15 @@ export default function RequestPage() {
       toast({ title: "Login Required", description: "Please login to leave a review.", variant: "destructive" })
       return
     }
+    if (!reviewData.text) {
+      toast({ title: "Review Empty", description: "Please write something about our service.", variant: "destructive" })
+      return
+    }
 
     try {
       await addDoc(collection(db, "reviews"), {
-        userId: user.id,
-        userName: user.name,
+        userId: user.uid,
+        userName: user.displayName || "Anonymous",
         text: reviewData.text,
         rating: reviewData.rating,
         status: "pending",
@@ -109,7 +117,7 @@ export default function RequestPage() {
       // 1. Save to Firestore
       await addDoc(collection(db, "requests"), {
         ...formData,
-        userId: user?.id || 'guest',
+        userId: user?.uid || 'guest',
         userName: formData.fullName,
         status: 'pending',
         createdAt: new Date().toISOString()
@@ -118,7 +126,7 @@ export default function RequestPage() {
       toast({ title: "Success!", description: "Your request has been submitted to Firestore." })
 
       // 2. Redirect to WhatsApp
-      const waMessage = `Hello, I submitted a website request on RIZERWEBNP.\nName: ${formData.fullName}\nType: ${formData.websiteType}`
+      const waMessage = `Hello, I submitted a website request on RIZERWEBNP.\nName: ${formData.fullName}\nType: ${formData.websiteType}\nBudget: ${formData.budget}`
       const encodedMsg = encodeURIComponent(waMessage)
       
       setTimeout(() => {
@@ -134,87 +142,102 @@ export default function RequestPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col selection:bg-primary/30 selection:text-primary overflow-x-hidden">
       <Navbar />
       <main className="flex-1 py-12">
-        <div className="container mx-auto px-4 max-w-4xl space-y-12">
+        <div className="container mx-auto px-4 max-w-4xl space-y-10 md:space-y-16">
           {/* Main Request Form */}
-          <Card className="glass border-border/50 shadow-2xl">
-            <CardHeader className="text-center">
-              <CardTitle className="font-headline text-4xl font-bold">Request Your Website</CardTitle>
-              <CardDescription>All requests are now saved securely in our cloud database.</CardDescription>
+          <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
+            <CardHeader className="text-center bg-white/5 pt-10 pb-8">
+              <CardTitle className="font-headline text-3xl md:text-5xl font-bold mb-2">Request Your Website</CardTitle>
+              <CardDescription className="text-muted-foreground font-medium">All requests are saved securely in our cloud database.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CardContent className="p-6 md:p-12">
+              <form onSubmit={handleSubmit} className="space-y-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                   {/* Basic Info */}
-                  <div className="space-y-4">
-                    <h3 className="font-headline font-semibold text-lg border-b border-border pb-2">Contact Details</h3>
-                    <div className="space-y-2">
-                      <Label htmlFor="fullName">Full Name</Label>
-                      <Input id="fullName" required value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} className="glass" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input id="email" type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="glass" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input id="phone" type="tel" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="glass" />
+                  <div className="space-y-6">
+                    <h3 className="font-headline font-bold text-xl flex items-center gap-2">
+                      <div className="w-1.5 h-6 bg-primary rounded-full" />
+                      Contact Details
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="fullName" className="font-bold">Full Name</Label>
+                        <Input id="fullName" required value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} className="glass h-12 rounded-xl" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="font-bold">Email</Label>
+                        <Input id="email" type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="glass h-12 rounded-xl" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" className="font-bold">Phone Number</Label>
+                        <Input id="phone" type="tel" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="glass h-12 rounded-xl" />
+                      </div>
                     </div>
                   </div>
 
                   {/* Website Info */}
-                  <div className="space-y-4">
-                    <h3 className="font-headline font-semibold text-lg border-b border-border pb-2">Website Specification</h3>
-                    <div className="space-y-2">
-                      <Label htmlFor="websiteType">Website Type</Label>
-                      <Select value={formData.websiteType} onValueChange={val => setFormData({...formData, websiteType: val})}>
-                        <SelectTrigger id="websiteType" className="glass">
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {WEBSITE_TYPES.map(t => (
-                            <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="budget">Budget Amount (NPR / USD)</Label>
-                      <Input id="budget" placeholder="e.g. $100 or 15,000 NPR" required value={formData.budget} onChange={e => setFormData({...formData, budget: e.target.value})} className="glass" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="pages">Pages Needed</Label>
-                      <Input id="pages" placeholder="Home, About..." required value={formData.pages} onChange={e => setFormData({...formData, pages: e.target.value})} className="glass" />
+                  <div className="space-y-6">
+                    <h3 className="font-headline font-bold text-xl flex items-center gap-2">
+                      <div className="w-1.5 h-6 bg-accent rounded-full" />
+                      Specification
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="websiteType" className="font-bold">Website Type</Label>
+                        <Select value={formData.websiteType} onValueChange={val => setFormData({...formData, websiteType: val})}>
+                          <SelectTrigger id="websiteType" className="glass h-12 rounded-xl">
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                          <SelectContent className="glass">
+                            {WEBSITE_TYPES.map(t => (
+                              <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="budget" className="font-bold">Budget (NPR / USD)</Label>
+                        <Input id="budget" placeholder="e.g. $100 or 15,000 NPR" required value={formData.budget} onChange={e => setFormData({...formData, budget: e.target.value})} className="glass h-12 rounded-xl" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="pages" className="font-bold">Pages Needed</Label>
+                        <Input id="pages" placeholder="Home, About, Services..." required value={formData.pages} onChange={e => setFormData({...formData, pages: e.target.value})} className="glass h-12 rounded-xl" />
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-6">
-                  <h3 className="font-headline font-semibold text-lg border-b border-border pb-2">Project Details</h3>
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Vision Description</Label>
-                    <Textarea id="description" className="min-h-[100px] glass" placeholder="Explain what your website should do..." required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="designStyle">Design Style & Idea</Label>
-                      <Button type="button" variant="ghost" size="sm" onClick={handleAiSuggestion} disabled={aiLoading} className="text-primary">
-                        {aiLoading ? "Thinking..." : <><Sparkles className="w-4 h-4 mr-2" /> AI Suggest Design</>}
-                      </Button>
+                <div className="space-y-8">
+                  <h3 className="font-headline font-bold text-xl flex items-center gap-2">
+                    <div className="w-1.5 h-6 bg-primary rounded-full" />
+                    Project Details
+                  </h3>
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="description" className="font-bold">Vision Description</Label>
+                      <Textarea id="description" className="min-h-[120px] glass rounded-2xl p-4" placeholder="Explain what your website should do and any core business goals..." required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
                     </div>
-                    <Textarea id="designStyle" className="min-h-[120px] glass" value={formData.designStyle} onChange={e => setFormData({...formData, designStyle: e.target.value})} />
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="designStyle" className="font-bold">Design Style & Idea</Label>
+                        <Button type="button" variant="ghost" size="sm" onClick={handleAiSuggestion} disabled={aiLoading} className="text-primary hover:bg-primary/10 font-black text-xs uppercase tracking-wider">
+                          {aiLoading ? "AI Thinking..." : <><Sparkles className="w-3 h-3 mr-2" /> AI Suggest Design</>}
+                        </Button>
+                      </div>
+                      <Textarea id="designStyle" className="min-h-[150px] glass rounded-2xl p-4" placeholder="Describe the aesthetic (e.g. dark, minimalist, futuristic)..." value={formData.designStyle} onChange={e => setFormData({...formData, designStyle: e.target.value})} />
+                    </div>
                   </div>
                 </div>
 
-                <div className="pt-6 flex flex-col md:flex-row gap-4">
-                  <Button type="submit" size="lg" className="flex-1 h-14 rounded-full text-lg shadow-xl" disabled={loading}>
-                    <Send className="w-5 h-5 mr-2" />
-                    {loading ? "Submitting..." : "Submit to Cloud"}
+                <div className="pt-6 flex flex-col sm:flex-row gap-4">
+                  <Button type="submit" size="lg" className="flex-1 h-14 rounded-2xl text-lg font-black shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-all" disabled={loading}>
+                    <Send className="w-5 h-5 mr-3" />
+                    {loading ? "Submitting..." : "Submit Project"}
                   </Button>
-                  <Button type="button" variant="outline" size="lg" className="flex-1 h-14 rounded-full text-lg glass shadow-xl" onClick={() => window.open(`https://wa.me/${WHATSAPP_NUM}`, '_blank')}>
-                    <MessageCircle className="w-5 h-5 mr-2" />
+                  <Button type="button" variant="outline" size="lg" className="flex-1 h-14 rounded-2xl text-lg glass border-white/10 font-bold shadow-xl hover:scale-[1.02] transition-all" onClick={() => window.open(`https://wa.me/${WHATSAPP_NUM}`, '_blank')}>
+                    <MessageCircle className="w-5 h-5 mr-3 text-[#25D366]" />
                     Direct WhatsApp
                   </Button>
                 </div>
@@ -224,27 +247,29 @@ export default function RequestPage() {
 
           {/* Review Submission Form */}
           {user && (
-            <Card className="glass border-accent/30 shadow-2xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="w-6 h-6 text-accent fill-accent" />
+            <Card className="glass border-accent/20 shadow-2xl rounded-[2.5rem] overflow-hidden">
+              <CardHeader className="bg-white/5 p-8">
+                <CardTitle className="flex items-center gap-3 font-headline text-2xl md:text-3xl font-bold">
+                  <Star className="w-8 h-8 text-accent fill-accent" />
                   Leave a Review
                 </CardTitle>
-                <CardDescription>Share your experience with others.</CardDescription>
+                <CardDescription className="font-medium">Share your experience with the RIZERWEBNP community.</CardDescription>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmitReview} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Rating (1-5)</Label>
-                    <div className="flex gap-2">
+              <CardContent className="p-8 md:p-12">
+                <form onSubmit={handleSubmitReview} className="space-y-8">
+                  <div className="space-y-4">
+                    <Label className="font-bold">Rating (1-5 Stars)</Label>
+                    <div className="flex gap-3">
                       {[1, 2, 3, 4, 5].map((num) => (
                         <button
                           key={num}
                           type="button"
                           onClick={() => setReviewData({ ...reviewData, rating: num })}
                           className={cn(
-                            "p-2 rounded-lg border transition-all",
-                            reviewData.rating >= num ? "bg-accent border-accent text-white" : "glass border-border"
+                            "w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-2 transition-all flex items-center justify-center font-black text-lg",
+                            reviewData.rating >= num 
+                              ? "bg-accent border-accent text-white shadow-lg shadow-accent/20" 
+                              : "glass border-white/10 text-muted-foreground hover:border-accent/50"
                           )}
                         >
                           {num}
@@ -253,15 +278,15 @@ export default function RequestPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Your Feedback</Label>
+                    <Label className="font-bold">Your Feedback</Label>
                     <Textarea 
-                      placeholder="How was our service?" 
+                      placeholder="How was our service? What did you love about your new website?" 
                       value={reviewData.text} 
                       onChange={e => setReviewData({ ...reviewData, text: e.target.value })}
-                      className="glass"
+                      className="glass rounded-2xl min-h-[120px] p-4"
                     />
                   </div>
-                  <Button type="submit" variant="secondary" className="w-full font-bold">Post Review</Button>
+                  <Button type="submit" variant="secondary" className="w-full h-14 font-black rounded-2xl text-lg hover:bg-accent hover:text-white transition-all">Post Review</Button>
                 </form>
               </CardContent>
             </Card>
