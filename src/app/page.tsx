@@ -37,9 +37,9 @@ export default function Home() {
     if (rawReviews && rawReviews.length > 0) return rawReviews
     
     return [
-      { userName: "Anish Sharma", rating: 5, text: "RIZERWEBNP transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
-      { userName: "Sita Gurung", rating: 5, text: "My portfolio looks futuristic and high-end. Biplop is a true professional developer who understands design." },
-      { userName: "Rahul KC", rating: 5, text: "Unbeatable price for such a premium feel. Highly recommend the custom features and animations!" },
+      { id: "1", userName: "Anish Sharma", rating: 5, text: "RIZERWEBNP transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
+      { id: "2", userName: "Sita Gurung", rating: 5, text: "My portfolio looks futuristic and high-end. Biplop is a true professional developer who understands design." },
+      { id: "3", userName: "Rahul KC", rating: 5, text: "Unbeatable price for such a premium feel. Highly recommend the custom features and animations!" },
     ]
   }, [rawReviews])
 
@@ -134,19 +134,18 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {displayReviews.map((t: any, i) => (
                 <div 
-                  key={i} 
+                  key={t.id || i} 
                   className={cn(
                     "p-8 rounded-3xl glass border border-white/5 hover:border-primary/50 transition-all duration-500 group relative",
                     i % 2 === 0 ? "md:animate-float" : "md:animate-float-slow"
                   )}
                 >
                   <div className="flex gap-1 mb-6">
-                    {Array.from({ length: 5 }).map((_, starIdx) => {
-                      const starVal = starIdx + 1;
+                    {[1, 2, 3, 4, 5].map((starVal) => {
                       const isFull = starVal <= (t.rating || 0);
                       return (
                         <Star 
-                          key={starIdx} 
+                          key={starVal} 
                           className={cn(
                             "w-4 h-4",
                             isFull ? "fill-accent text-accent" : "text-white/20"
