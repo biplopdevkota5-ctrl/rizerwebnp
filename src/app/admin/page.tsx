@@ -33,6 +33,7 @@ export default function AdminPage() {
     if (saved === "active") setIsAuthorized(true)
   }, [])
 
+  // Stable queries that only activate when authorized
   const requestsQuery = useMemoFirebase(() => 
     (db && mounted && isAuthorized) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
     [db, mounted, isAuthorized]
@@ -213,7 +214,6 @@ export default function AdminPage() {
                               <Phone className="w-3 h-3" />
                               {req.phone || req.whatsapp || 'N/A'}
                             </div>
-                            {req.ipAddress && <div className="text-[9px] text-primary/60 font-mono mt-1">IP: {req.ipAddress}</div>}
                           </TableCell>
                           <TableCell className="capitalize font-bold">{req.websiteType}</TableCell>
                           <TableCell>
