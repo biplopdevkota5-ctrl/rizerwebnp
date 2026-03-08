@@ -1,4 +1,3 @@
-
 import Link from "next/link"
 import { Instagram, Github, Mail, Phone, MapPin, Twitter } from "lucide-react"
 
@@ -36,11 +35,11 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-primary" />
-                biplop@rizerwebnp.com
+                dematweb@gmail.com
               </li>
               <li className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" />
-                Kathmandu, Nepal 🇳🇵
+                Gaidakot, Nepal 🇳🇵
               </li>
             </ul>
           </div>
