@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -92,60 +93,61 @@
         },
         "userId": {
           "type": "string",
-          "description": "Reference to the User who submitted this request, if logged in. (Relationship: User 1:N WebsiteRequest)"
+          "description": "Reference to the User who submitted this request, if logged in."
         },
         "fullName": {
           "type": "string",
-          "description": "The full name of the person submitting the request, as entered in the form."
+          "description": "The full name of the person submitting the request."
         },
         "email": {
           "type": "string",
-          "description": "The email address for contact regarding this request, as entered in the form.",
+          "description": "The email address for contact.",
           "format": "email"
         },
         "phoneNumber": {
           "type": "string",
-          "description": "The primary phone number for contact regarding this request, as entered in the form."
+          "description": "The primary phone number for contact."
         },
         "whatsAppNumber": {
           "type": "string",
-          "description": "The WhatsApp number for direct communication, as entered in the form."
+          "description": "The WhatsApp number for direct communication."
         },
         "websiteTypeId": {
           "type": "string",
-          "description": "Reference to the WebsiteType chosen or specified for this request. (Relationship: WebsiteType 1:N WebsiteRequest)"
+          "description": "Reference to the WebsiteType chosen."
         },
         "budgetAmount": {
           "type": "number",
-          "description": "The budget specified by the user for the website project."
+          "description": "The budget specified by the user."
         },
         "websiteTitle": {
           "type": "string",
-          "description": "The proposed title or main subject of the requested website."
+          "description": "The proposed title of the requested website."
         },
         "websiteDescription": {
           "type": "string",
-          "description": "A detailed description of the website requirements and purpose."
+          "description": "A detailed description of the website requirements."
         },
         "functionsRequired": {
           "type": "string",
-          "description": "A free-text field detailing specific functions or features the website needs."
+          "description": "Specific functions or features the website needs."
         },
         "pagesNeeded": {
           "type": "string",
-          "description": "A description or number of pages required for the website."
+          "description": "Description or number of pages required."
         },
         "designStyle": {
           "type": "string",
-          "description": "User's ideas or preferences for the website's design and aesthetics."
+          "description": "User's ideas for the website's design."
         },
         "extraFeatures": {
           "type": "string",
-          "description": "Any additional features or specific requests not covered elsewhere."
+          "description": "Any additional features or specific requests."
         },
         "status": {
           "type": "string",
-          "description": "The current status of the website request (e.g., 'Pending', 'Reviewed', 'In Progress', 'Completed', 'Cancelled')."
+          "description": "The current status of the website request.",
+          "enum": ["pending", "processing", "completed", "cancelled"]
         },
         "createdAt": {
           "type": "string",
@@ -154,7 +156,7 @@
         },
         "updatedAt": {
           "type": "string",
-          "description": "Timestamp indicating when the website request was last updated (e.g., status changed by admin).",
+          "description": "Timestamp indicating when the website request was last updated.",
           "format": "date-time"
         }
       },
@@ -163,18 +165,33 @@
         "fullName",
         "email",
         "phoneNumber",
-        "whatsAppNumber",
-        "websiteTypeId",
-        "budgetAmount",
-        "websiteTitle",
-        "websiteDescription",
-        "functionsRequired",
-        "pagesNeeded",
-        "designStyle",
-        "extraFeatures",
         "status",
         "createdAt"
       ]
+    },
+    "Announcement": {
+      "title": "Announcement",
+      "type": "object",
+      "description": "Global announcements displayed on the homepage.",
+      "properties": {
+        "content": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "type": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Review": {
+      "title": "Review",
+      "type": "object",
+      "description": "Client testimonials and reviews.",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "text": { "type": "string" },
+        "rating": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
     }
   },
   "auth": {
@@ -192,13 +209,7 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Stores individual user profiles. Access is restricted to the owning user, where 'userId' matches 'request.auth.uid'. The 'id' field within the document must also match 'userId' in the path for data integrity. This is private user data.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user, corresponding to Firebase Authentication UID."
-            }
-          ]
+          "description": "Stores individual user profiles."
         }
       },
       {
@@ -208,13 +219,7 @@
           "schema": {
             "$ref": "#/backend/entities/WebsiteType"
           },
-          "description": "Contains definitions of different website categories offered by RIZERWEBNP. These documents are publicly readable by all users and are only writable by administrators.",
-          "params": [
-            {
-              "name": "websiteTypeId",
-              "description": "The unique identifier for a specific website type."
-            }
-          ]
+          "description": "Definitions of different website categories offered."
         }
       },
       {
@@ -224,17 +229,7 @@
           "schema": {
             "$ref": "#/backend/entities/WebsiteRequest"
           },
-          "description": "Stores website requests submitted by logged-in users. Each document includes a denormalized 'userId' field that must match the 'userId' in the path, ensuring authorization independence. Users can view, edit, and delete only their own requests. Admins can access all requests.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who submitted the request, corresponding to Firebase Authentication UID."
-            },
-            {
-              "name": "websiteRequestId",
-              "description": "The unique identifier for a specific website request."
-            }
-          ]
+          "description": "Website requests submitted by logged-in users."
         }
       },
       {
@@ -244,13 +239,7 @@
           "schema": {
             "$ref": "#/backend/entities/WebsiteRequest"
           },
-          "description": "Stores website requests submitted by users who are not logged in. These documents will not contain a 'userId' field. Access to this collection (read, write, list) is strictly limited to administrators.",
-          "params": [
-            {
-              "name": "websiteRequestId",
-              "description": "The unique identifier for a specific anonymous website request."
-            }
-          ]
+          "description": "Website requests submitted by non-logged-in users."
         }
       },
       {
@@ -260,16 +249,33 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "A dedicated collection where the document ID ('userId') is the Firebase Authentication UID of a user who has administrator privileges. The mere existence of a document in this collection for a given UID grants admin rights.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of a user who holds the administrator role."
-            }
-          ]
+          "description": "Marker collection for administrator privileges."
+        }
+      },
+      {
+        "path": "/announcements/{announcementId}",
+        "definition": {
+          "entityName": "Announcement",
+          "schema": { "$ref": "#/backend/entities/Announcement" },
+          "description": "Global announcements managed by admin."
+        }
+      },
+      {
+        "path": "/reviews/{reviewId}",
+        "definition": {
+          "entityName": "Review",
+          "schema": { "$ref": "#/backend/entities/Review" },
+          "description": "User reviews for the platform."
+        }
+      },
+      {
+        "path": "/requests/{requestId}",
+        "definition": {
+          "entityName": "WebsiteRequest",
+          "schema": { "$ref": "#/backend/entities/WebsiteRequest" },
+          "description": "Flat requests collection used by the admin panel for easy management."
         }
       }
-    ],
-    "reasoning": "The Firestore data structure for RIZERWEBNP is designed to prioritize Authorization Independence, Structural Segregation, and robust QAP (Query-Aware Permissions) support, as mandated by the core design principles. \n\n**Authorization Independence:**\n1.  **User Profiles (`/users/{userId}`):** Each user's profile document is placed directly under their unique UID. This makes authorization trivial: `request.auth.uid == userId`. No `get()` calls to parent documents are necessary.\n2.  **User-Owned Website Requests (`/users/{userId}/website_requests/{websiteRequestId}`):** Each request submitted by a logged-in user is stored in a subcollection under their `/users/{userId}` path. Crucially, the `WebsiteRequest` document itself includes a `userId` field which *must* match the `userId` wildcard in the path. This denormalization means that security rules can verify ownership by simply comparing `request.auth.uid` with the path's `userId` (and optionally the document's `userId` for integrity checks), eliminating any need for `get()` operations. This enables atomic creation and manipulation of requests without complex transactional dependencies on parent data.\n3.  **Anonymous Website Requests (`/anonymous_website_requests/{websiteRequestId}`):** These requests are separate and do not rely on user authentication for their primary authorization, instead being solely accessible by administrators. This complete segregation ensures independence from user-specific authentication logic.\n4.  **Website Types (`/website_types/{websiteTypeId}`):** These are public and read-only for general users, and only writable by administrators. Their access is independent of user-specific data.\n5.  **Admin Roles (`/roles_admin/{userId}`):** Admin authorization is handled by checking the existence of a document in this dedicated collection (`exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid))`). This is a direct, atomic check without requiring any hierarchical data fetches.\n\n**QAPs (Query-Aware Permissions) Support:**\nQAPs require that `list` operations only return documents for which the user *already has* read permission, without relying on client-side query filters. This structure achieves this through:\n1.  **Public Collections (`/website_types/{websiteTypeId}`):** These are entirely public, so any `list` operation is permitted, as all documents are readable by everyone.\n2.  **User-Scoped Subcollections (`/users/{userId}/website_requests/{websiteRequestId}`):** By placing a user's requests under their specific `userId` path, a `list` operation on `/users/$(request.auth.uid)/website_requests` inherently ensures that *all* returned documents belong to the authenticated user. The security rule for this subcollection can simply check `request.auth.uid == userId` (where `userId` is the path wildcard), satisfying the QAP requirement that all listed items are authorized.\n3.  **Admin-Only Collections (`/anonymous_website_requests/{websiteRequestId}`):** Only administrators can `list` this collection, as every document within it is accessible by an admin. This ensures that any `list` performed by an admin returns authorized documents, and non-admins are prevented from listing anything.\n4.  **Implicit for `users/{userId}`:** User profiles are generally `get`-only for the owning user, preventing unauthorized `list` attempts on the `/users` collection.\n\nThis design leverages structural segregation to ensure homogeneous security postures within collections, making security rules simpler, more robust, and easier to debug, while fully supporting authorization independence and QAPs."
+    ]
   }
 }
