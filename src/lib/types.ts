@@ -27,12 +27,52 @@ export interface WebsiteRequest {
 }
 
 export const WEBSITE_TYPES = [
-  { id: 'business', label: 'Business Website', price: '$49' },
-  { id: 'portfolio', label: 'Portfolio Website', price: '$39' },
-  { id: 'blog', label: 'Blog Website', price: '$29' },
-  { id: 'ecommerce', label: 'Ecommerce Website', price: '$99' },
-  { id: 'gaming', label: 'Gaming Website', price: '$59' },
-  { id: 'hotel', label: 'Hotel / Resort Website', price: '$79' },
-  { id: 'streaming', label: 'Streaming Website', price: '$129' },
-  { id: 'custom', label: 'Custom Website', price: 'Varies' }
+  { 
+    id: 'business', 
+    label: 'Business Website', 
+    price: '$149 - $250',
+    features: ['Corporate Design', 'SEO Optimization', 'Contact Forms', 'Service Pages']
+  },
+  { 
+    id: 'portfolio', 
+    label: 'Portfolio Website', 
+    price: '$100 - $129',
+    features: ['Creative Showcase', 'Gallery System', 'Personal Branding', 'Mobile Ready']
+  },
+  { 
+    id: 'blog', 
+    label: 'Blog Website', 
+    price: '$79 - $99',
+    features: ['Article Management', 'Social Sharing', 'Newsletter Integration', 'Comments']
+  },
+  { 
+    id: 'ecommerce', 
+    label: 'Ecommerce Website', 
+    price: '$299+',
+    features: ['Payment Gateway', 'Inventory System', 'Cart/Checkout', 'User Accounts']
+  },
+  { 
+    id: 'gaming', 
+    label: 'Gaming Website', 
+    price: '$149 - $199',
+    features: ['E-sports Layout', 'Stream Integration', 'Community Forums', 'Dark Mode']
+  },
+  { 
+    id: 'hotel', 
+    label: 'Hotel / Resort Website', 
+    price: '$199 - $299',
+    features: ['Booking Calendar', 'Room Showcase', 'Maps Integration', 'Testimonials']
+  },
+  { 
+    id: 'streaming', 
+    label: 'Streaming Website', 
+    price: '$399+',
+    features: ['Video Management', 'Subscription Model', 'High Performance', 'Chat System']
+  },
+  { 
+    id: 'custom', 
+    label: 'Custom Website', 
+    price: 'Varies',
+    features: ['Tailored Solutions', 'Any Functionality', 'Scalable Architecture', 'Full Control']
+  }
 ];
