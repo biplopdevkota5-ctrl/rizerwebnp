@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -149,7 +148,7 @@ export default function Home() {
                   <div className="flex gap-1 mb-6">
                     {Array.from({ length: 5 }).map((_, starIdx) => {
                       const starVal = starIdx + 1;
-                      const isFull = starVal <= Math.floor(t.rating);
+                      const isFull = starVal <= (t.rating || 0);
                       return (
                         <Star 
                           key={starIdx} 

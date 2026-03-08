@@ -56,31 +56,31 @@
     }
   },
   "auth": {
-    "providers": ["password", "google.com", "anonymous"]
+    "providers": ["password", "google.com"]
   },
   "firestore": {
     "/users/{userId}": {
-      "schema": "User",
+      "schema": { "$ref": "#/entities/User" },
       "description": "User profiles."
     },
     "/announcements/{announcementId}": {
-      "schema": "Announcement",
+      "schema": { "$ref": "#/entities/Announcement" },
       "description": "Global announcements."
     },
     "/reviews/{reviewId}": {
-      "schema": "Review",
+      "schema": { "$ref": "#/entities/Review" },
       "description": "Client reviews."
     },
     "/users/{userId}/website_requests/{requestId}": {
-      "schema": "WebsiteRequest",
+      "schema": { "$ref": "#/entities/WebsiteRequest" },
       "description": "User specific requests."
     },
     "/requests/{requestId}": {
-      "schema": "WebsiteRequest",
+      "schema": { "$ref": "#/entities/WebsiteRequest" },
       "description": "All requests for admin view."
     },
     "/roles_admin/{userId}": {
-      "schema": "User",
+      "schema": { "$ref": "#/entities/User" },
       "description": "Admin role markers."
     }
   }
