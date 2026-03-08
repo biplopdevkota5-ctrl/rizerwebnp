@@ -27,24 +27,24 @@
     --radius: 0.75rem;
   }
   .dark {
-    --background: 232 17% 9%; /* Darker background for more depth */
-    --foreground: 232 10% 100%; /* Pure white for maximum visibility */
-    --card: 232 17% 12%;
+    --background: 232 17% 7%; /* Slightly deeper background */
+    --foreground: 232 10% 100%;
+    --card: 232 17% 10%;
     --card-foreground: 232 10% 100%;
-    --popover: 232 17% 9%;
+    --popover: 232 17% 7%;
     --popover-foreground: 232 10% 100%;
     --primary: 240 39% 52%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 232 17% 15%;
+    --secondary: 232 17% 12%;
     --secondary-foreground: 232 10% 100%;
-    --muted: 232 17% 14%;
-    --muted-foreground: 232 10% 90%; /* Much brighter muted text */
+    --muted: 232 17% 12%;
+    --muted-foreground: 232 10% 80%;
     --accent: 207 83% 63%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 232 17% 25%;
-    --input: 232 17% 25%;
+    --border: 232 17% 20%;
+    --input: 232 17% 20%;
     --ring: 240 39% 52%;
   }
 }
@@ -64,48 +64,31 @@
   }
 }
 
+/* Made glass more solid as per user request for "non-transparent" feel */
 .glass {
-  @apply bg-background/90 backdrop-blur-2xl border border-white/20 shadow-2xl;
+  @apply bg-background/95 backdrop-blur-3xl border border-white/20 shadow-2xl;
 }
 
 .gradient-bg {
-  background: radial-gradient(circle at top left, hsla(240, 39%, 52%, 0.15), transparent 40%),
-              radial-gradient(circle at bottom right, hsla(207, 83%, 63%, 0.15), transparent 40%);
+  background: radial-gradient(circle at top left, hsla(240, 39%, 52%, 0.1), transparent 40%),
+              radial-gradient(circle at bottom right, hsla(207, 83%, 63%, 0.1), transparent 40%);
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(30px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes float {
   0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-15px) rotate(1deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
-}
-
-@keyframes float-slow {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(-1deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
   100% { transform: translateY(0px) rotate(0deg); }
 }
 
 .animate-fade-in {
-  animation: fade-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-float {
-  animation: float 5s ease-in-out infinite;
-}
-
-.animate-float-slow {
-  animation: float-slow 7s ease-in-out infinite;
-}
-
-.staggered-entry {
-  opacity: 0;
-}
-
-.staggered-entry.visible {
-  animation: fade-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: float 4s ease-in-out infinite;
 }

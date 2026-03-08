@@ -1,10 +1,11 @@
+
 "use client"
 
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { LayoutGrid, PlusCircle, User as UserIcon, LogOut } from "lucide-react"
+import { LayoutGrid, PlusCircle, User as UserIcon, LogOut, Menu } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useUser, useAuth } from "@/firebase"
 import { signOut } from "firebase/auth"
@@ -20,8 +21,6 @@ export function Navbar() {
   const clickTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
 
   const handleLogoClick = (e: React.MouseEvent) => {
-    // We prevent default if we are about to trigger the secret navigation
-    // but usually, we just let the link work normally unless it's the 10th click.
     const newCount = logoClicks + 1
     
     if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current)
@@ -50,19 +49,20 @@ export function Navbar() {
   ]
 
   return (
-    <nav className="sticky top-0 z-[100] w-full border-b border-white/10 bg-background shadow-md">
+    <nav className="sticky top-0 z-[100] w-full border-b border-white/10 bg-background shadow-xl">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link 
-          href="/" 
+        <div 
           onClick={handleLogoClick}
-          className="flex items-center gap-2 group shrink-0 transition-transform active:scale-95"
+          className="flex items-center gap-2 group shrink-0 transition-transform active:scale-95 cursor-pointer"
         >
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold group-hover:scale-110 transition-transform shadow-lg shadow-primary/20">R</div>
-          <span className="font-headline font-bold text-xl tracking-tight text-foreground hidden sm:inline">RIZER WEB <span className="text-primary">APP</span></span>
-          <span className="font-headline font-bold text-xl tracking-tight text-foreground sm:hidden">RIZER</span>
-        </Link>
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold group-hover:scale-110 transition-transform shadow-lg shadow-primary/20">R</div>
+            <span className="font-headline font-bold text-xl tracking-tight text-foreground hidden sm:inline">RIZER WEB <span className="text-primary">APP</span></span>
+            <span className="font-headline font-bold text-xl tracking-tight text-foreground sm:hidden">RIZER</span>
+          </Link>
+        </div>
 
-        {/* Desktop Navigation Links - Hidden on small screens */}
+        {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <Link 
@@ -80,10 +80,10 @@ export function Navbar() {
           <div className="h-6 w-px bg-white/10 mx-2" />
         </div>
 
-        {/* Auth Actions - Direct buttons, no hamburger menu */}
+        {/* Mobile & Desktop Auth Actions */}
         <div className="flex items-center gap-2">
           {user ? (
-            <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-2">
               <Link href="/dashboard" className="text-sm font-bold text-foreground hover:text-primary transition-colors flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <UserIcon className="w-4 h-4 text-primary" />
@@ -95,15 +95,22 @@ export function Navbar() {
               </Button>
             </div>
           ) : (
-            <div className="flex items-center gap-1 sm:gap-2">
-              <Link href="/auth/login">
-                <Button variant="ghost" size="sm" className="font-bold h-9 px-2 sm:px-4 text-xs sm:text-sm">Login</Button>
+            <div className="flex items-center gap-2">
+              <Link href="/auth/login" className="hidden xs:block">
+                <Button variant="ghost" size="sm" className="font-bold h-9 px-4">Login</Button>
               </Link>
               <Link href="/auth/signup">
-                <Button size="sm" className="font-bold rounded-full h-9 px-3 sm:px-6 text-xs sm:text-sm shadow-lg shadow-primary/20">Sign Up</Button>
+                <Button size="sm" className="font-bold rounded-full h-9 px-6 shadow-lg shadow-primary/20">Sign Up</Button>
               </Link>
             </div>
           )}
+          
+          {/* Mobile Menu Toggle - Now navigates to /menu as requested */}
+          <Link href="/menu" className="md:hidden">
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <Menu className="w-6 h-6" />
+            </Button>
+          </Link>
         </div>
       </div>
     </nav>

@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -94,11 +95,11 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="absolute top-1/2 left-0 w-64 h-64 md:w-96 md:h-96 bg-primary/20 rounded-full blur-[80px] md:blur-[120px] -translate-y-1/2 -translate-x-1/2 opacity-50" />
-          <div className="absolute bottom-0 right-0 w-64 h-64 md:w-96 md:h-96 bg-accent/20 rounded-full blur-[80px] md:blur-[120px] translate-x-1/4 opacity-50" />
+          <div className="absolute top-1/2 left-0 w-64 h-64 md:w-96 md:h-96 bg-primary/20 rounded-full blur-[80px] md:blur-[120px] -translate-y-1/2 -translate-x-1/2 opacity-30" />
+          <div className="absolute bottom-0 right-0 w-64 h-64 md:w-96 md:h-96 bg-accent/20 rounded-full blur-[80px] md:blur-[120px] translate-x-1/4 opacity-30" />
         </section>
 
-        <section className="py-20 md:py-24 bg-black/20">
+        <section className="py-20 md:py-24 bg-black/10">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 md:mb-16 space-y-4">
               <h2 className="text-3xl md:text-5xl font-headline font-bold text-foreground">Why Choose RIZERWEBNP?</h2>
@@ -136,23 +137,19 @@ export default function Home() {
                 <div 
                   key={t.id || i} 
                   className={cn(
-                    "p-8 rounded-3xl glass border border-white/5 hover:border-primary/50 transition-all duration-500 group relative",
-                    i % 2 === 0 ? "md:animate-float" : "md:animate-float-slow"
+                    "p-8 rounded-3xl glass border border-white/5 hover:border-primary/50 transition-all duration-500 group relative shadow-2xl"
                   )}
                 >
                   <div className="flex gap-1 mb-6">
-                    {[1, 2, 3, 4, 5].map((starVal) => {
-                      const isFull = starVal <= (t.rating || 0);
-                      return (
-                        <Star 
-                          key={starVal} 
-                          className={cn(
-                            "w-4 h-4",
-                            isFull ? "fill-accent text-accent" : "text-white/20"
-                          )} 
-                        />
-                      );
-                    })}
+                    {[1, 2, 3, 4, 5].map((starVal) => (
+                      <Star 
+                        key={starVal} 
+                        className={cn(
+                          "w-4 h-4",
+                          starVal <= (t.rating || 0) ? "fill-accent text-accent" : "text-white/20"
+                        )} 
+                      />
+                    ))}
                     <span className="ml-2 text-xs font-black text-accent tracking-tighter">{t.rating} / 5</span>
                   </div>
                   <p className="text-foreground/90 font-medium italic mb-8 leading-relaxed text-lg">
