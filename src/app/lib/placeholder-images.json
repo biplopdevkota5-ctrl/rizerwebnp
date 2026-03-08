@@ -1,0 +1,53 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "business-web",
+      "description": "Professional Business Website",
+      "imageUrl": "https://picsum.photos/seed/business/600/400",
+      "imageHint": "business website corporate"
+    },
+    {
+      "id": "portfolio-web",
+      "description": "Creative Portfolio Website",
+      "imageUrl": "https://picsum.photos/seed/portfolio/600/400",
+      "imageHint": "creative portfolio design"
+    },
+    {
+      "id": "blog-web",
+      "description": "Modern Blog Website",
+      "imageUrl": "https://picsum.photos/seed/blog/600/400",
+      "imageHint": "blogging news article"
+    },
+    {
+      "id": "ecommerce-web",
+      "description": "Online Store Ecommerce",
+      "imageUrl": "https://picsum.photos/seed/ecommerce/600/400",
+      "imageHint": "online shop ecommerce"
+    },
+    {
+      "id": "gaming-web",
+      "description": "Gaming Community Website",
+      "imageUrl": "https://picsum.photos/seed/gaming/600/400",
+      "imageHint": "gaming e-sports"
+    },
+    {
+      "id": "hotel-web",
+      "description": "Hotel and Resort Website",
+      "imageUrl": "https://picsum.photos/seed/hotel/600/400",
+      "imageHint": "hotel resort luxury"
+    },
+    {
+      "id": "streaming-web",
+      "description": "Video Streaming Platform",
+      "imageUrl": "https://picsum.photos/seed/streaming/600/400",
+      "imageHint": "streaming video movie"
+    },
+    {
+      "id": "custom-web",
+      "description": "Unique Custom Website",
+      "imageUrl": "https://picsum.photos/seed/custom/600/400",
+      "imageHint": "abstract tech future"
+    }
+  ]
+}
