@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -23,15 +22,12 @@ export default function Home() {
   // Fetch Announcements
   const announcementsQuery = useMemoFirebase(() => {
     if (!db) return null
-    return query(collection(db, "announcements"), limit(10))
+    return query(collection(db, "announcements"), limit(1))
   }, [db])
   const { data: rawAnnouncements } = useCollection(announcementsQuery)
 
   const announcements = React.useMemo(() => {
-    return (rawAnnouncements || [])
-      .filter(a => a.isActive)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 1)
+    return (rawAnnouncements || []).filter(a => a.isActive)
   }, [rawAnnouncements])
 
   // Fetch Reviews
@@ -41,20 +37,16 @@ export default function Home() {
   }, [db])
   const { data: rawReviews } = useCollection(reviewsQuery)
 
-  const reviews = React.useMemo(() => {
-    return (rawReviews || [])
-      .filter(r => r.status === "approved")
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 6)
+  const displayReviews = React.useMemo(() => {
+    const approved = (rawReviews || []).filter(r => r.status === "approved")
+    if (approved.length > 0) return approved.slice(0, 6)
+    
+    return [
+      { userName: "Anish Sharma", rating: 5, text: "RIZERWEBNP transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
+      { userName: "Sita Gurung", rating: 5, text: "My portfolio looks futuristic and high-end. Biplop is a true professional developer who understands design." },
+      { userName: "Rahul KC", rating: 5, text: "Unbeatable price for such a premium feel. Highly recommend the custom features and animations!" },
+    ]
   }, [rawReviews])
-
-  const defaultTestimonials = [
-    { userName: "Anish Sharma", rating: 5, text: "RIZERWEBNP transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
-    { userName: "Sita Gurung", rating: 5, text: "My portfolio looks futuristic and high-end. Biplop is a true professional developer who understands design." },
-    { userName: "Rahul KC", rating: 5, text: "Unbeatable price for such a premium feel. Highly recommend the custom features and animations!" },
-  ]
-
-  const displayReviews = reviews?.length ? reviews : defaultTestimonials
 
   if (!mounted) {
     return (
@@ -154,18 +146,15 @@ export default function Home() {
                   )}
                 >
                   <div className="flex gap-1 mb-6">
-                    {[1, 2, 3, 4, 5].map((starIdx) => {
-                      const isFull = starIdx <= (t.rating || 0);
-                      return (
-                        <Star 
-                          key={starIdx} 
-                          className={cn(
-                            "w-4 h-4",
-                            isFull ? "fill-accent text-accent" : "text-white/20"
-                          )} 
-                        />
-                      )
-                    })}
+                    {[1, 2, 3, 4, 5].map((starIdx) => (
+                      <Star 
+                        key={starIdx} 
+                        className={cn(
+                          "w-4 h-4",
+                          starIdx <= (t.rating || 0) ? "fill-accent text-accent" : "text-white/20"
+                        )} 
+                      />
+                    ))}
                     <span className="ml-2 text-xs font-black text-accent tracking-tighter">{t.rating} / 5</span>
                   </div>
                   <p className="text-foreground/90 font-medium italic mb-8 leading-relaxed text-lg">

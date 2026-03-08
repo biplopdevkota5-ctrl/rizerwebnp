@@ -95,9 +95,9 @@ export function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Overlay - Updated to be non-transparent */}
       <div className={cn(
-        "fixed inset-0 top-16 z-[90] bg-background/95 backdrop-blur-xl md:hidden transition-all duration-300 ease-in-out",
+        "fixed inset-0 top-16 z-[90] bg-background md:hidden transition-all duration-300 ease-in-out border-t border-white/10",
         isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none translate-x-full"
       )}>
         <div className="container px-4 py-8 flex flex-col gap-6 h-[calc(100vh-4rem)]">
