@@ -25,14 +25,14 @@ export default function Home() {
     if (!db) return null
     return query(collection(db, "announcements"), where("isActive", "==", true), orderBy("createdAt", "desc"), limit(1))
   }, [db])
-  const { data: announcements, isLoading: isAnnouncementsLoading } = useCollection(announcementsQuery)
+  const { data: announcements } = useCollection(announcementsQuery)
 
   // Fetch Approved Reviews
   const reviewsQuery = useMemoFirebase(() => {
     if (!db) return null
     return query(collection(db, "reviews"), where("status", "==", "approved"), orderBy("createdAt", "desc"), limit(6))
   }, [db])
-  const { data: reviews, isLoading: isReviewsLoading } = useCollection(reviewsQuery)
+  const { data: reviews } = useCollection(reviewsQuery)
 
   const defaultTestimonials = [
     { userName: "Anish Sharma", rating: 4.5, text: "RIZERWEBNP transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
@@ -147,7 +147,7 @@ export default function Home() {
                   )}
                 >
                   <div className="flex gap-1 mb-6">
-                    {Array.from({ length:  starVal <= Math.floor(t.rating) ? 5 : 5 }).map((_, starIdx) => {
+                    {Array.from({ length: 5 }).map((_, starIdx) => {
                       const starVal = starIdx + 1;
                       const isFull = starVal <= Math.floor(t.rating);
                       return (
