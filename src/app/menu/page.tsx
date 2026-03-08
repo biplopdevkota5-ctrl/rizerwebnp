@@ -26,6 +26,7 @@ export default function MobileMenuPage() {
   const { user } = useUser()
   const auth = useAuth()
   const router = useRouter()
+  const WHATSAPP_MESSAGE = encodeURIComponent("Hello, Rizer Web NP. I Need Support.")
 
   const handleLogout = async () => {
     await signOut(auth)
@@ -113,7 +114,7 @@ export default function MobileMenuPage() {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-2">Support & Contact</p>
           <div className="grid grid-cols-1 gap-3">
             <Button 
-              onClick={() => window.open('https://wa.me/9779805602394', '_blank')}
+              onClick={() => window.open(`https://wa.me/9779805602394?text=${WHATSAPP_MESSAGE}`, '_blank')}
               className="w-full h-16 rounded-3xl font-black text-lg bg-[#25D366] hover:bg-[#128C7E] text-white shadow-xl shadow-green-500/20"
             >
               <MessageCircle className="w-6 h-6 mr-3" />

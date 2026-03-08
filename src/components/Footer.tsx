@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 
 export function Footer() {
   const WHATSAPP_NUMBER = "9805602394"
+  const WHATSAPP_MESSAGE = encodeURIComponent("Hello, Rizer Web NP. I Need Support.")
   const [year, setYear] = React.useState<number | null>(null)
 
   React.useEffect(() => {
@@ -66,7 +67,7 @@ export function Footer() {
             <p className="text-sm text-muted-foreground font-medium">
               Have questions? Chat with us directly on WhatsApp for instant support.
             </p>
-            <Link href={`https://wa.me/977${WHATSAPP_NUMBER}`} target="_blank">
+            <Link href={`https://wa.me/977${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`} target="_blank">
               <Button className="w-full rounded-full font-bold shadow-lg h-12 gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white border-none">
                 <MessageCircle className="w-5 h-5" />
                 Contact on WhatsApp
