@@ -95,12 +95,12 @@ export function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu Overlay - Updated to be non-transparent */}
+      {/* Mobile Menu Overlay - Updated to be solid non-transparent slate-950 */}
       <div className={cn(
-        "fixed inset-0 top-16 z-[90] bg-background md:hidden transition-all duration-300 ease-in-out border-t border-white/10",
-        isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none translate-x-full"
+        "fixed top-16 inset-x-0 bottom-0 z-[90] bg-slate-950 md:hidden transition-all duration-300 ease-in-out border-t border-white/10",
+        isOpen ? "translate-x-0 opacity-100 pointer-events-auto" : "translate-x-full opacity-0 pointer-events-none"
       )}>
-        <div className="container px-4 py-8 flex flex-col gap-6 h-[calc(100vh-4rem)]">
+        <div className="container px-4 py-8 flex flex-col gap-6 h-full overflow-y-auto">
           <div className="space-y-2">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 mb-4">Navigation</p>
             {navLinks.map((link) => (
@@ -121,7 +121,7 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className="mt-auto space-y-4 pb-8">
+          <div className="mt-auto space-y-4 pb-12">
             <div className="h-px bg-white/10 mb-6" />
             {user ? (
               <div className="space-y-3">

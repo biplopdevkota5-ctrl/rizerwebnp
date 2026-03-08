@@ -146,15 +146,19 @@ export default function Home() {
                   )}
                 >
                   <div className="flex gap-1 mb-6">
-                    {[1, 2, 3, 4, 5].map((starIdx) => (
-                      <Star 
-                        key={starIdx} 
-                        className={cn(
-                          "w-4 h-4",
-                          starIdx <= (t.rating || 0) ? "fill-accent text-accent" : "text-white/20"
-                        )} 
-                      />
-                    ))}
+                    {Array.from({ length: 5 }).map((_, starIdx) => {
+                      const starVal = starIdx + 1;
+                      const isFull = starVal <= (t.rating || 0);
+                      return (
+                        <Star 
+                          key={starIdx} 
+                          className={cn(
+                            "w-4 h-4",
+                            isFull ? "fill-accent text-accent" : "text-white/20"
+                          )} 
+                        />
+                      );
+                    })}
                     <span className="ml-2 text-xs font-black text-accent tracking-tighter">{t.rating} / 5</span>
                   </div>
                   <p className="text-foreground/90 font-medium italic mb-8 leading-relaxed text-lg">
