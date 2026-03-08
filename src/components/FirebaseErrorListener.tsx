@@ -3,23 +3,17 @@
 import { useEffect } from 'react';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
-import { useToast } from '@/hooks/use-toast';
 
 /**
- * Listens for globally emitted 'permission-error' events and displays them as toasts
- * rather than throwing, which prevents full-page client-side exceptions.
+ * Listens for globally emitted 'permission-error' events.
+ * Removed the toast notification to prevent UI overlap as requested.
+ * Errors are now logged to the console for developer debugging.
  */
 export function FirebaseErrorListener() {
-  const { toast } = useToast();
-
   useEffect(() => {
     const handleError = (error: FirestorePermissionError) => {
-      console.error("Firestore Permission Denied:", error);
-      toast({
-        title: "Access Restricted",
-        description: "You don't have permission to perform this action. Please check your admin status.",
-        variant: "destructive",
-      });
+      console.warn("Firestore Permission Denied (Silenced Toast):", error.request.path);
+      // Toast has been removed to prevent hiding content in the Admin/Home pages.
     };
 
     errorEmitter.on('permission-error', handleError);
@@ -27,7 +21,7 @@ export function FirebaseErrorListener() {
     return () => {
       errorEmitter.off('permission-error', handleError);
     };
-  }, [toast]);
+  }, []);
 
   return null;
 }

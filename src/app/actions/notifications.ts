@@ -1,4 +1,3 @@
-
 'use server';
 
 /**
@@ -20,13 +19,9 @@ export async function sendDiscordNotification(data: {
   extraFeatures: string;
   ipAddress: string;
 }) {
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  // Hardcoded webhook as requested for immediate reliability
+  const webhookUrl = "https://discord.com/api/webhooks/1480219526506483713/jujVi1SSJfcDrBlutbjDNgc3uRhr8LOQQdO5eiPVpod_j_c7QcD-PyBHs2QJQpH06p_v";
   
-  if (!webhookUrl) {
-    console.warn('Discord Webhook URL not configured. Skipping notification.');
-    return;
-  }
-
   const embed = {
     title: '🚀 New Website Request Received',
     description: `A new build request has been submitted on **RIZERWEBNP**.`,
@@ -62,7 +57,7 @@ export async function sendDiscordNotification(data: {
     });
 
     if (!response.ok) {
-      throw new Error(`Discord API error: ${response.statusText}`);
+      console.error(`Discord API error: ${response.status} ${response.statusText}`);
     }
   } catch (error) {
     console.error('Failed to send Discord notification:', error);

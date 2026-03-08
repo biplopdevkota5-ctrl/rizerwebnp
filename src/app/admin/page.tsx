@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -16,7 +15,6 @@ import { useToast } from "@/hooks/use-toast"
 import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList, RefreshCw, LogOut } from "lucide-react"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, doc, updateDoc, deleteDoc, addDoc, query, orderBy } from "firebase/firestore"
-import { cn } from "@/lib/utils"
 
 const ADMIN_PASSWORD = "090102030405"
 
@@ -28,12 +26,11 @@ export default function AdminPage() {
   const { toast } = useToast()
   const db = useFirestore()
 
-  // Prevent hydration mismatches
   React.useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Strictly gate queries by authorization state to prevent permission errors/crashes for guests
+  // Strictly gate queries by authorization state
   const requestsQuery = useMemoFirebase(() => 
     (db && isAuthorized && mounted) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
     [db, isAuthorized, mounted]
@@ -56,9 +53,9 @@ export default function AdminPage() {
     e.preventDefault()
     if (password === ADMIN_PASSWORD) {
       setIsAuthorized(true)
-      toast({ title: "Welcome Admin", description: "Full access to Rizer Web App granted." })
+      toast({ title: "Authorized", description: "Welcome to Rizer Studio Management." })
     } else {
-      toast({ title: "Access Denied", description: "Incorrect management password.", variant: "destructive" })
+      toast({ title: "Denied", description: "Invalid management password.", variant: "destructive" })
     }
   }
 
@@ -66,17 +63,17 @@ export default function AdminPage() {
     if (!db) return
     try {
       await updateDoc(doc(db, "requests", id), { status: newStatus })
-      toast({ title: "Status Updated", description: `Request ${id.slice(0,5)} is now ${newStatus}.` })
+      toast({ title: "Updated", description: "Request status modified successfully." })
     } catch (err) {
       console.error(err)
     }
   }
 
   const handleDeleteRequest = async (id: string) => {
-    if (!db || !confirm("Permanently delete this project request?")) return
+    if (!db || !confirm("Delete this request?")) return
     try {
       await deleteDoc(doc(db, "requests", id))
-      toast({ title: "Deleted", description: "Project removed from database." })
+      toast({ title: "Deleted", description: "Request removed." })
     } catch (err) {
       console.error(err)
     }
@@ -86,7 +83,7 @@ export default function AdminPage() {
     if (!db) return
     try {
       await updateDoc(doc(db, "reviews", id), { status: newStatus })
-      toast({ title: "Review Updated", description: "Client testimonial status changed." })
+      toast({ title: "Review Updated", description: "Status changed." })
     } catch (err) {
       console.error(err)
     }
@@ -101,31 +98,17 @@ export default function AdminPage() {
         createdAt: new Date().toISOString()
       })
       setAnnouncementInput("")
-      toast({ title: "Announcement Live", description: "The homepage banner has been updated." })
+      toast({ title: "Live", description: "Notice published to homepage." })
     } catch (err) {
       console.error(err)
     }
   }
 
-  const formatDate = (dateValue: any) => {
-    if (!mounted || !dateValue) return "..."
-    try {
-      const d = new Date(dateValue)
-      return isNaN(d.getTime()) ? "N/A" : d.toLocaleDateString()
-    } catch {
-      return "Error"
-    }
-  }
-
-  if (!mounted) return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <RefreshCw className="w-10 h-10 animate-spin text-primary opacity-20" />
-    </div>
-  )
+  if (!mounted) return null
 
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="flex-1 flex items-center justify-center p-4">
           <Card className="w-full max-w-md glass border-primary/20 shadow-2xl animate-fade-in">
@@ -133,24 +116,24 @@ export default function AdminPage() {
               <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl">
                 <ShieldCheck className="w-8 h-8 text-primary" />
               </div>
-              <CardTitle className="text-3xl font-headline font-bold">Admin Portal</CardTitle>
-              <CardDescription>RIZER WEB APP Management Console</CardDescription>
+              <CardTitle className="text-3xl font-headline font-bold">Manager Login</CardTitle>
+              <CardDescription>RIZER STUDIO Internal Console</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleLogin} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="password">Management Password</Label>
+                  <Label htmlFor="password">Management Key</Label>
                   <Input 
                     id="password" 
                     type="password" 
                     value={password} 
                     onChange={e => setPassword(e.target.value)} 
-                    placeholder="Enter admin key..."
+                    placeholder="Enter key..."
                     className="glass h-12 rounded-xl" 
                     required 
                   />
                 </div>
-                <Button type="submit" className="w-full h-12 rounded-xl font-bold">Authenticate</Button>
+                <Button type="submit" className="w-full h-12 rounded-xl font-bold">Enter Portal</Button>
               </form>
             </CardContent>
           </Card>
@@ -161,7 +144,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4 max-w-6xl">
@@ -171,11 +154,11 @@ export default function AdminPage() {
                 <ShieldCheck className="w-8 h-8 text-primary" />
                 Admin Panel
               </h1>
-              <p className="text-muted-foreground font-medium">Managing RIZER Studio Operations</p>
+              <p className="text-muted-foreground font-medium">Managing Rizer Studio Projects</p>
             </div>
-            <Button variant="outline" size="sm" onClick={() => setIsAuthorized(false)} className="rounded-full h-10 px-6 glass">
+            <Button variant="outline" onClick={() => setIsAuthorized(false)} className="rounded-full h-10 px-6 glass">
               <LogOut className="w-4 h-4 mr-2" />
-              Lock Console
+              Exit Console
             </Button>
           </div>
 
@@ -192,9 +175,9 @@ export default function AdminPage() {
                   <Table>
                     <TableHeader className="bg-white/5">
                       <TableRow className="border-white/10">
-                        <TableHead className="pl-8">Client & Date</TableHead>
-                        <TableHead>Service Type</TableHead>
-                        <TableHead>Status Control</TableHead>
+                        <TableHead className="pl-8">Client</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Status</TableHead>
                         <TableHead className="text-right pr-8">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -204,8 +187,9 @@ export default function AdminPage() {
                       ) : requests?.map((req) => (
                         <TableRow key={req.id} className="border-white/5 hover:bg-white/5">
                           <TableCell className="pl-8 py-6">
-                            <div className="font-bold text-lg">{req.fullName || "Guest User"}</div>
-                            <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{formatDate(req.createdAt)}</div>
+                            <div className="font-bold text-lg">{req.fullName}</div>
+                            <div className="text-[10px] text-muted-foreground uppercase tracking-widest">{req.email}</div>
+                            {req.ipAddress && <div className="text-[9px] text-primary/60 font-mono mt-1">IP: {req.ipAddress}</div>}
                           </TableCell>
                           <TableCell className="capitalize font-bold">{req.websiteType}</TableCell>
                           <TableCell>
@@ -241,7 +225,7 @@ export default function AdminPage() {
                     <TableHeader className="bg-white/5">
                       <TableRow className="border-white/10">
                         <TableHead className="pl-8">Author</TableHead>
-                        <TableHead>Testimonial Content</TableHead>
+                        <TableHead>Content</TableHead>
                         <TableHead className="text-right pr-8">Status</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -273,29 +257,29 @@ export default function AdminPage() {
             <TabsContent value="announcements" className="animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <Card className="glass rounded-[2rem]">
-                  <CardHeader><CardTitle>Publish New Notice</CardTitle></CardHeader>
+                  <CardHeader><CardTitle>New Notice</CardTitle></CardHeader>
                   <CardContent className="space-y-6">
                     <div className="space-y-2">
                       <Label>Announcement Text</Label>
                       <Input 
-                        placeholder="e.g. 20% Discount for new clients!" 
+                        placeholder="e.g. New Year Discount!" 
                         value={announcementInput} 
                         onChange={e => setAnnouncementInput(e.target.value)}
                         className="glass h-12 rounded-xl"
                       />
                     </div>
-                    <Button onClick={handleAddAnnouncement} className="w-full h-12 rounded-xl font-bold">Update Homepage Banner</Button>
+                    <Button onClick={handleAddAnnouncement} className="w-full h-12 rounded-xl font-bold">Post Notice</Button>
                   </CardContent>
                 </Card>
                 <Card className="glass rounded-[2rem] overflow-hidden">
-                  <CardHeader><CardTitle>Notice History</CardTitle></CardHeader>
+                  <CardHeader><CardTitle>History</CardTitle></CardHeader>
                   <CardContent className="p-0">
                     <div className="divide-y divide-white/5">
                       {announcements?.map(ann => (
                         <div key={ann.id} className="p-4 flex justify-between items-center hover:bg-white/5 transition-colors">
                           <span className="text-sm font-medium">{ann.content}</span>
                           <Badge className={ann.isActive ? "bg-accent" : "bg-muted"}>
-                            {ann.isActive ? "Live" : "Ended"}
+                            {ann.isActive ? "Active" : "Archived"}
                           </Badge>
                         </div>
                       ))}
