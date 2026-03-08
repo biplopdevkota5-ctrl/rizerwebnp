@@ -52,7 +52,8 @@
         "isActive": { "type": "boolean" },
         "type": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
-      }
+      },
+      "required": ["content", "isActive", "createdAt"]
     },
     "Review": {
       "title": "Review",
@@ -64,7 +65,8 @@
         "rating": { "type": "number" },
         "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
         "createdAt": { "type": "string", "format": "date-time" }
-      }
+      },
+      "required": ["userId", "text", "rating", "status", "createdAt"]
     }
   },
   "auth": {

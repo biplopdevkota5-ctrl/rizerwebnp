@@ -17,7 +17,27 @@ service cloud.firestore {
       return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
-    // --- Collections ---
+    // --- Public Access Collections ---
+
+    match /announcements/{announcementId} {
+      // Explicitly allow get and list for everyone (unauthenticated)
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /reviews/{reviewId} {
+      // Explicitly allow get and list for everyone
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    match /website_types/{typeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // --- User Specific Collections ---
 
     match /users/{userId} {
       allow get: if isOwner(userId);
@@ -31,23 +51,7 @@ service cloud.firestore {
       }
     }
 
-    match /website_types/{typeId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    match /announcements/{announcementId} {
-      // Explicitly allow public reading for homepage visibility
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    match /reviews/{reviewId} {
-      // Explicitly allow public reading for homepage testimonials
-      allow read: if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isAdmin();
-    }
+    // --- Admin & Support Collections ---
 
     match /anonymous_website_requests/{requestId} {
       allow create: if true;
