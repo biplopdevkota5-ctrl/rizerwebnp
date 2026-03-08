@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -26,7 +25,7 @@ export default function WebsiteTypesPage() {
               <Sparkles className="w-4 h-4" />
               <span>Tailored Digital Experiences</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-headline font-bold tracking-tight">
+            <h1 className="text-5xl md:text-7xl font-headline font-bold tracking-tight text-foreground">
               Website <span className="text-primary italic">Solutions</span>
             </h1>
             <p className="text-muted-foreground text-xl max-w-2xl mx-auto font-body">
@@ -38,55 +37,46 @@ export default function WebsiteTypesPage() {
           <section className="mb-24">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
-                <h2 className="text-3xl md:text-4xl font-headline font-bold">About RIZERWEBNP</h2>
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  Founded by <span className="text-primary font-bold">Biplop Devkota</span>, RIZERWEBNP is a dedicated web development studio based in <span className="text-foreground font-medium">Gaidakot, Nepal</span>. We believe that professional digital presence shouldn't be a luxury. 
-                </p>
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  Our mission is to empower local businesses, creators, and entrepreneurs with world-class websites that utilize modern technologies like Glassmorphism, smooth animations, and ultra-fast performance.
-                </p>
+                <h2 className="text-3xl md:text-4xl font-headline font-bold text-foreground">About RIZERWEBNP</h2>
+                <div className="space-y-4">
+                  <p className="text-lg text-foreground/90 leading-relaxed font-medium">
+                    Founded by <span className="text-primary font-bold">Biplop Devkota</span>, RIZERWEBNP is a dedicated web development studio based in <span className="text-foreground font-bold">Gaidakot, Nepal</span>.
+                  </p>
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    We believe that professional digital presence shouldn't be a luxury. Our mission is to empower local businesses, creators, and entrepreneurs with world-class websites that utilize modern technologies like Glassmorphism, smooth animations, and ultra-fast performance.
+                  </p>
+                </div>
                 <div className="grid grid-cols-2 gap-4 pt-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                      <Shield className="w-5 h-5" />
+                  {[
+                    { icon: Shield, label: "Secure Builds" },
+                    { icon: Globe, label: "Global Standards" },
+                    { icon: Award, label: "Premium UI/UX" },
+                    { icon: Users, label: "Client Focused" }
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-primary/20 text-primary">
+                        <item.icon className="w-5 h-5" />
+                      </div>
+                      <span className="font-bold text-sm text-foreground">{item.label}</span>
                     </div>
-                    <span className="font-medium text-sm">Secure Builds</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                      <Globe className="w-5 h-5" />
-                    </div>
-                    <span className="font-medium text-sm">Global Standards</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                      <Award className="w-5 h-5" />
-                    </div>
-                    <span className="font-medium text-sm">Premium UI/UX</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                      <Users className="w-5 h-5" />
-                    </div>
-                    <span className="font-medium text-sm">Client Focused</span>
-                  </div>
+                  ))}
                 </div>
               </div>
               <div className="glass p-8 rounded-3xl border-primary/20 space-y-6 relative overflow-hidden">
                 <div className="relative z-10">
-                  <h3 className="text-2xl font-headline font-bold mb-4">Our Vision</h3>
-                  <p className="text-muted-foreground italic">
+                  <h3 className="text-2xl font-headline font-bold mb-4 text-foreground">Our Vision</h3>
+                  <p className="text-foreground/90 italic text-lg leading-relaxed">
                     "We don't just build websites; we create digital homes for your ideas. Our goal is to make Nepal a hub for cutting-edge web design by providing accessible yet high-end services."
                   </p>
-                  <div className="mt-6 flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold">BD</div>
+                  <div className="mt-8 flex items-center gap-4 border-t border-white/10 pt-6">
+                    <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold shadow-lg">BD</div>
                     <div>
-                      <p className="font-bold">Biplop Devkota</p>
-                      <p className="text-xs text-muted-foreground">Founder & Lead Developer</p>
+                      <p className="font-bold text-foreground">Biplop Devkota</p>
+                      <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Founder & Lead Developer</p>
                     </div>
                   </div>
                 </div>
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl" />
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl" />
               </div>
             </div>
           </section>
@@ -94,33 +84,33 @@ export default function WebsiteTypesPage() {
           {/* Website Types List Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {WEBSITE_TYPES.map((type) => (
-              <Card key={type.id} className="group glass border-border/50 hover:border-primary/50 transition-all duration-300 flex flex-col h-full hover:shadow-lg">
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start mb-2">
-                    <Badge variant="outline" className="text-primary border-primary/30">
+              <Card key={type.id} className="group glass border-border/50 hover:border-primary/50 transition-all duration-300 flex flex-col h-full hover:shadow-2xl">
+                <CardHeader className="pb-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <Badge variant="outline" className="text-primary border-primary/40 font-bold bg-primary/5">
                       Category
                     </Badge>
-                    <span className="text-sm font-bold text-accent">{type.price}</span>
+                    <span className="text-sm font-black text-accent">{type.price}</span>
                   </div>
-                  <CardTitle className="font-headline font-bold text-xl group-hover:text-primary transition-colors">
+                  <CardTitle className="font-headline font-bold text-2xl group-hover:text-primary transition-colors text-foreground">
                     {type.label}
                   </CardTitle>
                 </CardHeader>
 
                 <CardContent className="flex-1 space-y-4">
-                  <div className="space-y-2 pt-2">
+                  <div className="space-y-3 pt-2">
                     {type.features?.map((feature: string, i: number) => (
-                      <div key={i} className="flex items-center gap-2 text-sm text-foreground/70">
-                        <Check className="w-3.5 h-3.5 text-accent" />
+                      <div key={i} className="flex items-center gap-3 text-sm text-foreground font-medium">
+                        <Check className="w-4 h-4 text-accent shrink-0" />
                         <span>{feature}</span>
                       </div>
                     ))}
                   </div>
                 </CardContent>
 
-                <CardFooter className="pt-4 pb-6 px-6">
+                <CardFooter className="pt-6 pb-6 px-6">
                   <Link href={`/request?type=${type.id}`} className="w-full">
-                    <Button variant="outline" className="w-full rounded-full h-10 text-sm glass border-primary/20 group-hover:bg-primary group-hover:text-white transition-all">
+                    <Button variant="outline" className="w-full rounded-full h-11 text-sm font-bold glass border-primary/30 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all shadow-sm">
                       Request Quote
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
@@ -130,17 +120,18 @@ export default function WebsiteTypesPage() {
             ))}
           </div>
           
-          <div className="mt-24 text-center p-12 rounded-3xl glass border-primary/20 relative overflow-hidden">
-            <div className="relative z-10 space-y-4">
-              <h2 className="text-3xl font-headline font-bold">Need something completely unique?</h2>
-              <p className="text-muted-foreground max-w-lg mx-auto">We specialize in custom logic and bespoke architectures. Let's discuss your custom project.</p>
-              <Link href="/request?type=custom">
-                <Button size="lg" className="rounded-full mt-4 h-12 px-8">
+          <div className="mt-24 text-center p-12 rounded-3xl glass border-primary/30 relative overflow-hidden shadow-2xl">
+            <div className="relative z-10 space-y-6">
+              <h2 className="text-3xl md:text-4xl font-headline font-bold text-foreground">Need something completely unique?</h2>
+              <p className="text-muted-foreground text-lg max-w-lg mx-auto font-medium">We specialize in custom logic and bespoke architectures. Let's discuss your custom project.</p>
+              <Link href="/request?type=custom" className="inline-block">
+                <Button size="lg" className="rounded-full mt-4 h-14 px-10 text-lg font-bold shadow-xl">
                   Get a Custom Proposal
                 </Button>
               </Link>
             </div>
-            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl" />
+            <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-primary/20 rounded-full blur-[100px]" />
+            <div className="absolute -top-10 -left-10 w-64 h-64 bg-accent/10 rounded-full blur-[100px]" />
           </div>
         </div>
       </main>
