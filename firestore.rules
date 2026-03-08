@@ -25,7 +25,7 @@ service cloud.firestore {
     }
 
     match /reviews/{reviewId} {
-      // Allow everyone to see approved reviews
+      // Allow everyone to see reviews
       allow read: if true;
       allow create: if isSignedIn();
       allow update, delete: if isAdmin();
@@ -49,8 +49,9 @@ service cloud.firestore {
     // --- Admin & Support Collections ---
 
     match /requests/{requestId} {
-      allow create: if true;
+      // Admin page uses local password auth initially, but we allow admin reads
       allow read, update, delete: if isAdmin();
+      allow create: if true;
     }
 
     match /anonymous_website_requests/{requestId} {

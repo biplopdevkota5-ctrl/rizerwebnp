@@ -1,12 +1,20 @@
+"use client"
+
+import * as React from "react"
 import Link from "next/link"
 import { Instagram, Github, Mail, Phone, MapPin, Twitter, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Footer() {
   const WHATSAPP_NUMBER = "9805602394"
+  const [year, setYear] = React.useState<number | null>(null)
+
+  React.useEffect(() => {
+    setYear(new Date().getFullYear())
+  }, [])
 
   return (
-    <footer className="border-t border-border/40 bg-background/90 backdrop-blur-md py-16">
+    <footer className="border-t border-border/40 bg-background/95 backdrop-blur-md py-16">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="space-y-6">
@@ -36,7 +44,7 @@ export function Footer() {
                 <div className="p-2 rounded-full bg-primary/10">
                   <Phone className="w-4 h-4 text-primary" />
                 </div>
-                +977 9805602394
+                +977 {WHATSAPP_NUMBER}
               </li>
               <li className="flex items-center gap-3">
                 <div className="p-2 rounded-full bg-primary/10">
@@ -68,7 +76,7 @@ export function Footer() {
         </div>
         
         <div className="mt-16 pt-8 border-t border-border/40 text-center text-xs text-muted-foreground font-bold uppercase tracking-widest">
-          <p>© {new Date().getFullYear()} RIZER WEB APP. All rights reserved. Developed with ❤️ in Nepal by Biplop Devkota.</p>
+          <p>© {year || "..."} RIZER WEB APP. All rights reserved. Developed with ❤️ in Nepal by Biplop Devkota.</p>
         </div>
       </div>
     </footer>

@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 
-const WHATSAPP_NUM = "9779805602394"
+const WHATSAPP_NUM = "9805602394"
 
 function RequestFormContent() {
   const searchParams = useSearchParams()
@@ -138,7 +138,7 @@ function RequestFormContent() {
         const encodedMsg = encodeURIComponent(waMessage)
         
         setTimeout(() => {
-          window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodedMsg}`, '_blank')
+          window.open(`https://wa.me/977${WHATSAPP_NUM}?text=${encodedMsg}`, '_blank')
           router.push('/dashboard')
         }, 1500)
       })
@@ -242,7 +242,7 @@ function RequestFormContent() {
                 <Send className="w-5 h-5 mr-3" />
                 {loading ? "Submitting..." : "Submit Project"}
               </Button>
-              <Button type="button" variant="outline" size="lg" className="flex-1 h-14 rounded-2xl text-lg glass border-white/10 font-bold shadow-xl hover:scale-[1.02] transition-all" onClick={() => window.open(`https://wa.me/${WHATSAPP_NUM}`, '_blank')}>
+              <Button type="button" variant="outline" size="lg" className="flex-1 h-14 rounded-2xl text-lg glass border-white/10 font-bold shadow-xl hover:scale-[1.02] transition-all" onClick={() => window.open(`https://wa.me/977${WHATSAPP_NUM}`, '_blank')}>
                 <MessageCircle className="w-5 h-5 mr-3 text-[#25D366]" />
                 Direct WhatsApp
               </Button>
