@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
-import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList, RefreshCw, LogOut } from "lucide-react"
+import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList, RefreshCw, LogOut, Phone } from "lucide-react"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, doc, updateDoc, deleteDoc, addDoc, query, orderBy } from "firebase/firestore"
 
@@ -32,7 +32,6 @@ export default function AdminPage() {
     if (saved === "active") setIsAuthorized(true)
   }, [])
 
-  // Stable Queries: These will now work across devices due to updated security rules
   const requestsQuery = useMemoFirebase(() => 
     (db && mounted) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
     [db, mounted]
@@ -199,6 +198,10 @@ export default function AdminPage() {
                           <TableCell className="pl-8 py-6">
                             <div className="font-bold text-lg">{req.fullName}</div>
                             <div className="text-[10px] text-muted-foreground uppercase tracking-widest">{req.email}</div>
+                            <div className="flex items-center gap-1.5 text-[11px] text-primary font-bold mt-1">
+                              <Phone className="w-3 h-3" />
+                              {req.phone || req.whatsapp || 'N/A'}
+                            </div>
                             {req.ipAddress && <div className="text-[9px] text-primary/60 font-mono mt-1">IP: {req.ipAddress}</div>}
                           </TableCell>
                           <TableCell className="capitalize font-bold">{req.websiteType}</TableCell>

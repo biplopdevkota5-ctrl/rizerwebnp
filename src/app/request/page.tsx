@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -158,7 +157,7 @@ function RequestFormContent() {
 
       toast({ title: "Success!", description: "Your request has been submitted. Check Discord/WhatsApp for confirmation." })
       
-      const waMessage = `Hello, I submitted a website request on RIZERWEBNP.\nName: ${formData.fullName}\nType: ${formData.websiteType}\nBudget: ${formData.budget}`
+      const waMessage = `Hello, I submitted a website request on RIZERWEBNP.\nName: ${formData.fullName}\nPhone: ${formData.phone}\nType: ${formData.websiteType}\nBudget: ${formData.budget}`
       const encodedMsg = encodeURIComponent(waMessage)
       
       setTimeout(() => {
