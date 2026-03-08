@@ -20,6 +20,7 @@ import { collection, addDoc } from "firebase/firestore"
 import { cn } from "@/lib/utils"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
+import { sendDiscordNotification } from "@/app/actions/notifications"
 
 const WHATSAPP_NUM = "9805602394"
 const DEFAULT_WHATSAPP_MSG = encodeURIComponent("Hello, Rizer Web NP. I Need Support.")
@@ -115,7 +116,7 @@ function RequestFormContent() {
     toast({ title: "Review Submitted", description: "Thanks! It will be visible after admin approval." });
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!db) return
     setLoading(true)
@@ -128,30 +129,51 @@ function RequestFormContent() {
       createdAt: new Date().toISOString()
     };
 
-    const requestsCol = user 
+    // 1. Write to Admin Database (Global Requests)
+    const adminRequestsCol = collection(db, "requests");
+    
+    // 2. Write to User Personal Database
+    const userRequestsCol = user 
       ? collection(db, "users", user.uid, "website_requests")
       : collection(db, "anonymous_website_requests");
 
-    addDoc(requestsCol, payload)
-      .then(() => {
-        toast({ title: "Success!", description: "Your request has been submitted." })
-        const waMessage = `Hello, I submitted a website request on RIZERWEBNP.\nName: ${formData.fullName}\nType: ${formData.websiteType}\nBudget: ${formData.budget}`
-        const encodedMsg = encodeURIComponent(waMessage)
-        
-        setTimeout(() => {
-          window.open(`https://wa.me/977${WHATSAPP_NUM}?text=${encodedMsg}`, '_blank')
-          router.push('/dashboard')
-        }, 1500)
-      })
-      .catch(async (error) => {
-        const permissionError = new FirestorePermissionError({
-          path: requestsCol.path,
-          operation: 'create',
-          requestResourceData: payload,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      })
-      .finally(() => setLoading(false));
+    try {
+      // Parallel submission to both databases
+      await Promise.all([
+        addDoc(adminRequestsCol, payload),
+        addDoc(userRequestsCol, payload)
+      ]);
+
+      // 3. Send Discord Notification
+      await sendDiscordNotification({
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        websiteType: formData.websiteType,
+        budget: formData.budget,
+        pages: formData.pages,
+        description: formData.description
+      });
+
+      toast({ title: "Success!", description: "Your request has been submitted. Check Discord/WhatsApp for confirmation." })
+      
+      const waMessage = `Hello, I submitted a website request on RIZERWEBNP.\nName: ${formData.fullName}\nType: ${formData.websiteType}\nBudget: ${formData.budget}`
+      const encodedMsg = encodeURIComponent(waMessage)
+      
+      setTimeout(() => {
+        window.open(`https://wa.me/977${WHATSAPP_NUM}?text=${encodedMsg}`, '_blank')
+        router.push('/dashboard')
+      }, 1500)
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast({ 
+        title: "Error", 
+        description: "Failed to submit request. Please try again or contact support.", 
+        variant: "destructive" 
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -159,7 +181,7 @@ function RequestFormContent() {
       <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
         <CardHeader className="text-center bg-white/5 pt-10 pb-8">
           <CardTitle className="font-headline text-3xl md:text-5xl font-bold mb-2">Request Your Website</CardTitle>
-          <CardDescription className="text-muted-foreground font-medium">All requests are saved securely in our cloud database.</CardDescription>
+          <CardDescription className="text-muted-foreground font-medium">Your request is sent directly to our admin and Discord channel.</CardDescription>
         </CardHeader>
         <CardContent className="p-6 md:p-12">
           <form onSubmit={handleSubmit} className="space-y-10">
@@ -241,7 +263,7 @@ function RequestFormContent() {
             <div className="pt-6 flex flex-col sm:flex-row gap-4">
               <Button type="submit" size="lg" className="flex-1 h-14 rounded-2xl text-lg font-black shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-all" disabled={loading}>
                 <Send className="w-5 h-5 mr-3" />
-                {loading ? "Submitting..." : "Submit Project"}
+                {loading ? "Processing..." : "Submit Project"}
               </Button>
               <Button type="button" variant="outline" size="lg" className="flex-1 h-14 rounded-2xl text-lg glass border-white/10 font-bold shadow-xl hover:scale-[1.02] transition-all" onClick={() => window.open(`https://wa.me/977${WHATSAPP_NUM}?text=${DEFAULT_WHATSAPP_MSG}`, '_blank')}>
                 <MessageCircle className="w-5 h-5 mr-3 text-[#25D366]" />
