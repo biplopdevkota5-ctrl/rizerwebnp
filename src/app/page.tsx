@@ -22,19 +22,20 @@ export default function Home() {
   
   // Fetch Announcements
   const announcementsQuery = useMemoFirebase(() => {
-    if (!db) return null
+    if (!db || !mounted) return null
     return query(collection(db, "announcements"), where("isActive", "==", true), limit(1))
-  }, [db])
+  }, [db, mounted])
   const { data: rawAnnouncements } = useCollection(announcementsQuery)
 
   // Fetch Reviews
   const reviewsQuery = useMemoFirebase(() => {
-    if (!db) return null
+    if (!db || !mounted) return null
     return query(collection(db, "reviews"), where("status", "==", "approved"), limit(6))
-  }, [db])
+  }, [db, mounted])
   const { data: rawReviews } = useCollection(reviewsQuery)
 
   const displayReviews = React.useMemo(() => {
+    if (!mounted) return []
     if (rawReviews && rawReviews.length > 0) return rawReviews
     
     return [
@@ -42,7 +43,7 @@ export default function Home() {
       { id: "2", userName: "Sita Gurung", rating: 5, text: "My portfolio looks futuristic and high-end. Biplop is a true professional developer who understands design." },
       { id: "3", userName: "Rahul KC", rating: 5, text: "Unbeatable price for such a premium feel. Highly recommend the custom features and animations!" },
     ]
-  }, [rawReviews])
+  }, [rawReviews, mounted])
 
   if (!mounted) {
     return (

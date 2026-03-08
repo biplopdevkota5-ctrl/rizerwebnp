@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
-import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList, RefreshCw } from "lucide-react"
+import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList, RefreshCw, AlertCircle } from "lucide-react"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, doc, updateDoc, deleteDoc, addDoc, query, orderBy } from "firebase/firestore"
 import { cn } from "@/lib/utils"
@@ -34,24 +34,24 @@ export default function AdminPage() {
     setMounted(true)
   }, [])
 
-  // Only fetch data if authorized and mounted to prevent hydration/permission crashes
+  // Memoized queries with strict guards
   const requestsQuery = useMemoFirebase(() => 
     (db && isAuthorized && mounted) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
     [db, isAuthorized, mounted]
   )
-  const { data: requests, isLoading: requestsLoading } = useCollection(requestsQuery)
+  const { data: requests, isLoading: requestsLoading, error: requestsError } = useCollection(requestsQuery)
 
   const reviewsQuery = useMemoFirebase(() => 
     (db && isAuthorized && mounted) ? query(collection(db, "reviews"), orderBy("createdAt", "desc")) : null, 
     [db, isAuthorized, mounted]
   )
-  const { data: reviews } = useCollection(reviewsQuery)
+  const { data: reviews, error: reviewsError } = useCollection(reviewsQuery)
 
   const announcementsQuery = useMemoFirebase(() => 
     (db && isAuthorized && mounted) ? query(collection(db, "announcements"), orderBy("createdAt", "desc")) : null, 
     [db, isAuthorized, mounted]
   )
-  const { data: announcements } = useCollection(announcementsQuery)
+  const { data: announcements, error: announcementsError } = useCollection(announcementsQuery)
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -73,7 +73,6 @@ export default function AdminPage() {
         requestResourceData: { status: newStatus }
       }));
     });
-    toast({ title: "Status Updated", description: "Request status sync with Firestore." })
   }
 
   const handleDeleteRequest = (id: string) => {
@@ -85,7 +84,6 @@ export default function AdminPage() {
         operation: 'delete'
       }));
     });
-    toast({ title: "Deleted", description: "Request removed from database." })
   }
 
   const handleReviewStatus = (id: string, newStatus: string) => {
@@ -98,7 +96,6 @@ export default function AdminPage() {
         requestResourceData: { status: newStatus }
       }));
     });
-    toast({ title: "Review Updated", description: `Marked as ${newStatus}` })
   }
 
   const handleDeleteReview = (id: string) => {
@@ -119,15 +116,16 @@ export default function AdminPage() {
       isActive: true,
       createdAt: new Date().toISOString()
     };
-    addDoc(collection(db, "announcements"), payload).catch((error) => {
+    addDoc(collection(db, "announcements"), payload).then(() => {
+      setAnnouncementInput("")
+      toast({ title: "Success", description: "Announcement posted." })
+    }).catch((error) => {
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: 'announcements',
         operation: 'create',
         requestResourceData: payload
       }));
     });
-    setAnnouncementInput("")
-    toast({ title: "Announcement Posted", description: "Now visible on home page." })
   }
 
   const toggleAnnouncement = (id: string, current: boolean) => {
@@ -143,7 +141,7 @@ export default function AdminPage() {
   }
 
   const formatDate = (dateValue: any) => {
-    if (!dateValue) return "No date";
+    if (!mounted || !dateValue) return "No date";
     try {
       const d = typeof dateValue === 'string' ? new Date(dateValue) : 
                 (dateValue.toDate ? dateValue.toDate() : new Date(dateValue));
@@ -153,7 +151,12 @@ export default function AdminPage() {
     }
   }
 
-  if (!mounted) return null
+  // Hydration guard
+  if (!mounted) return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+      <RefreshCw className="w-10 h-10 animate-spin text-primary opacity-20" />
+    </div>
+  )
 
   if (!isAuthorized) {
     return (
@@ -184,6 +187,16 @@ export default function AdminPage() {
     )
   }
 
+  const ErrorDisplay = ({ error }: { error: any }) => (
+    <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+      <AlertCircle className="w-12 h-12 text-destructive opacity-50" />
+      <div className="space-y-1">
+        <p className="font-bold text-destructive">Data Access Error</p>
+        <p className="text-sm text-muted-foreground max-w-xs">{error?.message || "Verify your Firebase permissions."}</p>
+      </div>
+    </div>
+  )
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -195,7 +208,7 @@ export default function AdminPage() {
               <p className="text-muted-foreground">SuperAdmin Control Panel</p>
             </div>
             <div className="flex gap-2">
-              <Badge variant="outline" className="text-primary border-primary bg-primary/10">Biplop Devkota (SuperAdmin)</Badge>
+              <Badge variant="outline" className="text-primary border-primary bg-primary/10 px-4 py-1">Biplop Devkota (SuperAdmin)</Badge>
               <Button variant="ghost" size="sm" onClick={() => setIsAuthorized(false)}>Logout</Button>
             </div>
           </div>
@@ -219,53 +232,59 @@ export default function AdminPage() {
                   <CardTitle className="font-headline text-2xl">Client Requests</CardTitle>
                 </CardHeader>
                 <CardContent className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Client</TableHead>
-                        <TableHead>Website</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {requests?.map((req: any) => (
-                        <TableRow key={req.id}>
-                          <TableCell>
-                            <div className="font-medium">{req.fullName || req.userName || "N/A"}</div>
-                            <div className="text-xs text-muted-foreground">{formatDate(req.createdAt)}</div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="font-medium">{req.title || "Untitled"}</div>
-                            <div className="text-xs text-muted-foreground">{req.websiteType} • {req.budget}</div>
-                          </TableCell>
-                          <TableCell>
-                            <Select value={req.status} onValueChange={(val) => handleUpdateStatus(req.id, val)}>
-                              <SelectTrigger className="w-[120px] h-8 text-xs glass">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="processing">Processing</SelectItem>
-                                <SelectItem value="completed">Completed</SelectItem>
-                                <SelectItem value="cancelled">Cancelled</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteRequest(req.id)} className="text-destructive">
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      {!requestsLoading && requests?.length === 0 && (
+                  {requestsError ? (
+                    <ErrorDisplay error={requestsError} />
+                  ) : requestsLoading ? (
+                    <div className="flex justify-center py-20"><RefreshCw className="animate-spin" /></div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
                         <TableRow>
-                          <TableCell colSpan={4} className="text-center py-12 text-muted-foreground">No requests found.</TableCell>
+                          <TableHead>Client</TableHead>
+                          <TableHead>Website</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {requests?.map((req: any) => (
+                          <TableRow key={req.id}>
+                            <TableCell>
+                              <div className="font-medium">{req.fullName || req.userName || "N/A"}</div>
+                              <div className="text-xs text-muted-foreground">{formatDate(req.createdAt)}</div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="font-medium">{req.title || "Untitled"}</div>
+                              <div className="text-xs text-muted-foreground">{req.websiteType} • {req.budget}</div>
+                            </TableCell>
+                            <TableCell>
+                              <Select value={req.status} onValueChange={(val) => handleUpdateStatus(req.id, val)}>
+                                <SelectTrigger className="w-[120px] h-8 text-xs glass">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pending">Pending</SelectItem>
+                                  <SelectItem value="processing">Processing</SelectItem>
+                                  <SelectItem value="completed">Completed</SelectItem>
+                                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button variant="ghost" size="icon" onClick={() => handleDeleteRequest(req.id)} className="text-destructive">
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {requests?.length === 0 && (
+                          <TableRow>
+                            <TableCell colSpan={4} className="text-center py-12 text-muted-foreground">No requests found.</TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -276,85 +295,93 @@ export default function AdminPage() {
                   <CardTitle className="font-headline text-2xl">Manage Reviews</CardTitle>
                 </CardHeader>
                 <CardContent className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Author</TableHead>
-                        <TableHead>Review</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {reviews?.map((rev: any) => (
-                        <TableRow key={rev.id}>
-                          <TableCell className="font-medium">{rev.userName}</TableCell>
-                          <TableCell className="max-w-md truncate">{rev.text}</TableCell>
-                          <TableCell>
-                            <Select value={rev.status} onValueChange={(val) => handleReviewStatus(rev.id, val)}>
-                              <SelectTrigger className="w-[120px] h-8 text-xs glass">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="approved">Approved</SelectItem>
-                                <SelectItem value="rejected">Rejected</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteReview(rev.id)} className="text-destructive">
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="announcements">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <Card className="glass col-span-1">
-                  <CardHeader>
-                    <CardTitle>Post New Announcement</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Label>Content</Label>
-                    <Input 
-                      placeholder="e.g. 50% discount this week!" 
-                      value={announcementInput} 
-                      onChange={e => setAnnouncementInput(e.target.value)}
-                      className="glass"
-                    />
-                    <Button onClick={handleAddAnnouncement} className="w-full">Publish</Button>
-                  </CardContent>
-                </Card>
-                
-                <Card className="glass lg:col-span-2">
-                  <CardHeader>
-                    <CardTitle>History</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                  {reviewsError ? (
+                    <ErrorDisplay error={reviewsError} />
+                  ) : (
                     <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Author</TableHead>
+                          <TableHead>Review</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
                       <TableBody>
-                        {announcements?.map((ann: any) => (
-                          <TableRow key={ann.id}>
-                            <TableCell className={cn("font-medium", !ann.isActive && "opacity-40")}>{ann.content}</TableCell>
+                        {reviews?.map((rev: any) => (
+                          <TableRow key={rev.id}>
+                            <TableCell className="font-medium">{rev.userName}</TableCell>
+                            <TableCell className="max-w-md truncate">{rev.text}</TableCell>
+                            <TableCell>
+                              <Select value={rev.status} onValueChange={(val) => handleReviewStatus(rev.id, val)}>
+                                <SelectTrigger className="w-[120px] h-8 text-xs glass">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pending">Pending</SelectItem>
+                                  <SelectItem value="approved">Approved</SelectItem>
+                                  <SelectItem value="rejected">Rejected</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
                             <TableCell className="text-right">
-                              <Button variant="ghost" size="sm" onClick={() => toggleAnnouncement(ann.id, ann.isActive)}>
-                                {ann.isActive ? "Deactivate" : "Activate"}
+                              <Button variant="ghost" size="icon" onClick={() => handleDeleteReview(rev.id)} className="text-destructive">
+                                <Trash2 className="w-4 h-4" />
                               </Button>
                             </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
                     </Table>
-                  </CardContent>
-                </Card>
-              </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="announcements">
+              {announcementsError ? (
+                <ErrorDisplay error={announcementsError} />
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  <Card className="glass col-span-1">
+                    <CardHeader>
+                      <CardTitle>Post New Announcement</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Label>Content</Label>
+                      <Input 
+                        placeholder="e.g. 50% discount this week!" 
+                        value={announcementInput} 
+                        onChange={e => setAnnouncementInput(e.target.value)}
+                        className="glass"
+                      />
+                      <Button onClick={handleAddAnnouncement} className="w-full">Publish</Button>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="glass lg:col-span-2">
+                    <CardHeader>
+                      <CardTitle>History</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableBody>
+                          {announcements?.map((ann: any) => (
+                            <TableRow key={ann.id}>
+                              <TableCell className={cn("font-medium", !ann.isActive && "opacity-40")}>{ann.content}</TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="sm" onClick={() => toggleAnnouncement(ann.id, ann.isActive)}>
+                                  {ann.isActive ? "Deactivate" : "Activate"}
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
