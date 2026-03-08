@@ -1,14 +1,20 @@
-
 "use client"
 
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { LayoutGrid, PlusCircle, User as UserIcon, LogOut, Menu } from "lucide-react"
+import { LayoutGrid, PlusCircle, User as UserIcon, LogOut, Menu, ShieldCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useUser, useAuth } from "@/firebase"
 import { signOut } from "firebase/auth"
+
+const ADMIN_EMAILS = [
+  "biplopdevkota5@gmail.com",
+  "officialhyper993@gmail.com",
+  "dematweb@gmail.com",
+  "devp62569@gmail.com"
+]
 
 export function Navbar() {
   const { user } = useUser()
@@ -16,27 +22,9 @@ export function Navbar() {
   const pathname = usePathname()
   const router = useRouter()
   
-  // Secret Admin Access Logic
-  const [logoClicks, setLogoClicks] = React.useState(0)
-  const clickTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
-
-  const handleLogoClick = (e: React.MouseEvent) => {
-    const newCount = logoClicks + 1
-    
-    if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current)
-    
-    if (newCount >= 10) {
-      e.preventDefault()
-      setLogoClicks(0)
-      router.push('/admin')
-      return
-    }
-
-    setLogoClicks(newCount)
-    clickTimeoutRef.current = setTimeout(() => {
-      setLogoClicks(0)
-    }, 3000) // Reset clicks after 3 seconds of inactivity
-  }
+  const isAdmin = React.useMemo(() => {
+    return user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase())
+  }, [user])
 
   const handleLogout = async () => {
     await signOut(auth)
@@ -51,10 +39,7 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-[100] w-full border-b border-white/10 bg-background shadow-xl">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div 
-          onClick={handleLogoClick}
-          className="flex items-center gap-2 group shrink-0 transition-transform active:scale-95 cursor-pointer"
-        >
+        <div className="flex items-center gap-2 group shrink-0 transition-transform active:scale-95 cursor-pointer">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold group-hover:scale-110 transition-transform shadow-lg shadow-primary/20">R</div>
             <span className="font-headline font-bold text-xl tracking-tight text-foreground hidden sm:inline">RIZER WEB <span className="text-primary">APP</span></span>
@@ -82,6 +67,15 @@ export function Navbar() {
 
         {/* Mobile & Desktop Auth Actions */}
         <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Link href="/admin">
+              <Button variant="ghost" size="sm" className="hidden sm:flex items-center gap-2 text-accent hover:text-accent/80 hover:bg-accent/10 font-black uppercase text-[10px] tracking-widest mr-2">
+                <ShieldCheck className="w-4 h-4" />
+                Admin Panel
+              </Button>
+            </Link>
+          )}
+
           {user ? (
             <div className="flex items-center gap-2">
               <Link href="/dashboard" className="text-sm font-bold text-foreground hover:text-primary transition-colors flex items-center gap-2">
@@ -105,7 +99,6 @@ export function Navbar() {
             </div>
           )}
           
-          {/* Mobile Menu Toggle - Now navigates to /menu as requested */}
           <Link href="/menu" className="md:hidden">
             <Button variant="ghost" size="icon" className="rounded-full">
               <Menu className="w-6 h-6" />

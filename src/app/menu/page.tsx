@@ -4,29 +4,37 @@ import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Navbar } from "@/components/Navbar"
-import { Footer } from "@/components/Footer"
 import { 
   LayoutGrid, 
   PlusCircle, 
-  User as UserIcon, 
   LogOut, 
   MessageCircle, 
   Info, 
   Shield, 
   ChevronRight, 
   X,
-  ArrowLeft
+  ArrowLeft,
+  ShieldCheck
 } from "lucide-react"
 import { useUser, useAuth } from "@/firebase"
 import { signOut } from "firebase/auth"
-import { cn } from "@/lib/utils"
+
+const ADMIN_EMAILS = [
+  "biplopdevkota5@gmail.com",
+  "officialhyper993@gmail.com",
+  "dematweb@gmail.com",
+  "devp62569@gmail.com"
+]
 
 export default function MobileMenuPage() {
   const { user } = useUser()
   const auth = useAuth()
   const router = useRouter()
   const WHATSAPP_MESSAGE = encodeURIComponent("Hello, Rizer Web NP. I Need Support.")
+
+  const isAdmin = React.useMemo(() => {
+    return user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase())
+  }, [user])
 
   const handleLogout = async () => {
     await signOut(auth)
@@ -92,6 +100,16 @@ export default function MobileMenuPage() {
                   <p className="text-xs text-muted-foreground font-medium">{user.email}</p>
                 </div>
               </Link>
+              
+              {isAdmin && (
+                <Link href="/admin">
+                  <Button className="w-full rounded-2xl h-14 font-black bg-accent/20 text-accent hover:bg-accent/30 border border-accent/20" variant="ghost">
+                    <ShieldCheck className="w-5 h-5 mr-3" />
+                    Enter Admin Portal
+                  </Button>
+                </Link>
+              )}
+
               <Button onClick={handleLogout} className="w-full rounded-2xl h-14 font-bold text-destructive hover:bg-destructive/10" variant="ghost">
                 <LogOut className="w-5 h-5 mr-3" />
                 Logout from Account
@@ -135,10 +153,10 @@ export default function MobileMenuPage() {
         </section>
 
         <div className="pt-8 pb-12 text-center">
-          <Link href="/admin" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-primary transition-colors">
+          <p className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-muted-foreground">
             <Shield className="w-3 h-3" />
-            Admin Secure Portal
-          </Link>
+            Secure Platform
+          </p>
         </div>
       </main>
       
