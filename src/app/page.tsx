@@ -7,23 +7,23 @@ import { Button } from "@/components/ui/button"
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { FloatingButton } from "@/components/FloatingButton"
-import { CheckCircle2, Zap, Shield, Globe, Cpu, Sparkles, Star, StarHalf, Megaphone, ArrowRight } from "lucide-react"
+import { CheckCircle2, Zap, Shield, Globe, Cpu, Sparkles, Star, Megaphone, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useFirestore, useCollection } from "@/firebase"
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, query, where, orderBy, limit } from "firebase/firestore"
 
 export default function Home() {
   const db = useFirestore()
   
   // Fetch Announcements
-  const announcementsQuery = React.useMemo(() => {
+  const announcementsQuery = useMemoFirebase(() => {
     if (!db) return null
     return query(collection(db, "announcements"), where("isActive", "==", true), orderBy("createdAt", "desc"), limit(1))
   }, [db])
   const { data: announcements } = useCollection(announcementsQuery)
 
   // Fetch Approved Reviews
-  const reviewsQuery = React.useMemo(() => {
+  const reviewsQuery = useMemoFirebase(() => {
     if (!db) return null
     return query(collection(db, "reviews"), where("status", "==", "approved"), orderBy("createdAt", "desc"), limit(6))
   }, [db])
@@ -136,13 +136,12 @@ export default function Home() {
                     {Array.from({ length: 5 }).map((_, starIdx) => {
                       const starVal = starIdx + 1;
                       const isFull = starVal <= Math.floor(t.rating);
-                      const isHalf = !isFull && starVal === Math.ceil(t.rating) && (t.rating % 1 !== 0);
                       return (
                         <Star 
                           key={starIdx} 
                           className={cn(
                             "w-4 h-4",
-                            isFull ? "fill-accent text-accent" : isHalf ? "fill-accent text-accent opacity-70" : "text-white/20"
+                            isFull ? "fill-accent text-accent" : "text-white/20"
                           )} 
                         />
                       )

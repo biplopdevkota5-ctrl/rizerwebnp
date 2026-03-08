@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList } from "lucide-react"
-import { useFirestore, useCollection } from "@/firebase"
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, doc, updateDoc, deleteDoc, addDoc, query, orderBy } from "firebase/firestore"
 import { cn } from "@/lib/utils"
 
@@ -27,13 +27,13 @@ export default function AdminPage() {
   const { toast } = useToast()
   const db = useFirestore()
 
-  const requestsQuery = React.useMemo(() => db ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, [db])
+  const requestsQuery = useMemoFirebase(() => db ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, [db])
   const { data: requests } = useCollection(requestsQuery)
 
-  const reviewsQuery = React.useMemo(() => db ? query(collection(db, "reviews"), orderBy("createdAt", "desc")) : null, [db])
+  const reviewsQuery = useMemoFirebase(() => db ? query(collection(db, "reviews"), orderBy("createdAt", "desc")) : null, [db])
   const { data: reviews } = useCollection(reviewsQuery)
 
-  const announcementsQuery = React.useMemo(() => db ? query(collection(db, "announcements"), orderBy("createdAt", "desc")) : null, [db])
+  const announcementsQuery = useMemoFirebase(() => db ? query(collection(db, "announcements"), orderBy("createdAt", "desc")) : null, [db])
   const { data: announcements } = useCollection(announcementsQuery)
 
   const handleLogin = (e: React.FormEvent) => {

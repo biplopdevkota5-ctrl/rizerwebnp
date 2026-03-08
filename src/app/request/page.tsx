@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -18,6 +17,8 @@ import { aiDesignSuggestion } from "@/ai/flows/ai-design-suggestion-flow"
 import { useFirestore, useUser } from "@/firebase"
 import { collection, addDoc } from "firebase/firestore"
 import { cn } from "@/lib/utils"
+import { errorEmitter } from "@/firebase/error-emitter"
+import { FirestorePermissionError } from "@/firebase/errors"
 
 const WHATSAPP_NUM = "9805602394"
 
@@ -46,7 +47,6 @@ export default function RequestPage() {
     extraFeatures: ""
   })
 
-  // Review Form State
   const [reviewData, setReviewData] = React.useState({
     text: "",
     rating: 5
@@ -81,7 +81,7 @@ export default function RequestPage() {
     }
   }
 
-  const handleSubmitReview = async (e: React.FormEvent) => {
+  const handleSubmitReview = (e: React.FormEvent) => {
     e.preventDefault()
     if (!db || !user) {
       toast({ title: "Login Required", description: "Please login to leave a review.", variant: "destructive" })
@@ -92,53 +92,67 @@ export default function RequestPage() {
       return
     }
 
-    try {
-      await addDoc(collection(db, "reviews"), {
-        userId: user.uid,
-        userName: user.displayName || "Anonymous",
-        text: reviewData.text,
-        rating: reviewData.rating,
-        status: "pending",
-        createdAt: new Date().toISOString()
-      })
-      setReviewData({ text: "", rating: 5 })
-      toast({ title: "Review Submitted", description: "Thanks! It will be visible after admin approval." })
-    } catch (e) {
-      toast({ title: "Error", description: "Could not submit review.", variant: "destructive" })
-    }
+    const reviewsCol = collection(db, "reviews");
+    const payload = {
+      userId: user.uid,
+      userName: user.displayName || "Anonymous",
+      text: reviewData.text,
+      rating: reviewData.rating,
+      status: "pending",
+      createdAt: new Date().toISOString()
+    };
+
+    addDoc(reviewsCol, payload).catch(async (error) => {
+      const permissionError = new FirestorePermissionError({
+        path: reviewsCol.path,
+        operation: 'create',
+        requestResourceData: payload,
+      });
+      errorEmitter.emit('permission-error', permissionError);
+    });
+    
+    setReviewData({ text: "", rating: 5 });
+    toast({ title: "Review Submitted", description: "Thanks! It will be visible after admin approval." });
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!db) return
     setLoading(true)
 
-    try {
-      // 1. Save to Firestore
-      await addDoc(collection(db, "requests"), {
-        ...formData,
-        userId: user?.uid || 'guest',
-        userName: formData.fullName,
-        status: 'pending',
-        createdAt: new Date().toISOString()
+    const payload = {
+      ...formData,
+      userId: user?.uid || 'guest',
+      userName: formData.fullName,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+
+    // Corrected path for logged in users or fallback
+    const requestsCol = user 
+      ? collection(db, "users", user.uid, "website_requests")
+      : collection(db, "anonymous_website_requests");
+
+    addDoc(requestsCol, payload)
+      .then(() => {
+        toast({ title: "Success!", description: "Your request has been submitted." })
+        const waMessage = `Hello, I submitted a website request on RIZERWEBNP.\nName: ${formData.fullName}\nType: ${formData.websiteType}\nBudget: ${formData.budget}`
+        const encodedMsg = encodeURIComponent(waMessage)
+        
+        setTimeout(() => {
+          window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodedMsg}`, '_blank')
+          router.push('/dashboard')
+        }, 1500)
       })
-
-      toast({ title: "Success!", description: "Your request has been submitted to Firestore." })
-
-      // 2. Redirect to WhatsApp
-      const waMessage = `Hello, I submitted a website request on RIZERWEBNP.\nName: ${formData.fullName}\nType: ${formData.websiteType}\nBudget: ${formData.budget}`
-      const encodedMsg = encodeURIComponent(waMessage)
-      
-      setTimeout(() => {
-        window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodedMsg}`, '_blank')
-        router.push('/dashboard')
-      }, 1500)
-
-    } catch (error) {
-      toast({ title: "Submission Error", description: "There was a problem sending your request.", variant: "destructive" })
-    } finally {
-      setLoading(false)
-    }
+      .catch(async (error) => {
+        const permissionError = new FirestorePermissionError({
+          path: requestsCol.path,
+          operation: 'create',
+          requestResourceData: payload,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      })
+      .finally(() => setLoading(false));
   }
 
   return (
@@ -146,7 +160,6 @@ export default function RequestPage() {
       <Navbar />
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4 max-w-4xl space-y-10 md:space-y-16">
-          {/* Main Request Form */}
           <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
             <CardHeader className="text-center bg-white/5 pt-10 pb-8">
               <CardTitle className="font-headline text-3xl md:text-5xl font-bold mb-2">Request Your Website</CardTitle>
@@ -155,7 +168,6 @@ export default function RequestPage() {
             <CardContent className="p-6 md:p-12">
               <form onSubmit={handleSubmit} className="space-y-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-                  {/* Basic Info */}
                   <div className="space-y-6">
                     <h3 className="font-headline font-bold text-xl flex items-center gap-2">
                       <div className="w-1.5 h-6 bg-primary rounded-full" />
@@ -177,7 +189,6 @@ export default function RequestPage() {
                     </div>
                   </div>
 
-                  {/* Website Info */}
                   <div className="space-y-6">
                     <h3 className="font-headline font-bold text-xl flex items-center gap-2">
                       <div className="w-1.5 h-6 bg-accent rounded-full" />
@@ -245,7 +256,6 @@ export default function RequestPage() {
             </CardContent>
           </Card>
 
-          {/* Review Submission Form */}
           {user && (
             <Card className="glass border-accent/20 shadow-2xl rounded-[2.5rem] overflow-hidden">
               <CardHeader className="bg-white/5 p-8">

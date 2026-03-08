@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -12,12 +11,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast"
 import { Trash2, Plus, RefreshCw, LayoutDashboard } from "lucide-react"
 import Link from "next/link"
-import { useFirestore, useCollection, useUser } from "@/firebase"
+import { useFirestore, useCollection, useUser, useMemoFirebase } from "@/firebase"
 import { collection, query, where, orderBy, deleteDoc, doc } from "firebase/firestore"
 import { cn } from "@/lib/utils"
+import { errorEmitter } from "@/firebase/error-emitter"
+import { FirestorePermissionError } from "@/firebase/errors"
 
 export default function DashboardPage() {
-  const { user, loading: authLoading } = useUser()
+  const { user, isUserLoading: authLoading } = useUser()
   const router = useRouter()
   const { toast } = useToast()
   const db = useFirestore()
@@ -28,25 +29,30 @@ export default function DashboardPage() {
     }
   }, [user, authLoading, router])
 
-  const userRequestsQuery = React.useMemo(() => {
+  const userRequestsQuery = useMemoFirebase(() => {
     if (!db || !user) return null
+    // Updated path to match backend.json: /users/{userId}/website_requests
     return query(
-      collection(db, "requests"),
-      where("userId", "==", user.uid),
+      collection(db, "users", user.uid, "website_requests"),
       orderBy("createdAt", "desc")
     )
   }, [db, user])
 
-  const { data: requests, loading: dataLoading } = useCollection(userRequestsQuery)
+  const { data: requests, isLoading: dataLoading } = useCollection(userRequestsQuery)
 
-  const deleteRequest = async (id: string) => {
-    if (!db || !confirm("Are you sure you want to delete this request?")) return
-    try {
-      await deleteDoc(doc(db, "requests", id))
-      toast({ title: "Request Deleted", description: "Successfully removed from your history." })
-    } catch (e) {
-      toast({ title: "Error", description: "Could not delete request.", variant: "destructive" })
-    }
+  const deleteRequest = (id: string) => {
+    if (!db || !user || !confirm("Are you sure you want to delete this request?")) return
+    
+    const docRef = doc(db, "users", user.uid, "website_requests", id);
+    deleteDoc(docRef).catch(async (error) => {
+      const permissionError = new FirestorePermissionError({
+        path: docRef.path,
+        operation: 'delete',
+      });
+      errorEmitter.emit('permission-error', permissionError);
+    });
+    
+    toast({ title: "Deleting...", description: "Request removal initiated." })
   }
 
   if (authLoading) {
