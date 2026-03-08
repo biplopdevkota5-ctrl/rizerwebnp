@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -28,9 +29,11 @@ export default function AdminPage() {
 
   React.useEffect(() => {
     setMounted(true)
+    const saved = localStorage.getItem("rizer_admin_session")
+    if (saved === "active") setIsAuthorized(true)
   }, [])
 
-  // Strictly gate queries by authorization state
+  // Optimized Queries: Only run when authorized and mounted
   const requestsQuery = useMemoFirebase(() => 
     (db && isAuthorized && mounted) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
     [db, isAuthorized, mounted]
@@ -53,10 +56,16 @@ export default function AdminPage() {
     e.preventDefault()
     if (password === ADMIN_PASSWORD) {
       setIsAuthorized(true)
+      localStorage.setItem("rizer_admin_session", "active")
       toast({ title: "Authorized", description: "Welcome to Rizer Studio Management." })
     } else {
       toast({ title: "Denied", description: "Invalid management password.", variant: "destructive" })
     }
+  }
+
+  const handleLogout = () => {
+    setIsAuthorized(false)
+    localStorage.removeItem("rizer_admin_session")
   }
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
@@ -156,7 +165,7 @@ export default function AdminPage() {
               </h1>
               <p className="text-muted-foreground font-medium">Managing Rizer Studio Projects</p>
             </div>
-            <Button variant="outline" onClick={() => setIsAuthorized(false)} className="rounded-full h-10 px-6 glass">
+            <Button variant="outline" onClick={handleLogout} className="rounded-full h-10 px-6 glass">
               <LogOut className="w-4 h-4 mr-2" />
               Exit Console
             </Button>
@@ -182,8 +191,10 @@ export default function AdminPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {requestsLoading ? (
+                      {requestsLoading && !requests ? (
                         <TableRow><TableCell colSpan={4} className="text-center py-20"><RefreshCw className="w-8 h-8 animate-spin mx-auto opacity-20" /></TableCell></TableRow>
+                      ) : requests?.length === 0 ? (
+                        <TableRow><TableCell colSpan={4} className="text-center py-20 text-muted-foreground">No build requests found.</TableCell></TableRow>
                       ) : requests?.map((req) => (
                         <TableRow key={req.id} className="border-white/5 hover:bg-white/5">
                           <TableCell className="pl-8 py-6">

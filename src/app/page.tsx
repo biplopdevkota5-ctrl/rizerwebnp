@@ -20,7 +20,7 @@ export default function Home() {
     setMounted(true)
   }, [])
   
-  // Announcements: Simplified guest-safe query
+  // Announcements: Stable query to prevent flickering
   const announcementsQuery = useMemoFirebase(() => {
     if (!db || !mounted) return null
     return query(
@@ -29,26 +29,27 @@ export default function Home() {
       limit(5)
     )
   }, [db, mounted])
-  const { data: rawAnnouncements } = useCollection(announcementsQuery)
+  const { data: rawAnnouncements, isLoading: announcementsLoading } = useCollection(announcementsQuery)
 
-  // Reviews: Simplified guest-safe query
+  // Reviews: Stable query
   const reviewsQuery = useMemoFirebase(() => {
     if (!db || !mounted) return null
     return query(collection(db, "reviews"), where("status", "==", "approved"), limit(6))
   }, [db, mounted])
   const { data: rawReviews } = useCollection(reviewsQuery)
 
-  const sortedAnnouncements = React.useMemo(() => {
-    if (!rawAnnouncements) return []
+  const latestAnnouncement = React.useMemo(() => {
+    if (!rawAnnouncements || rawAnnouncements.length === 0) return null
     return [...rawAnnouncements].sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
+    )[0]
   }, [rawAnnouncements])
 
   const displayReviews = React.useMemo(() => {
     if (!mounted) return []
     if (rawReviews && rawReviews.length > 0) return rawReviews
     
+    // Fallback static reviews if database is empty or loading
     return [
       { id: "1", userName: "Anish Sharma", rating: 5, text: "RIZERWEBNP transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
       { id: "2", userName: "Sita Gurung", rating: 5, text: "My portfolio looks futuristic and high-end. Biplop is a true professional developer who understands design." },
@@ -67,12 +68,12 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen selection:bg-primary/30 selection:text-primary overflow-x-hidden">
       {/* High-Visibility Admin Announcement Banner */}
-      {sortedAnnouncements?.[0] && (
+      {latestAnnouncement && (
         <div className="bg-primary text-primary-foreground py-3 px-4 text-center animate-fade-in relative z-[101] shadow-[0_4px_20px_rgba(88,88,179,0.4)]">
           <div className="container mx-auto flex items-center justify-center gap-3">
             <Sparkles className="w-5 h-5 animate-pulse shrink-0 hidden xs:block" />
             <span className="text-xs sm:text-sm md:text-base font-black uppercase tracking-tight">
-              {sortedAnnouncements[0].content}
+              {latestAnnouncement.content}
             </span>
             <Sparkles className="w-5 h-5 animate-pulse shrink-0 hidden xs:block" />
           </div>
