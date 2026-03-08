@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -19,18 +20,18 @@ export default function Home() {
     setMounted(true)
   }, [])
   
-  // Fetch Latest Active Announcement - Simplified to avoid index errors/permission triggers for guests
+  // Announcements: Simplified guest-safe query
   const announcementsQuery = useMemoFirebase(() => {
     if (!db || !mounted) return null
     return query(
       collection(db, "announcements"), 
       where("isActive", "==", true),
-      limit(5) // Get multiple to sort in memory if needed, safer than complex query for first-load
+      limit(5)
     )
   }, [db, mounted])
   const { data: rawAnnouncements } = useCollection(announcementsQuery)
 
-  // Fetch Approved Reviews
+  // Reviews: Simplified guest-safe query
   const reviewsQuery = useMemoFirebase(() => {
     if (!db || !mounted) return null
     return query(collection(db, "reviews"), where("status", "==", "approved"), limit(6))
