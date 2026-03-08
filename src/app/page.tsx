@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -147,7 +148,7 @@ export default function Home() {
               <p className="text-muted-foreground max-w-2xl mx-auto font-medium italic">Verified reviews from satisfied clients.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {displayReviews.map((t, i) => (
+              {displayReviews.map((t: any, i) => (
                 <div 
                   key={i} 
                   className={cn(
