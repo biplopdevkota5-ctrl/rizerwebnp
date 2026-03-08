@@ -1,4 +1,3 @@
-
 import type {Metadata} from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase';
@@ -6,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
 export const metadata: Metadata = {
-  title: 'RIZERWEBNP | Custom Websites for Everyone',
+  title: 'RIZER WEB APP | Custom Websites for Everyone',
   description: 'Professional custom website development at affordable prices by Biplop Devkota.',
 };
 

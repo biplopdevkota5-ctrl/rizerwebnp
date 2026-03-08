@@ -12,7 +12,7 @@ export function Footer() {
           <div className="space-y-6">
             <Link href="/" className="flex items-center gap-2 group">
               <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-105 transition-transform">R</div>
-              <span className="font-headline font-bold text-2xl tracking-tight text-primary">RIZERWEBNP</span>
+              <span className="font-headline font-bold text-2xl tracking-tight text-primary">RIZER WEB APP</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed font-medium">
               Empowering individuals and businesses in Nepal with world-class websites at unbeatable prices. Developed by Biplop Devkota in Gaidakot.
@@ -68,7 +68,7 @@ export function Footer() {
         </div>
         
         <div className="mt-16 pt-8 border-t border-border/40 text-center text-xs text-muted-foreground font-bold uppercase tracking-widest">
-          <p>© {new Date().getFullYear()} RIZERWEBNP. All rights reserved. Developed with ❤️ in Nepal by Biplop Devkota.</p>
+          <p>© {new Date().getFullYear()} RIZER WEB APP. All rights reserved. Developed with ❤️ in Nepal by Biplop Devkota.</p>
         </div>
       </div>
     </footer>

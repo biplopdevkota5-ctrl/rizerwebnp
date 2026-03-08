@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -38,7 +37,7 @@ export function Navbar() {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold group-hover:scale-110 transition-transform shadow-lg shadow-primary/20">R</div>
-          <span className="font-headline font-bold text-xl tracking-tight text-foreground">RIZERWEB<span className="text-primary">NP</span></span>
+          <span className="font-headline font-bold text-xl tracking-tight text-foreground">RIZER WEB <span className="text-primary">APP</span></span>
         </Link>
 
         {/* Desktop Links */}

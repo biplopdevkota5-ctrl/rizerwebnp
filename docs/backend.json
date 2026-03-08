@@ -1,11 +1,10 @@
-
 {
   "entities": {
     "User": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a registered user of the RIZERWEBNP platform, allowing them to log in and manage their website requests.",
+      "description": "Represents a registered user of the RIZER WEB APP platform, allowing them to log in and manage their website requests.",
       "properties": {
         "id": {
           "type": "string",
@@ -50,7 +49,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "WebsiteType",
       "type": "object",
-      "description": "Defines the different categories or types of websites RIZERWEBNP offers, displayed in the 'Website Types Page'.",
+      "description": "Defines the different categories or types of websites RIZER WEB APP offers, displayed in the 'Website Types Page'.",
       "properties": {
         "id": {
           "type": "string",
