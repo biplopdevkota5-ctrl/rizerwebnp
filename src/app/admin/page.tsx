@@ -17,6 +17,7 @@ import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList, RefreshCw, LogOut,
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, doc, updateDoc, deleteDoc, addDoc, query, orderBy } from "firebase/firestore"
 
+// Updated Password as requested
 const ADMIN_PASSWORD = "090102030405"
 
 export default function AdminPage() {
@@ -33,7 +34,7 @@ export default function AdminPage() {
     if (saved === "active") setIsAuthorized(true)
   }, [])
 
-  // Stable queries that only activate when authorized
+  // Stable queries that only activate when authorized to prevent permission error popups
   const requestsQuery = useMemoFirebase(() => 
     (db && mounted && isAuthorized) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
     [db, mounted, isAuthorized]
@@ -66,6 +67,7 @@ export default function AdminPage() {
   const handleLogout = () => {
     setIsAuthorized(false)
     localStorage.removeItem("rizer_admin_session")
+    toast({ title: "Logged Out", description: "Session ended." })
   }
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
@@ -144,7 +146,7 @@ export default function AdminPage() {
                   <Label htmlFor="password">Management Key</Label>
                   <Input 
                     id="password" 
-                    type="password" 
+                    type="password" // Hidden input as requested
                     value={password} 
                     onChange={e => setPassword(e.target.value)} 
                     placeholder="Enter key..."
@@ -316,7 +318,7 @@ export default function AdminPage() {
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              onClick={() => handleDeleteAnnouncement(ann.id)} 
+                              onClick={() => handleDeleteAnnouncement(ann.id)} // Added delete functionality
                               className="text-destructive hover:bg-destructive/10 h-8 w-8 rounded-lg"
                             >
                               <Trash2 className="w-4 h-4" />
