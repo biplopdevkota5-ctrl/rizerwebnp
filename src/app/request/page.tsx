@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
@@ -11,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
-import { Sparkles, Send, MessageCircle, Star } from "lucide-react"
+import { Sparkles, Send, MessageCircle, Star, RefreshCw } from "lucide-react"
 import { WEBSITE_TYPES } from "@/lib/types"
 import { aiDesignSuggestion } from "@/ai/flows/ai-design-suggestion-flow"
 import { useFirestore, useUser } from "@/firebase"
@@ -22,7 +23,7 @@ import { FirestorePermissionError } from "@/firebase/errors"
 
 const WHATSAPP_NUM = "9805602394"
 
-export default function RequestPage() {
+function RequestFormContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { toast } = useToast()
@@ -58,8 +59,6 @@ export default function RequestPage() {
         ...prev, 
         fullName: user.displayName || "", 
         email: user.email || "", 
-        phone: prev.phone || "", 
-        whatsapp: prev.whatsapp || "" 
       }))
     }
   }, [user])
@@ -128,7 +127,6 @@ export default function RequestPage() {
       createdAt: new Date().toISOString()
     };
 
-    // Corrected path for logged in users or fallback
     const requestsCol = user 
       ? collection(db, "users", user.uid, "website_requests")
       : collection(db, "anonymous_website_requests");
@@ -156,152 +154,164 @@ export default function RequestPage() {
   }
 
   return (
+    <div className="container mx-auto px-4 max-w-4xl space-y-10 md:space-y-16">
+      <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
+        <CardHeader className="text-center bg-white/5 pt-10 pb-8">
+          <CardTitle className="font-headline text-3xl md:text-5xl font-bold mb-2">Request Your Website</CardTitle>
+          <CardDescription className="text-muted-foreground font-medium">All requests are saved securely in our cloud database.</CardDescription>
+        </CardHeader>
+        <CardContent className="p-6 md:p-12">
+          <form onSubmit={handleSubmit} className="space-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+              <div className="space-y-6">
+                <h3 className="font-headline font-bold text-xl flex items-center gap-2">
+                  <div className="w-1.5 h-6 bg-primary rounded-full" />
+                  Contact Details
+                </h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName" className="font-bold">Full Name</Label>
+                    <Input id="fullName" required value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} className="glass h-12 rounded-xl" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="font-bold">Email</Label>
+                    <Input id="email" type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="glass h-12 rounded-xl" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="font-bold">Phone Number</Label>
+                    <Input id="phone" type="tel" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="glass h-12 rounded-xl" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <h3 className="font-headline font-bold text-xl flex items-center gap-2">
+                  <div className="w-1.5 h-6 bg-accent rounded-full" />
+                  Specification
+                </h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="websiteType" className="font-bold">Website Type</Label>
+                    <Select value={formData.websiteType} onValueChange={val => setFormData({...formData, websiteType: val})}>
+                      <SelectTrigger id="websiteType" className="glass h-12 rounded-xl">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent className="glass">
+                        {WEBSITE_TYPES.map(t => (
+                          <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="budget" className="font-bold">Budget (NPR / USD)</Label>
+                    <Input id="budget" placeholder="e.g. $100 or 15,000 NPR" required value={formData.budget} onChange={e => setFormData({...formData, budget: e.target.value})} className="glass h-12 rounded-xl" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="pages" className="font-bold">Pages Needed</Label>
+                    <Input id="pages" placeholder="Home, About, Services..." required value={formData.pages} onChange={e => setFormData({...formData, pages: e.target.value})} className="glass h-12 rounded-xl" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-8">
+              <h3 className="font-headline font-bold text-xl flex items-center gap-2">
+                <div className="w-1.5 h-6 bg-primary rounded-full" />
+                Project Details
+              </h3>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="font-bold">Vision Description</Label>
+                  <Textarea id="description" className="min-h-[120px] glass rounded-2xl p-4" placeholder="Explain what your website should do and any core business goals..." required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <Label htmlFor="designStyle" className="font-bold">Design Style & Idea</Label>
+                    <Button type="button" variant="ghost" size="sm" onClick={handleAiSuggestion} disabled={aiLoading} className="text-primary hover:bg-primary/10 font-black text-xs uppercase tracking-wider">
+                      {aiLoading ? "AI Thinking..." : <><Sparkles className="w-3 h-3 mr-2" /> AI Suggest Design</>}
+                    </Button>
+                  </div>
+                  <Textarea id="designStyle" className="min-h-[150px] glass rounded-2xl p-4" placeholder="Describe the aesthetic (e.g. dark, minimalist, futuristic)..." value={formData.designStyle} onChange={e => setFormData({...formData, designStyle: e.target.value})} />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-6 flex flex-col sm:flex-row gap-4">
+              <Button type="submit" size="lg" className="flex-1 h-14 rounded-2xl text-lg font-black shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-all" disabled={loading}>
+                <Send className="w-5 h-5 mr-3" />
+                {loading ? "Submitting..." : "Submit Project"}
+              </Button>
+              <Button type="button" variant="outline" size="lg" className="flex-1 h-14 rounded-2xl text-lg glass border-white/10 font-bold shadow-xl hover:scale-[1.02] transition-all" onClick={() => window.open(`https://wa.me/${WHATSAPP_NUM}`, '_blank')}>
+                <MessageCircle className="w-5 h-5 mr-3 text-[#25D366]" />
+                Direct WhatsApp
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      {user && (
+        <Card className="glass border-accent/20 shadow-2xl rounded-[2.5rem] overflow-hidden">
+          <CardHeader className="bg-white/5 p-8">
+            <CardTitle className="flex items-center gap-3 font-headline text-2xl md:text-3xl font-bold">
+              <Star className="w-8 h-8 text-accent fill-accent" />
+              Leave a Review
+            </CardTitle>
+            <CardDescription className="font-medium">Share your experience with the RIZERWEBNP community.</CardDescription>
+          </CardHeader>
+          <CardContent className="p-8 md:p-12">
+            <form onSubmit={handleSubmitReview} className="space-y-8">
+              <div className="space-y-4">
+                <Label className="font-bold">Rating (1-5 Stars)</Label>
+                <div className="flex gap-3">
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => setReviewData({ ...reviewData, rating: num })}
+                      className={cn(
+                        "w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-2 transition-all flex items-center justify-center font-black text-lg",
+                        reviewData.rating >= num 
+                          ? "bg-accent border-accent text-white shadow-lg shadow-accent/20" 
+                          : "glass border-white/10 text-muted-foreground hover:border-accent/50"
+                      )}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="font-bold">Your Feedback</Label>
+                <Textarea 
+                  placeholder="How was our service? What did you love about your new website?" 
+                  value={reviewData.text} 
+                  onChange={e => setReviewData({ ...reviewData, text: e.target.value })}
+                  className="glass rounded-2xl min-h-[120px] p-4"
+                />
+              </div>
+              <Button type="submit" variant="secondary" className="w-full h-14 font-black rounded-2xl text-lg hover:bg-accent hover:text-white transition-all">Post Review</Button>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+export default function RequestPage() {
+  return (
     <div className="min-h-screen flex flex-col selection:bg-primary/30 selection:text-primary overflow-x-hidden">
       <Navbar />
       <main className="flex-1 py-12">
-        <div className="container mx-auto px-4 max-w-4xl space-y-10 md:space-y-16">
-          <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
-            <CardHeader className="text-center bg-white/5 pt-10 pb-8">
-              <CardTitle className="font-headline text-3xl md:text-5xl font-bold mb-2">Request Your Website</CardTitle>
-              <CardDescription className="text-muted-foreground font-medium">All requests are saved securely in our cloud database.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-6 md:p-12">
-              <form onSubmit={handleSubmit} className="space-y-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-                  <div className="space-y-6">
-                    <h3 className="font-headline font-bold text-xl flex items-center gap-2">
-                      <div className="w-1.5 h-6 bg-primary rounded-full" />
-                      Contact Details
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="fullName" className="font-bold">Full Name</Label>
-                        <Input id="fullName" required value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} className="glass h-12 rounded-xl" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email" className="font-bold">Email</Label>
-                        <Input id="email" type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="glass h-12 rounded-xl" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="phone" className="font-bold">Phone Number</Label>
-                        <Input id="phone" type="tel" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="glass h-12 rounded-xl" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <h3 className="font-headline font-bold text-xl flex items-center gap-2">
-                      <div className="w-1.5 h-6 bg-accent rounded-full" />
-                      Specification
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="websiteType" className="font-bold">Website Type</Label>
-                        <Select value={formData.websiteType} onValueChange={val => setFormData({...formData, websiteType: val})}>
-                          <SelectTrigger id="websiteType" className="glass h-12 rounded-xl">
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                          <SelectContent className="glass">
-                            {WEBSITE_TYPES.map(t => (
-                              <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="budget" className="font-bold">Budget (NPR / USD)</Label>
-                        <Input id="budget" placeholder="e.g. $100 or 15,000 NPR" required value={formData.budget} onChange={e => setFormData({...formData, budget: e.target.value})} className="glass h-12 rounded-xl" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="pages" className="font-bold">Pages Needed</Label>
-                        <Input id="pages" placeholder="Home, About, Services..." required value={formData.pages} onChange={e => setFormData({...formData, pages: e.target.value})} className="glass h-12 rounded-xl" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-8">
-                  <h3 className="font-headline font-bold text-xl flex items-center gap-2">
-                    <div className="w-1.5 h-6 bg-primary rounded-full" />
-                    Project Details
-                  </h3>
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="description" className="font-bold">Vision Description</Label>
-                      <Textarea id="description" className="min-h-[120px] glass rounded-2xl p-4" placeholder="Explain what your website should do and any core business goals..." required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between mb-2">
-                        <Label htmlFor="designStyle" className="font-bold">Design Style & Idea</Label>
-                        <Button type="button" variant="ghost" size="sm" onClick={handleAiSuggestion} disabled={aiLoading} className="text-primary hover:bg-primary/10 font-black text-xs uppercase tracking-wider">
-                          {aiLoading ? "AI Thinking..." : <><Sparkles className="w-3 h-3 mr-2" /> AI Suggest Design</>}
-                        </Button>
-                      </div>
-                      <Textarea id="designStyle" className="min-h-[150px] glass rounded-2xl p-4" placeholder="Describe the aesthetic (e.g. dark, minimalist, futuristic)..." value={formData.designStyle} onChange={e => setFormData({...formData, designStyle: e.target.value})} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-6 flex flex-col sm:flex-row gap-4">
-                  <Button type="submit" size="lg" className="flex-1 h-14 rounded-2xl text-lg font-black shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-all" disabled={loading}>
-                    <Send className="w-5 h-5 mr-3" />
-                    {loading ? "Submitting..." : "Submit Project"}
-                  </Button>
-                  <Button type="button" variant="outline" size="lg" className="flex-1 h-14 rounded-2xl text-lg glass border-white/10 font-bold shadow-xl hover:scale-[1.02] transition-all" onClick={() => window.open(`https://wa.me/${WHATSAPP_NUM}`, '_blank')}>
-                    <MessageCircle className="w-5 h-5 mr-3 text-[#25D366]" />
-                    Direct WhatsApp
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-
-          {user && (
-            <Card className="glass border-accent/20 shadow-2xl rounded-[2.5rem] overflow-hidden">
-              <CardHeader className="bg-white/5 p-8">
-                <CardTitle className="flex items-center gap-3 font-headline text-2xl md:text-3xl font-bold">
-                  <Star className="w-8 h-8 text-accent fill-accent" />
-                  Leave a Review
-                </CardTitle>
-                <CardDescription className="font-medium">Share your experience with the RIZERWEBNP community.</CardDescription>
-              </CardHeader>
-              <CardContent className="p-8 md:p-12">
-                <form onSubmit={handleSubmitReview} className="space-y-8">
-                  <div className="space-y-4">
-                    <Label className="font-bold">Rating (1-5 Stars)</Label>
-                    <div className="flex gap-3">
-                      {[1, 2, 3, 4, 5].map((num) => (
-                        <button
-                          key={num}
-                          type="button"
-                          onClick={() => setReviewData({ ...reviewData, rating: num })}
-                          className={cn(
-                            "w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-2 transition-all flex items-center justify-center font-black text-lg",
-                            reviewData.rating >= num 
-                              ? "bg-accent border-accent text-white shadow-lg shadow-accent/20" 
-                              : "glass border-white/10 text-muted-foreground hover:border-accent/50"
-                          )}
-                        >
-                          {num}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="font-bold">Your Feedback</Label>
-                    <Textarea 
-                      placeholder="How was our service? What did you love about your new website?" 
-                      value={reviewData.text} 
-                      onChange={e => setReviewData({ ...reviewData, text: e.target.value })}
-                      className="glass rounded-2xl min-h-[120px] p-4"
-                    />
-                  </div>
-                  <Button type="submit" variant="secondary" className="w-full h-14 font-black rounded-2xl text-lg hover:bg-accent hover:text-white transition-all">Post Review</Button>
-                </form>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+        <Suspense fallback={
+          <div className="flex-1 flex items-center justify-center py-20">
+            <RefreshCw className="w-10 h-10 animate-spin text-primary opacity-50" />
+          </div>
+        }>
+          <RequestFormContent />
+        </Suspense>
       </main>
       <Footer />
     </div>
