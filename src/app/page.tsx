@@ -20,14 +20,13 @@ export default function Home() {
     setMounted(true)
   }, [])
   
-  // Fetch Announcements - Simplified to avoid composite index crashes
+  // Fetch Announcements
   const announcementsQuery = useMemoFirebase(() => {
     if (!db) return null
     return query(collection(db, "announcements"), limit(10))
   }, [db])
   const { data: rawAnnouncements } = useCollection(announcementsQuery)
 
-  // Client-side filtering and sorting for maximum stability
   const announcements = React.useMemo(() => {
     return (rawAnnouncements || [])
       .filter(a => a.isActive)
@@ -35,7 +34,7 @@ export default function Home() {
       .slice(0, 1)
   }, [rawAnnouncements])
 
-  // Fetch Reviews - Simplified to avoid composite index crashes
+  // Fetch Reviews
   const reviewsQuery = useMemoFirebase(() => {
     if (!db) return null
     return query(collection(db, "reviews"), limit(20))
@@ -57,7 +56,6 @@ export default function Home() {
 
   const displayReviews = reviews?.length ? reviews : defaultTestimonials
 
-  // Prevent hydration mismatch
   if (!mounted) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background">
@@ -70,7 +68,6 @@ export default function Home() {
     <div className="flex flex-col min-h-screen selection:bg-primary/30 selection:text-primary overflow-x-hidden">
       <Navbar />
       
-      {/* Announcement Banner */}
       {announcements?.[0] && (
         <div className="bg-primary/20 backdrop-blur-md border-b border-primary/30 py-3 text-center animate-fade-in relative z-50">
           <div className="container mx-auto px-4 flex items-center justify-center gap-2">
@@ -83,7 +80,6 @@ export default function Home() {
       )}
 
       <main className="flex-1">
-        {/* Hero Section */}
         <section className="relative pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden">
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8 animate-fade-in">
@@ -111,19 +107,16 @@ export default function Home() {
               </div>
             </div>
           </div>
-          
           <div className="absolute top-1/2 left-0 w-64 h-64 md:w-96 md:h-96 bg-primary/20 rounded-full blur-[80px] md:blur-[120px] -translate-y-1/2 -translate-x-1/2 opacity-50" />
           <div className="absolute bottom-0 right-0 w-64 h-64 md:w-96 md:h-96 bg-accent/20 rounded-full blur-[80px] md:blur-[120px] translate-x-1/4 opacity-50" />
         </section>
 
-        {/* Features Section */}
         <section className="py-20 md:py-24 bg-black/20">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 md:mb-16 space-y-4">
               <h2 className="text-3xl md:text-5xl font-headline font-bold text-foreground">Why Choose RIZERWEBNP?</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto font-medium">We combine cutting-edge technology with affordable pricing to deliver websites that stand out.</p>
             </div>
-            
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {[
                 { icon: Zap, title: "Lightning Fast", desc: "Optimized for speed and SEO to ensure your business loads instantly on any device." },
@@ -145,7 +138,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Testimonials */}
         <section id="testimonials-section" className="py-20 md:py-24 relative overflow-hidden">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 md:mb-16 space-y-4">
@@ -176,11 +168,9 @@ export default function Home() {
                     })}
                     <span className="ml-2 text-xs font-black text-accent tracking-tighter">{t.rating} / 5</span>
                   </div>
-                  
                   <p className="text-foreground/90 font-medium italic mb-8 leading-relaxed text-lg">
                     "{t.text}"
                   </p>
-                  
                   <div className="flex items-center gap-4 pt-6 border-t border-white/10">
                     <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary text-sm border border-primary/30 uppercase">
                       {t.userName?.[0] || "?"}
@@ -196,7 +186,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CTA Section */}
         <section className="py-20 md:py-24">
           <div className="container mx-auto px-4">
             <div className="rounded-[2.5rem] bg-primary p-10 md:p-16 text-center text-primary-foreground space-y-8 overflow-hidden relative shadow-[0_32px_64px_-16px_rgba(88,88,179,0.5)]">
@@ -218,7 +207,6 @@ export default function Home() {
           </div>
         </section>
       </main>
-
       <Footer />
       <FloatingButton />
     </div>
