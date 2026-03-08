@@ -1,9 +1,8 @@
-
 export const firebaseConfig = {
-  apiKey: "AIzaSyAs-PLACEHOLDER-KEY",
-  authDomain: "webnp-699dd.firebaseapp.com",
-  projectId: "webnp-699dd",
-  storageBucket: "webnp-699dd.appspot.com",
-  messagingSenderId: "1234567890",
-  appId: "1:1234567890:web:abcdef123456"
+  "projectId": "webnp-699dd",
+  "appId": "1:878573023998:web:16ebeb9981f445e9d32baf",
+  "apiKey": "AIzaSyAkcqSQkusxP1X2K-ojbKIu_dQNX2sLkng",
+  "authDomain": "webnp-699dd.firebaseapp.com",
+  "measurementId": "",
+  "messagingSenderId": "878573023998"
 };

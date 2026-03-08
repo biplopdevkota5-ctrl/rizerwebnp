@@ -1,66 +1,256 @@
-
 {
   "entities": {
-    "Review": {
-      "title": "Review",
-      "description": "A client testimonial and rating.",
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
       "type": "object",
+      "description": "Represents a user account on the RIZERWEBNP platform, allowing for login, logout, and saving requests.",
       "properties": {
-        "userId": { "type": "string" },
-        "userName": { "type": "string" },
-        "rating": { "type": "number" },
-        "text": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The full name of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the user, used for communication and login.",
+          "format": "email"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "The primary phone number of the user."
+        },
+        "role": {
+          "type": "string",
+          "description": "The role of the user (e.g., 'user', 'admin'), defining their access level.",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["userName", "rating", "text", "status"]
+      "required": [
+        "id",
+        "name",
+        "email",
+        "phoneNumber",
+        "role"
+      ]
     },
-    "Announcement": {
-      "title": "Announcement",
-      "description": "Global admin announcements displayed on the site.",
+    "WebsiteType": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WebsiteType",
       "type": "object",
+      "description": "Defines a specific category or template for a website, showcased in the website types gallery.",
       "properties": {
-        "content": { "type": "string" },
-        "type": { "type": "string", "enum": ["info", "success", "warning"] },
-        "isActive": { "type": "boolean" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WebsiteType entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the website type (e.g., 'Business Website', 'Portfolio Website')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of what this website type entails."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL to an image representing this website type.",
+          "format": "uri"
+        },
+        "startingPrice": {
+          "type": "number",
+          "description": "The minimum estimated cost for a website of this type."
+        }
       },
-      "required": ["content", "isActive"]
+      "required": [
+        "id",
+        "name",
+        "description",
+        "imageUrl",
+        "startingPrice"
+      ]
     },
     "WebsiteRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "WebsiteRequest",
-      "description": "A client's request for a new website build.",
       "type": "object",
+      "description": "Represents a user's request for a custom website, including all submitted requirements and contact information.",
       "properties": {
-        "userId": { "type": "string" },
-        "userName": { "type": "string" },
-        "email": { "type": "string", "format": "email" },
-        "phone": { "type": "string" },
-        "websiteType": { "type": "string" },
-        "budget": { "type": "string" },
-        "title": { "type": "string" },
-        "description": { "type": "string" },
-        "status": { "type": "string", "enum": ["pending", "processing", "completed", "cancelled"] },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WebsiteRequest entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who submitted this request. (Relationship: User 1:N WebsiteRequest)"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "The full name of the person submitting the request."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the requester.",
+          "format": "email"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "The primary phone number of the requester."
+        },
+        "whatsappNumber": {
+          "type": "string",
+          "description": "The WhatsApp contact number provided by the requester."
+        },
+        "websiteTypeId": {
+          "type": "string",
+          "description": "Reference to the WebsiteType chosen for this request. (Relationship: WebsiteType 1:N WebsiteRequest)"
+        },
+        "budgetAmount": {
+          "type": "number",
+          "description": "The budget amount specified by the requester for the website project."
+        },
+        "websiteTitle": {
+          "type": "string",
+          "description": "A suggested title or name for the requested website."
+        },
+        "websiteDescription": {
+          "type": "string",
+          "description": "A detailed description of the website's purpose and content."
+        },
+        "functionsRequired": {
+          "type": "array",
+          "description": "A list of specific functions or features required for the website (e.g., 'e-commerce', 'blogging', 'user authentication').",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pagesNeeded": {
+          "type": "array",
+          "description": "A list of pages or sections required for the website (e.g., 'Home', 'About', 'Contact', 'Services').",
+          "items": {
+            "type": "string"
+          }
+        },
+        "designStyle": {
+          "type": "string",
+          "description": "The preferred design style or aesthetic for the website (e.g., 'minimalist', 'corporate', 'modern')."
+        },
+        "extraFeatures": {
+          "type": "string",
+          "description": "Any additional features or specific requirements not covered by other fields."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the website request (e.g., 'Pending', 'In Progress', 'Completed', 'Canceled')."
+        },
+        "submissionDate": {
+          "type": "string",
+          "description": "The date and time when the request was submitted.",
+          "format": "date-time"
+        },
+        "lastModifiedDate": {
+          "type": "string",
+          "description": "The date and time when the request was last modified.",
+          "format": "date-time"
+        }
       },
-      "required": ["userName", "email", "websiteType", "status"]
+      "required": [
+        "id",
+        "fullName",
+        "email",
+        "phoneNumber",
+        "whatsappNumber",
+        "websiteTypeId",
+        "budgetAmount",
+        "websiteTitle",
+        "websiteDescription",
+        "functionsRequired",
+        "pagesNeeded",
+        "designStyle",
+        "extraFeatures",
+        "status",
+        "submissionDate"
+      ]
     }
   },
   "auth": {
-    "providers": ["password"]
+    "providers": [
+      "password",
+      "anonymous"
+    ]
   },
   "firestore": {
-    "/reviews/{reviewId}": {
-      "schema": "Review",
-      "description": "Collection of client reviews."
-    },
-    "/announcements/{announcementId}": {
-      "schema": "Announcement",
-      "description": "Collection of global announcements."
-    },
-    "/requests/{requestId}": {
-      "schema": "WebsiteRequest",
-      "description": "Collection of website build requests."
-    }
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores individual user profiles. Access is strictly restricted to the user whose UID matches '{userId}'. This path-based ownership ensures authorization independence for user-specific data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, corresponding to Firebase Authentication UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/admin_roles/{adminId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "A top-level collection used for Database Access Control (DBAC) to grant administrative privileges. Documents in this collection typically contain minimal data (e.g., 'true' or a timestamp) and their existence for a given '{adminId}' (matching `request.auth.uid`) signifies admin status. This provides authorization independence for role checks.",
+          "params": [
+            {
+              "name": "adminId",
+              "description": "The unique identifier of a user who possesses administrative privileges, corresponding to Firebase Authentication UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/website_types/{websiteTypeId}",
+        "definition": {
+          "entityName": "WebsiteType",
+          "schema": {
+            "$ref": "#/backend/entities/WebsiteType"
+          },
+          "description": "Contains definitions for various website categories or templates. These documents are publicly readable, facilitating the 'Website Types Page' gallery without any authorization restrictions. This structure supports secure 'list' operations (QAPs) for all users.",
+          "params": [
+            {
+              "name": "websiteTypeId",
+              "description": "The unique identifier for a specific website type."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/website_requests/{websiteRequestId}",
+        "definition": {
+          "entityName": "WebsiteRequest",
+          "schema": {
+            "$ref": "#/backend/entities/WebsiteRequest"
+          },
+          "description": "Stores all custom website requests submitted by users. Each document includes a denormalized `userId` field, allowing authorization rules to check ownership (`resource.data.userId == request.auth.uid`) directly for authorization independence. Users can read, update, and delete their own requests, while authenticated admins have full read/list access to all requests, ensuring QAPs for both user-specific and global admin views.",
+          "params": [
+            {
+              "name": "websiteRequestId",
+              "description": "The unique identifier for a specific website request."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed following strict adherence to the CORE DESIGN PRINCIPLES and DESIGN STRATEGY MANDATES to ensure a secure, scalable, and debuggable system for RIZERWEBNP. It prioritizes Authorization Independence, Structural Segregation, and consistent Access Modeling.\n\n1.  **Authorization Independence (CRITICAL) & Denormalization Strategy:**\n    *   **Users (`/users/{userId}`):** User profiles are stored at a path directly corresponding to their UID, making ownership trivial (`request.auth.uid == userId`) without requiring `get()` operations. This ensures atomic creation and updates for user-specific data.\n    *   **Admin Roles (`/admin_roles/{adminId}`):** Administrative privileges are implemented using a separate top-level collection where each document's ID is the UID of an admin user. Authorization rules can then use an efficient `exists()` check (`exists(/databases/$(database)/documents/admin_roles/$(request.auth.uid))`) to determine admin status. This completely avoids `get()` calls on user documents for role checking, fulfilling the Authorization Independence mandate and DBAC (Database Access Control) principle.\n    *   **Website Requests (`/website_requests/{websiteRequestId}`):** Each website request document includes a `userId` field. This denormalizes ownership directly into the document, allowing rules to check `resource.data.userId == request.auth.uid` without needing to perform a `get()` on any parent collection or user document. This is crucial for maintaining atomic operations and rule simplicity.\n\n2.  **QAPs (Rules are not Filters) Support:**\n    *   **Website Types (`/website_types/{websiteTypeId}`):** This collection stores publicly viewable website categories. All documents share the same security posture (public read access), making `list` operations inherently secure without complex filtering rules. Any user can `list` all `website_types` without authorization issues.\n    *   **Website Requests (`/website_requests/{websiteRequestId}`):**\n        *   **For Users:** Users can efficiently query and `list` *only their own* requests by performing a client-side query with a `where('userId', '==', request.auth.uid)` clause. The security rules will then enforce that `resource.data.userId` matches `request.auth.uid`, ensuring that only authorized documents are returned. This avoids 'filtering' by rules and ensures efficient client-side queries.\n        *   **For Admins:** Admins (identified via the `admin_roles` collection) are granted `list` access to the entire `/website_requests` collection. This allows them to retrieve all requests globally without requiring complex or inefficient queries across user-specific subcollections, fully supporting their administrative QAPs.\n\n3.  **Structural Segregation & Access Modeling:**\n    *   Each collection (e.g., `users`, `admin_roles`, `website_types`, `website_requests`) is designed to hold documents with a homogeneous security posture and access pattern. This simplifies rule writing by moving access complexity into the data structure itself.\n    *   Path-based ownership is used for user profiles (`/users/{userId}`).\n    *   A top-level collection with a denormalized `userId` field is used for `WebsiteRequest` to balance individual user ownership with global admin access and efficient `list` operations.\n    *   Global roles are managed by existence in a dedicated collection (`/admin_roles`).\n\nThis design ensures that authorization logic in security rules remains explicit, minimal, and performant, avoiding the pitfalls of `get()` calls and complex rule filters."
   }
 }

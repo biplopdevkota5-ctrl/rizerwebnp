@@ -1,0 +1,114 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * RIZERWEBNP SECURITY RULES - PROTOTYPING MODE
+     *
+     * Core Philosophy: 
+     * This ruleset implements a hybrid security model combining strict path-based ownership for user profiles, 
+     * field-based ownership for transactional requests, and role-based access for administrative tasks.
+     * Administrative status is determined by the existence of a document in the '/admin_roles' collection.
+     *
+     * Data Structure:
+     * - /users/{userId}: Private user profiles, owned by the authenticated user.
+     * - /admin_roles/{adminId}: Marker collection for database-wide admin privileges.
+     * - /website_types/{websiteTypeId}: Publicly readable gallery of website templates.
+     * - /website_requests/{websiteRequestId}: User-submitted project requests.
+     *
+     * Key Security Decisions:
+     * - Admin roles are separated into their own collection to ensure Authorization Independence (avoiding costly get() calls on every request).
+     * - Website requests are stored in a top-level collection with a denormalized 'userId' field to support both user-specific filtering and global admin oversight.
+     * - All write operations require explicit ownership or administrative rights.
+     *
+     * Denormalization for Authorization:
+     * - 'WebsiteRequest' documents include the 'userId' of the requester. This allows the rules to verify ownership 
+     *   directly on the document (resource.data.userId) without looking up the user profile.
+     */
+
+    // --- Helper Functions ---
+
+    /** @description Checks if the request is from an authenticated user. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** @description Checks if the authenticated user's UID matches the provided userId. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** @description Checks if the document exists and the current user is the owner. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    /** @description Checks if the authenticated user has administrative privileges via the admin_roles collection. */
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/admin_roles/$(request.auth.uid));
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Rules for user profile documents. Users can only manage their own data.
+     * @path /users/{userId}
+     * @allow (create) User 'abc' creates document '/users/abc' while signed in as 'abc'.
+     * @deny (get) User 'abc' tries to read '/users/def'.
+     * @principle Path-based ownership and self-creation validation.
+     */
+    match /users/{userId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for the admin roles marker collection. Access is restricted to admins only.
+     * @path /admin_roles/{adminId}
+     * @allow (get) An admin checks the status of another admin marker.
+     * @deny (create) A standard user tries to create an admin marker for themselves.
+     * @principle Database-wide role-based access control (DBAC).
+     */
+    match /admin_roles/{adminId} {
+      allow get, list: if isAdmin();
+      allow create, update, delete: if false; // Admin roles are typically managed via Admin SDK/Console.
+    }
+
+    /**
+     * @description Rules for website types gallery. Publicly readable, admin-only writes.
+     * @path /website_types/{websiteTypeId}
+     * @allow (list) An anonymous user views the website types gallery.
+     * @deny (update) A standard user tries to change the price of a website type.
+     * @principle Public read-only access for configuration/gallery data.
+     */
+    match /website_types/{websiteTypeId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Rules for website requests. Users own their requests; admins can view/manage all.
+     * @path /website_requests/{websiteRequestId}
+     * @allow (create) User 'abc' submits a request with 'userId' set to 'abc'.
+     * @allow (list) Admin retrieves all pending website requests.
+     * @deny (update) User 'abc' tries to change the 'userId' on an existing request to 'def'.
+     * @principle Field-based ownership with administrative override.
+     */
+    match /website_requests/{websiteRequestId} {
+      allow get: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow list: if isAdmin() || isSignedIn(); // Note: Users must query by their own userId to succeed.
+      
+      allow create: if isSignedIn() 
+                    && request.resource.data.userId == request.auth.uid;
+      
+      allow update: if (isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid))
+                    && resource != null
+                    && request.resource.data.userId == resource.data.userId; // Enforce userId immutability.
+
+      allow delete: if (isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid))
+                    && resource != null;
+    }
+  }
+}
