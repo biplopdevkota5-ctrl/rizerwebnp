@@ -11,14 +11,15 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { PlaceHolderImages } from "@/lib/placeholder-images"
 import { WEBSITE_TYPES } from "@/lib/types"
-import { Check, Sparkles, ArrowRight } from "lucide-react"
+import { Check, Sparkles, ArrowRight, ExternalLink } from "lucide-react"
 
 export default function WebsiteTypesPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 py-20 relative">
-        {/* Decorative elements */}
+        {/* Decorative background gradients */}
+        <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-primary/10 to-transparent -z-10" />
         <div className="absolute top-40 left-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10" />
         <div className="absolute bottom-40 right-0 w-80 h-80 bg-accent/10 rounded-full blur-3xl -z-10" />
 
@@ -29,10 +30,10 @@ export default function WebsiteTypesPage() {
               <span>Tailored Digital Experiences</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-headline font-bold tracking-tight">
-              Website <span className="text-primary italic">Categories</span>
+              Website <span className="text-primary italic">Solutions</span>
             </h1>
             <p className="text-muted-foreground text-xl max-w-2xl mx-auto font-body">
-              Explore our range of professional web solutions designed to elevate your online presence in Nepal and beyond.
+              Choose the perfect category for your project. Every site is built with premium effects, high performance, and mobile-first design.
             </p>
           </div>
 
@@ -40,56 +41,77 @@ export default function WebsiteTypesPage() {
             {WEBSITE_TYPES.map((type) => {
               const img = PlaceHolderImages.find(p => p.id === `${type.id}-web`)
               return (
-                <Card key={type.id} className="group overflow-hidden glass border-border/50 hover:border-primary/50 transition-all duration-300 flex flex-col h-full hover:shadow-2xl hover:shadow-primary/5">
+                <Card key={type.id} className="group overflow-hidden glass border-border/50 hover:border-primary/50 transition-all duration-500 flex flex-col h-full hover:shadow-2xl hover:shadow-primary/10">
                   <div className="relative aspect-[16/10] overflow-hidden">
                     <Image 
                       src={img?.imageUrl || "https://picsum.photos/seed/web/600/400"} 
                       alt={type.label}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                      data-ai-hint={img?.imageHint || "website layout"}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute top-3 right-3">
-                      <Badge className="bg-primary/90 backdrop-blur-md px-3 py-1 text-sm font-bold shadow-lg">
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+                    <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
+                      <Badge className="bg-primary/90 backdrop-blur-md px-3 py-1 text-sm font-bold shadow-lg border-primary/20">
                         {type.price}
                       </Badge>
+                    </div>
+                    <div className="absolute bottom-4 left-4">
+                       <span className="text-xs font-bold uppercase tracking-widest text-white/70 drop-shadow-md">Professional Category</span>
                     </div>
                   </div>
                   
                   <CardHeader className="pb-4">
-                    <CardTitle className="font-headline font-bold text-2xl group-hover:text-primary transition-colors">
+                    <CardTitle className="font-headline font-bold text-2xl group-hover:text-primary transition-colors flex items-center justify-between">
                       {type.label}
                     </CardTitle>
                   </CardHeader>
 
                   <CardContent className="flex-1 space-y-4">
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      High-performance solutions tailored for your {type.label.toLowerCase()} needs. 
-                      Modern UI with blazing fast speed.
+                      Custom-engineered {type.label.toLowerCase()} with high conversion focus and ultra-smooth glassmorphism effects.
                     </p>
                     
-                    <div className="space-y-2 pt-2 border-t border-border/50">
-                      <p className="text-xs font-bold uppercase tracking-wider text-primary/80">Key Features:</p>
-                      {(type as any).features?.map((feature: string, i: number) => (
-                        <div key={i} className="flex items-center gap-2 text-sm text-foreground/80">
-                          <Check className="w-3.5 h-3.5 text-accent" />
-                          <span>{feature}</span>
-                        </div>
-                      ))}
+                    <div className="space-y-2 pt-4 border-t border-border/30">
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Standard Inclusions</p>
+                      <div className="grid grid-cols-1 gap-2">
+                        {(type as any).features?.map((feature: string, i: number) => (
+                          <div key={i} className="flex items-center gap-2 text-sm text-foreground/70">
+                            <div className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_8px_rgba(82,168,237,0.6)]" />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </CardContent>
 
-                  <CardFooter className="pt-0 pb-6">
+                  <CardFooter className="pt-0 pb-6 px-6">
                     <Link href={`/request?type=${type.id}`} className="w-full">
-                      <Button className="w-full rounded-full h-12 text-md font-bold group-hover:gap-3 transition-all">
-                        Request Project
-                        <ArrowRight className="w-4 h-4 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" />
+                      <Button className="w-full rounded-full h-12 text-md font-bold group-hover:gap-3 transition-all relative overflow-hidden group/btn">
+                        <span className="relative z-10 flex items-center justify-center gap-2">
+                          Request Quote
+                          <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                        </span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
                       </Button>
                     </Link>
                   </CardFooter>
                 </Card>
               )
             })}
+          </div>
+          
+          <div className="mt-24 text-center p-12 rounded-3xl glass border-primary/20 relative overflow-hidden">
+            <div className="relative z-10 space-y-4">
+              <h2 className="text-3xl font-headline font-bold">Don't see what you need?</h2>
+              <p className="text-muted-foreground max-w-lg mx-auto">We specialize in custom logic and unique architectures. Tell us your vision and we'll build it.</p>
+              <Link href="/request?type=custom">
+                <Button variant="outline" size="lg" className="rounded-full mt-4 glass border-primary/40 hover:bg-primary/10">
+                  Discuss Custom Project
+                </Button>
+              </Link>
+            </div>
+            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl" />
           </div>
         </div>
       </main>

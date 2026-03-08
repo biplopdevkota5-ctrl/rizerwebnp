@@ -3,50 +3,50 @@
     {
       "id": "business-web",
       "description": "Professional Business Website",
-      "imageUrl": "https://picsum.photos/seed/business/600/400",
-      "imageHint": "business website corporate"
+      "imageUrl": "https://picsum.photos/seed/business-site/800/600",
+      "imageHint": "business website"
     },
     {
       "id": "portfolio-web",
       "description": "Creative Portfolio Website",
-      "imageUrl": "https://picsum.photos/seed/portfolio/600/400",
-      "imageHint": "creative portfolio design"
+      "imageUrl": "https://picsum.photos/seed/portfolio-design/800/600",
+      "imageHint": "portfolio website"
     },
     {
       "id": "blog-web",
       "description": "Modern Blog Website",
-      "imageUrl": "https://picsum.photos/seed/blog/600/400",
-      "imageHint": "blogging news article"
+      "imageUrl": "https://picsum.photos/seed/blog-layout/800/600",
+      "imageHint": "blog website"
     },
     {
       "id": "ecommerce-web",
       "description": "Online Store Ecommerce",
-      "imageUrl": "https://picsum.photos/seed/ecommerce/600/400",
-      "imageHint": "online shop ecommerce"
+      "imageUrl": "https://picsum.photos/seed/shop-web/800/600",
+      "imageHint": "ecommerce website"
     },
     {
       "id": "gaming-web",
       "description": "Gaming Community Website",
-      "imageUrl": "https://picsum.photos/seed/gaming/600/400",
-      "imageHint": "gaming e-sports"
+      "imageUrl": "https://picsum.photos/seed/gaming-ui/800/600",
+      "imageHint": "gaming website"
     },
     {
       "id": "hotel-web",
       "description": "Hotel and Resort Website",
-      "imageUrl": "https://picsum.photos/seed/hotel/600/400",
-      "imageHint": "hotel resort luxury"
+      "imageUrl": "https://picsum.photos/seed/hotel-booking/800/600",
+      "imageHint": "hotel website"
     },
     {
       "id": "streaming-web",
       "description": "Video Streaming Platform",
-      "imageUrl": "https://picsum.photos/seed/streaming/600/400",
-      "imageHint": "streaming video movie"
+      "imageUrl": "https://picsum.photos/seed/video-stream/800/600",
+      "imageHint": "streaming website"
     },
     {
       "id": "custom-web",
       "description": "Unique Custom Website",
-      "imageUrl": "https://picsum.photos/seed/custom/600/400",
-      "imageHint": "abstract tech future"
+      "imageUrl": "https://picsum.photos/seed/future-web/800/600",
+      "imageHint": "custom website"
     }
   ]
 }
