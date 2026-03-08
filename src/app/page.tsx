@@ -10,7 +10,7 @@ import { FloatingButton } from "@/components/FloatingButton"
 import { CheckCircle2, Zap, Shield, Globe, Cpu, Sparkles, Star, Megaphone, ArrowRight, RefreshCw } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
-import { collection, query, limit, where } from "firebase/firestore"
+import { collection, query, limit, where, orderBy } from "firebase/firestore"
 
 export default function Home() {
   const [mounted, setMounted] = React.useState(false)
@@ -20,14 +20,19 @@ export default function Home() {
     setMounted(true)
   }, [])
   
-  // Fetch Announcements
+  // Fetch Latest Active Announcement
   const announcementsQuery = useMemoFirebase(() => {
     if (!db || !mounted) return null
-    return query(collection(db, "announcements"), where("isActive", "==", true), limit(1))
+    return query(
+      collection(db, "announcements"), 
+      where("isActive", "==", true), 
+      orderBy("createdAt", "desc"),
+      limit(1)
+    )
   }, [db, mounted])
   const { data: rawAnnouncements } = useCollection(announcementsQuery)
 
-  // Fetch Reviews
+  // Fetch Approved Reviews
   const reviewsQuery = useMemoFirebase(() => {
     if (!db || !mounted) return null
     return query(collection(db, "reviews"), where("status", "==", "approved"), limit(6))
@@ -55,19 +60,21 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen selection:bg-primary/30 selection:text-primary overflow-x-hidden">
-      <Navbar />
-      
+      {/* High-Visibility Admin Announcement Banner */}
       {rawAnnouncements?.[0] && (
-        <div className="bg-primary/20 backdrop-blur-md border-b border-primary/30 py-3 text-center animate-fade-in relative z-50">
-          <div className="container mx-auto px-4 flex items-center justify-center gap-2">
-            <Megaphone className="w-4 h-4 text-primary animate-bounce shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-foreground">
+        <div className="bg-primary text-primary-foreground py-3 px-4 text-center animate-fade-in relative z-[101] shadow-[0_4px_20px_rgba(88,88,179,0.4)]">
+          <div className="container mx-auto flex items-center justify-center gap-3">
+            <Sparkles className="w-5 h-5 animate-pulse shrink-0 hidden xs:block" />
+            <span className="text-xs sm:text-sm md:text-base font-black uppercase tracking-tight">
               {rawAnnouncements[0].content}
             </span>
+            <Sparkles className="w-5 h-5 animate-pulse shrink-0 hidden xs:block" />
           </div>
         </div>
       )}
 
+      <Navbar />
+      
       <main className="flex-1">
         <section className="relative pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden">
           <div className="container mx-auto px-4 relative z-10">
