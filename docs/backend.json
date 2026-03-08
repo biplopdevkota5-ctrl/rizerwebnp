@@ -1,0 +1,66 @@
+
+{
+  "entities": {
+    "Review": {
+      "title": "Review",
+      "description": "A client testimonial and rating.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "rating": { "type": "number" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] }
+      },
+      "required": ["userName", "rating", "text", "status"]
+    },
+    "Announcement": {
+      "title": "Announcement",
+      "description": "Global admin announcements displayed on the site.",
+      "type": "object",
+      "properties": {
+        "content": { "type": "string" },
+        "type": { "type": "string", "enum": ["info", "success", "warning"] },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["content", "isActive"]
+    },
+    "WebsiteRequest": {
+      "title": "WebsiteRequest",
+      "description": "A client's request for a new website build.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "websiteType": { "type": "string" },
+        "budget": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "processing", "completed", "cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userName", "email", "websiteType", "status"]
+    }
+  },
+  "auth": {
+    "providers": ["password"]
+  },
+  "firestore": {
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Collection of client reviews."
+    },
+    "/announcements/{announcementId}": {
+      "schema": "Announcement",
+      "description": "Collection of global announcements."
+    },
+    "/requests/{requestId}": {
+      "schema": "WebsiteRequest",
+      "description": "Collection of website build requests."
+    }
+  }
+}

@@ -12,17 +12,19 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
-import { Sparkles, Send, MessageCircle } from "lucide-react"
+import { Sparkles, Send, MessageCircle, Star } from "lucide-react"
 import { WEBSITE_TYPES } from "@/lib/types"
 import { aiDesignSuggestion } from "@/ai/flows/ai-design-suggestion-flow"
+import { useFirestore } from "@/firebase"
+import { collection, addDoc } from "firebase/firestore"
 
-const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1480167096888463401/Up3TfGIrO0qGw_Bh7CAe-FCQjKdEO2M5Np30CsxKARYThaQqRORkJwuTQycOuf34OBKv"
 const WHATSAPP_NUM = "9805602394"
 
 export default function RequestPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { toast } = useToast()
+  const db = useFirestore()
   
   const [user, setUser] = React.useState<any>(null)
   const [loading, setLoading] = React.useState(false)
@@ -41,6 +43,12 @@ export default function RequestPage() {
     pages: "",
     designStyle: "",
     extraFeatures: ""
+  })
+
+  // Review Form State
+  const [reviewData, setReviewData] = React.useState({
+    text: "",
+    rating: 5
   })
 
   React.useEffect(() => {
@@ -63,65 +71,56 @@ export default function RequestPage() {
       setFormData(prev => ({ ...prev, designStyle: result.suggestion }))
       toast({ title: "AI Suggestion Generated", description: "We've added some creative ideas to your design style!" })
     } catch (error) {
-      toast({ title: "AI Error", description: "Failed to get AI suggestions. Please try again.", variant: "destructive" })
+      toast({ title: "AI Error", description: "Failed to get AI suggestions.", variant: "destructive" })
     } finally {
       setAiLoading(false)
     }
   }
 
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!db || !user) {
+      toast({ title: "Login Required", description: "Please login to leave a review.", variant: "destructive" })
+      return
+    }
+
+    try {
+      await addDoc(collection(db, "reviews"), {
+        userId: user.id,
+        userName: user.name,
+        text: reviewData.text,
+        rating: reviewData.rating,
+        status: "pending",
+        createdAt: new Date().toISOString()
+      })
+      setReviewData({ text: "", rating: 5 })
+      toast({ title: "Review Submitted", description: "Thanks! It will be visible after admin approval." })
+    } catch (e) {
+      toast({ title: "Error", description: "Could not submit review.", variant: "destructive" })
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!db) return
     setLoading(true)
 
     try {
-      // 1. Send to Discord Webhook
-      const discordPayload = {
-        embeds: [{
-          title: "New Website Request – RIZERWEBNP",
-          color: 5789875, // Indigo #5858B3
-          fields: Object.entries(formData).map(([key, value]) => ({
-            name: key.replace(/([A-Z])/g, ' $1').toUpperCase(),
-            value: value || "Not specified",
-            inline: false
-          })),
-          timestamp: new Date().toISOString()
-        }]
-      }
-
-      await fetch(DISCORD_WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(discordPayload)
-      })
-
-      // 2. Save to local storage
-      const requestsRaw = localStorage.getItem('rizerweb_requests_db')
-      const requests = requestsRaw ? JSON.parse(requestsRaw) : []
-      const newRequest = {
+      // 1. Save to Firestore
+      await addDoc(collection(db, "requests"), {
         ...formData,
-        id: Math.random().toString(36).substr(2, 9),
         userId: user?.id || 'guest',
         userName: formData.fullName,
         status: 'pending',
         createdAt: new Date().toISOString()
-      }
-      requests.push(newRequest)
-      localStorage.setItem('rizerweb_requests_db', JSON.stringify(requests))
+      })
 
-      toast({ title: "Success!", description: "Your request has been submitted. Redirecting to WhatsApp..." })
+      toast({ title: "Success!", description: "Your request has been submitted to Firestore." })
 
-      // 3. Redirect to WhatsApp
-      const waMessage = `Hello, I submitted a website request on RIZERWEBNP.
-
-Name: ${formData.fullName}
-Email: ${formData.email}
-Phone: ${formData.phone}
-Website Type: ${formData.websiteType}
-Budget: ${formData.budget}
-Description: ${formData.description}
-Functions Needed: ${formData.functions}`
-
+      // 2. Redirect to WhatsApp
+      const waMessage = `Hello, I submitted a website request on RIZERWEBNP.\nName: ${formData.fullName}\nType: ${formData.websiteType}`
       const encodedMsg = encodeURIComponent(waMessage)
+      
       setTimeout(() => {
         window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodedMsg}`, '_blank')
         router.push('/dashboard')
@@ -138,11 +137,12 @@ Functions Needed: ${formData.functions}`
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 py-12">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <Card className="glass border-border/50">
+        <div className="container mx-auto px-4 max-w-4xl space-y-12">
+          {/* Main Request Form */}
+          <Card className="glass border-border/50 shadow-2xl">
             <CardHeader className="text-center">
               <CardTitle className="font-headline text-4xl font-bold">Request Your Website</CardTitle>
-              <CardDescription>Fill out the details below and we'll get started on your dream project.</CardDescription>
+              <CardDescription>All requests are now saved securely in our cloud database.</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-8">
@@ -152,19 +152,15 @@ Functions Needed: ${formData.functions}`
                     <h3 className="font-headline font-semibold text-lg border-b border-border pb-2">Contact Details</h3>
                     <div className="space-y-2">
                       <Label htmlFor="fullName">Full Name</Label>
-                      <Input id="fullName" required value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} />
+                      <Input id="fullName" required value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} className="glass" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
-                      <Input id="email" type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                      <Input id="email" type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="glass" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone Number</Label>
-                      <Input id="phone" type="tel" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="whatsapp">WhatsApp Number</Label>
-                      <Input id="whatsapp" type="tel" required value={formData.whatsapp} onChange={e => setFormData({...formData, whatsapp: e.target.value})} />
+                      <Input id="phone" type="tel" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="glass" />
                     </div>
                   </div>
 
@@ -174,7 +170,7 @@ Functions Needed: ${formData.functions}`
                     <div className="space-y-2">
                       <Label htmlFor="websiteType">Website Type</Label>
                       <Select value={formData.websiteType} onValueChange={val => setFormData({...formData, websiteType: val})}>
-                        <SelectTrigger id="websiteType">
+                        <SelectTrigger id="websiteType" className="glass">
                           <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -186,15 +182,11 @@ Functions Needed: ${formData.functions}`
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="budget">Budget Amount (NPR / USD)</Label>
-                      <Input id="budget" placeholder="e.g. $100 or 15,000 NPR" required value={formData.budget} onChange={e => setFormData({...formData, budget: e.target.value})} />
+                      <Input id="budget" placeholder="e.g. $100 or 15,000 NPR" required value={formData.budget} onChange={e => setFormData({...formData, budget: e.target.value})} className="glass" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="title">Website Title</Label>
-                      <Input id="title" placeholder="e.g. My Cool Shop" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="pages">Number of Pages Needed</Label>
-                      <Input id="pages" placeholder="e.g. Home, About, Contact" required value={formData.pages} onChange={e => setFormData({...formData, pages: e.target.value})} />
+                      <Label htmlFor="pages">Pages Needed</Label>
+                      <Input id="pages" placeholder="Home, About..." required value={formData.pages} onChange={e => setFormData({...formData, pages: e.target.value})} className="glass" />
                     </div>
                   </div>
                 </div>
@@ -202,43 +194,26 @@ Functions Needed: ${formData.functions}`
                 <div className="space-y-6">
                   <h3 className="font-headline font-semibold text-lg border-b border-border pb-2">Project Details</h3>
                   <div className="space-y-2">
-                    <Label htmlFor="description">Website Description (Vision)</Label>
-                    <Textarea id="description" className="min-h-[100px]" placeholder="Explain what your website should do..." required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+                    <Label htmlFor="description">Vision Description</Label>
+                    <Textarea id="description" className="min-h-[100px] glass" placeholder="Explain what your website should do..." required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="designStyle">Design Style & Idea</Label>
-                      <Button 
-                        type="button" 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-primary hover:text-primary/80" 
-                        onClick={handleAiSuggestion}
-                        disabled={aiLoading}
-                      >
+                      <Button type="button" variant="ghost" size="sm" onClick={handleAiSuggestion} disabled={aiLoading} className="text-primary">
                         {aiLoading ? "Thinking..." : <><Sparkles className="w-4 h-4 mr-2" /> AI Suggest Design</>}
                       </Button>
                     </div>
-                    <Textarea id="designStyle" className="min-h-[120px]" placeholder="How should it look? (Glassmorphism, Dark, Modern...)" value={formData.designStyle} onChange={e => setFormData({...formData, designStyle: e.target.value})} />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="functions">Functions Required</Label>
-                      <Textarea id="functions" placeholder="e.g. Login system, Cart, Blog section" value={formData.functions} onChange={e => setFormData({...formData, functions: e.target.value})} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="extraFeatures">Extra Features</Label>
-                      <Textarea id="extraFeatures" placeholder="e.g. Live chat, Map integration" value={formData.extraFeatures} onChange={e => setFormData({...formData, extraFeatures: e.target.value})} />
-                    </div>
+                    <Textarea id="designStyle" className="min-h-[120px] glass" value={formData.designStyle} onChange={e => setFormData({...formData, designStyle: e.target.value})} />
                   </div>
                 </div>
 
                 <div className="pt-6 flex flex-col md:flex-row gap-4">
-                  <Button type="submit" size="lg" className="flex-1 h-14 rounded-full text-lg" disabled={loading}>
+                  <Button type="submit" size="lg" className="flex-1 h-14 rounded-full text-lg shadow-xl" disabled={loading}>
                     <Send className="w-5 h-5 mr-2" />
-                    {loading ? "Submitting..." : "Submit Request"}
+                    {loading ? "Submitting..." : "Submit to Cloud"}
                   </Button>
-                  <Button type="button" variant="outline" size="lg" className="flex-1 h-14 rounded-full text-lg glass" onClick={() => window.open(`https://wa.me/${WHATSAPP_NUM}`, '_blank')}>
+                  <Button type="button" variant="outline" size="lg" className="flex-1 h-14 rounded-full text-lg glass shadow-xl" onClick={() => window.open(`https://wa.me/${WHATSAPP_NUM}`, '_blank')}>
                     <MessageCircle className="w-5 h-5 mr-2" />
                     Direct WhatsApp
                   </Button>
@@ -246,6 +221,51 @@ Functions Needed: ${formData.functions}`
               </form>
             </CardContent>
           </Card>
+
+          {/* Review Submission Form */}
+          {user && (
+            <Card className="glass border-accent/30 shadow-2xl">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="w-6 h-6 text-accent fill-accent" />
+                  Leave a Review
+                </CardTitle>
+                <CardDescription>Share your experience with others.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmitReview} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Rating (1-5)</Label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5].map((num) => (
+                        <button
+                          key={num}
+                          type="button"
+                          onClick={() => setReviewData({ ...reviewData, rating: num })}
+                          className={cn(
+                            "p-2 rounded-lg border transition-all",
+                            reviewData.rating >= num ? "bg-accent border-accent text-white" : "glass border-border"
+                          )}
+                        >
+                          {num}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Your Feedback</Label>
+                    <Textarea 
+                      placeholder="How was our service?" 
+                      value={reviewData.text} 
+                      onChange={e => setReviewData({ ...reviewData, text: e.target.value })}
+                      className="glass"
+                    />
+                  </div>
+                  <Button type="submit" variant="secondary" className="w-full font-bold">Post Review</Button>
+                </form>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
       <Footer />
