@@ -1,32 +1,19 @@
+
 "use client"
 
 import * as React from "react"
 import Link from "next/link"
-import { Phone, Mail, MapPin, MessageCircle, ShieldCheck } from "lucide-react"
+import { Phone, Mail, MapPin, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useUser } from "@/firebase"
-
-const ADMIN_EMAILS = [
-  "biplopdevkota5@gmail.com",
-  "officialhyper993@gmail.com",
-  "dematweb@gmail.com",
-  "devp62569@gmail.com"
-]
 
 export function Footer() {
   const WHATSAPP_NUMBER = "9805602394"
   const WHATSAPP_MESSAGE = encodeURIComponent("Hello, Rizer Web NP. I Need Support.")
   const [year, setYear] = React.useState<number | null>(null)
-  const { user } = useUser()
 
   React.useEffect(() => {
     setYear(new Date().getFullYear())
   }, [])
-
-  const isAdmin = React.useMemo(() => {
-    if (!user?.email) return false;
-    return ADMIN_EMAILS.some(email => email.toLowerCase() === user.email?.toLowerCase());
-  }, [user])
 
   return (
     <footer className="border-t border-border/40 bg-background/95 backdrop-blur-md py-16">
@@ -93,15 +80,6 @@ export function Footer() {
         <div className="mt-16 pt-8 border-t border-border/40 text-center space-y-4">
           <div className="text-xs text-muted-foreground font-bold uppercase tracking-widest">
             <p>© {year || "..."} RIZER WEB APP. All rights reserved. Developed with ❤️ in Nepal by Biplop Devkota.</p>
-          </div>
-          
-          <div className="flex justify-center animate-fade-in">
-            <Link href="/admin">
-              <Button variant="outline" size="sm" className="rounded-full bg-accent/10 border-accent/20 text-accent hover:bg-accent hover:text-white transition-all font-black uppercase text-[10px] tracking-widest gap-2 h-10 px-6">
-                <ShieldCheck className="w-4 h-4" />
-                Admin Portal
-              </Button>
-            </Link>
           </div>
         </div>
       </div>

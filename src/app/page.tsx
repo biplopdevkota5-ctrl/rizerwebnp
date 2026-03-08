@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { FloatingButton } from "@/components/FloatingButton"
-import { CheckCircle2, Zap, Shield, Globe, Cpu, Sparkles, Star, Megaphone, ArrowRight, RefreshCw } from "lucide-react"
+import { CheckCircle2, Zap, Shield, Globe, Cpu, Sparkles, Star, ArrowRight, RefreshCw } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
-import { collection, query, limit, where, orderBy } from "firebase/firestore"
+import { collection, query, limit, where } from "firebase/firestore"
 
 export default function Home() {
   const [mounted, setMounted] = React.useState(false)
@@ -20,30 +20,12 @@ export default function Home() {
     setMounted(true)
   }, [])
   
-  // Announcements: Stable query to prevent flickering
-  const announcementsQuery = useMemoFirebase(() => {
-    if (!db || !mounted) return null
-    return query(
-      collection(db, "announcements"), 
-      where("isActive", "==", true),
-      limit(5)
-    )
-  }, [db, mounted])
-  const { data: rawAnnouncements, isLoading: announcementsLoading } = useCollection(announcementsQuery)
-
   // Reviews: Stable query
   const reviewsQuery = useMemoFirebase(() => {
     if (!db || !mounted) return null
     return query(collection(db, "reviews"), where("status", "==", "approved"), limit(6))
   }, [db, mounted])
   const { data: rawReviews } = useCollection(reviewsQuery)
-
-  const latestAnnouncement = React.useMemo(() => {
-    if (!rawAnnouncements || rawAnnouncements.length === 0) return null
-    return [...rawAnnouncements].sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )[0]
-  }, [rawAnnouncements])
 
   const displayReviews = React.useMemo(() => {
     if (!mounted) return []
@@ -67,19 +49,6 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen selection:bg-primary/30 selection:text-primary overflow-x-hidden">
-      {/* High-Visibility Admin Announcement Banner */}
-      {latestAnnouncement && (
-        <div className="bg-primary text-primary-foreground py-3 px-4 text-center animate-fade-in relative z-[101] shadow-[0_4px_20px_rgba(88,88,179,0.4)]">
-          <div className="container mx-auto flex items-center justify-center gap-3">
-            <Sparkles className="w-5 h-5 animate-pulse shrink-0 hidden xs:block" />
-            <span className="text-xs sm:text-sm md:text-base font-black uppercase tracking-tight">
-              {latestAnnouncement.content}
-            </span>
-            <Sparkles className="w-5 h-5 animate-pulse shrink-0 hidden xs:block" />
-          </div>
-        </div>
-      )}
-
       <Navbar />
       
       <main className="flex-1">
