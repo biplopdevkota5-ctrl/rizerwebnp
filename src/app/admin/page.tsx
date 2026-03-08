@@ -13,9 +13,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
-import { Trash2, Search, Filter, ShieldCheck, Megaphone, Star, ClipboardList } from "lucide-react"
+import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList } from "lucide-react"
 import { useFirestore, useCollection } from "@/firebase"
-import { collection, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, query, orderBy } from "firebase/firestore"
+import { collection, doc, updateDoc, deleteDoc, addDoc, query, orderBy } from "firebase/firestore"
+import { cn } from "@/lib/utils"
 
 const ADMIN_PASSWORD = "090102030405"
 
@@ -159,7 +160,7 @@ export default function AdminPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {requests?.map((req) => (
+                      {requests?.map((req: any) => (
                         <TableRow key={req.id}>
                           <TableCell>
                             <div className="font-medium">{req.userName}</div>
@@ -211,7 +212,7 @@ export default function AdminPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {reviews?.map((rev) => (
+                      {reviews?.map((rev: any) => (
                         <TableRow key={rev.id}>
                           <TableCell className="font-medium">{rev.userName}</TableCell>
                           <TableCell className="max-w-md truncate">{rev.text}</TableCell>
@@ -265,7 +266,7 @@ export default function AdminPage() {
                   <CardContent>
                     <Table>
                       <TableBody>
-                        {announcements?.map((ann) => (
+                        {announcements?.map((ann: any) => (
                           <TableRow key={ann.id}>
                             <TableCell className={cn("font-medium", !ann.isActive && "opacity-40")}>{ann.content}</TableCell>
                             <TableCell className="text-right">
