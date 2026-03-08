@@ -10,7 +10,7 @@ import { FloatingButton } from "@/components/FloatingButton"
 import { CheckCircle2, Zap, Shield, Globe, Cpu, Sparkles, Star, Megaphone, ArrowRight, RefreshCw } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
-import { collection, query, where, orderBy, limit } from "firebase/firestore"
+import { collection, query, limit } from "firebase/firestore"
 
 export default function Home() {
   const [mounted, setMounted] = React.useState(false)
@@ -20,29 +20,34 @@ export default function Home() {
     setMounted(true)
   }, [])
   
-  // Fetch Announcements - Public Read
+  // Fetch Announcements - Simplified to avoid composite index crashes
   const announcementsQuery = useMemoFirebase(() => {
     if (!db) return null
-    return query(
-      collection(db, "announcements"), 
-      where("isActive", "==", true), 
-      orderBy("createdAt", "desc"), 
-      limit(1)
-    )
+    return query(collection(db, "announcements"), limit(10))
   }, [db])
-  const { data: announcements } = useCollection(announcementsQuery)
+  const { data: rawAnnouncements } = useCollection(announcementsQuery)
 
-  // Fetch Approved Reviews - Public Read
+  // Client-side filtering and sorting for maximum stability
+  const announcements = React.useMemo(() => {
+    return (rawAnnouncements || [])
+      .filter(a => a.isActive)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 1)
+  }, [rawAnnouncements])
+
+  // Fetch Reviews - Simplified to avoid composite index crashes
   const reviewsQuery = useMemoFirebase(() => {
     if (!db) return null
-    return query(
-      collection(db, "reviews"), 
-      where("status", "==", "approved"), 
-      orderBy("createdAt", "desc"), 
-      limit(6)
-    )
+    return query(collection(db, "reviews"), limit(20))
   }, [db])
-  const { data: reviews } = useCollection(reviewsQuery)
+  const { data: rawReviews } = useCollection(reviewsQuery)
+
+  const reviews = React.useMemo(() => {
+    return (rawReviews || [])
+      .filter(r => r.status === "approved")
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 6)
+  }, [rawReviews])
 
   const defaultTestimonials = [
     { userName: "Anish Sharma", rating: 5, text: "RIZERWEBNP transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
@@ -52,7 +57,7 @@ export default function Home() {
 
   const displayReviews = reviews?.length ? reviews : defaultTestimonials
 
-  // Prevent hydration mismatch and premature execution
+  // Prevent hydration mismatch
   if (!mounted) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background">
