@@ -1,4 +1,3 @@
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -17,16 +16,16 @@ service cloud.firestore {
       return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
-    // --- Public Access Collections ---
+    // --- Public Access Collections (Redeploy Trigger: v2) ---
 
     match /announcements/{announcementId} {
-      // Explicitly allow get and list for everyone (unauthenticated)
+      // Allow everyone to read announcements for the homepage
       allow read: if true;
       allow write: if isAdmin();
     }
 
     match /reviews/{reviewId} {
-      // Explicitly allow get and list for everyone
+      // Explicitly allow read (get and list) for everyone (authenticated or not)
       allow read: if true;
       allow create: if isSignedIn();
       allow update, delete: if isAdmin();
@@ -40,14 +39,10 @@ service cloud.firestore {
     // --- User Specific Collections ---
 
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
+      allow get, create, update: if isOwner(userId);
       
       match /website_requests/{requestId} {
-        allow read: if isOwner(userId) || isAdmin();
-        allow create: if isOwner(userId);
-        allow update, delete: if isOwner(userId) || isAdmin();
+        allow read, create, update, delete: if isOwner(userId) || isAdmin();
       }
     }
 
@@ -66,6 +61,7 @@ service cloud.firestore {
     match /roles_admin/{userId} {
       allow get: if isSignedIn();
       allow list: if isAdmin();
+      allow write: if isAdmin();
     }
   }
 }

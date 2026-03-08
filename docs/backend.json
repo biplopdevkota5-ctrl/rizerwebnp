@@ -1,44 +1,29 @@
-
 {
   "entities": {
     "User": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
+      "description": "Represents a registered user.",
       "type": "object",
-      "description": "Represents a registered user of the RIZER WEB APP platform.",
       "properties": {
         "id": { "type": "string" },
         "name": { "type": "string" },
         "email": { "type": "string", "format": "email" },
         "phone": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "updatedAt": { "type": "string", "format": "date-time" }
+        "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "name", "email", "createdAt"]
     },
-    "WebsiteType": {
-      "title": "WebsiteType",
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "name": { "type": "string" },
-        "description": { "type": "string" },
-        "startingPrice": { "type": "number" },
-        "imageUrl": { "type": "string", "format": "uri" }
-      },
-      "required": ["id", "name", "description", "startingPrice"]
-    },
     "WebsiteRequest": {
       "title": "WebsiteRequest",
+      "description": "A request for a website build.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
         "userId": { "type": "string" },
         "fullName": { "type": "string" },
         "email": { "type": "string", "format": "email" },
-        "phoneNumber": { "type": "string" },
-        "websiteTypeId": { "type": "string" },
-        "budgetAmount": { "type": "number" },
+        "websiteType": { "type": "string" },
+        "budget": { "type": "string" },
         "status": { "type": "string", "enum": ["pending", "processing", "completed", "cancelled"] },
         "createdAt": { "type": "string", "format": "date-time" }
       },
@@ -46,17 +31,18 @@
     },
     "Announcement": {
       "title": "Announcement",
+      "description": "Global home announcements.",
       "type": "object",
       "properties": {
         "content": { "type": "string" },
         "isActive": { "type": "boolean" },
-        "type": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["content", "isActive", "createdAt"]
     },
     "Review": {
       "title": "Review",
+      "description": "Client testimonials.",
       "type": "object",
       "properties": {
         "userId": { "type": "string" },
@@ -70,40 +56,32 @@
     }
   },
   "auth": {
-    "providers": ["password", "anonymous", "google.com"]
+    "providers": ["password", "google.com", "anonymous"]
   },
   "firestore": {
     "/users/{userId}": {
-      "schema": { "$ref": "#/backend/entities/User" },
+      "schema": "User",
       "description": "User profiles."
     },
-    "/website_types/{websiteTypeId}": {
-      "schema": { "$ref": "#/backend/entities/WebsiteType" },
-      "description": "Website categories."
-    },
-    "/users/{userId}/website_requests/{websiteRequestId}": {
-      "schema": { "$ref": "#/backend/entities/WebsiteRequest" },
-      "description": "User specific build requests."
-    },
-    "/anonymous_website_requests/{websiteRequestId}": {
-      "schema": { "$ref": "#/backend/entities/WebsiteRequest" },
-      "description": "Guest build requests."
-    },
     "/announcements/{announcementId}": {
-      "schema": { "$ref": "#/backend/entities/Announcement" },
-      "description": "Global home announcements."
+      "schema": "Announcement",
+      "description": "Global announcements."
     },
     "/reviews/{reviewId}": {
-      "schema": { "$ref": "#/backend/entities/Review" },
-      "description": "Client testimonials."
+      "schema": "Review",
+      "description": "Client reviews."
+    },
+    "/users/{userId}/website_requests/{requestId}": {
+      "schema": "WebsiteRequest",
+      "description": "User specific requests."
     },
     "/requests/{requestId}": {
-      "schema": { "$ref": "#/backend/entities/WebsiteRequest" },
-      "description": "Admin requests view."
+      "schema": "WebsiteRequest",
+      "description": "All requests for admin view."
     },
     "/roles_admin/{userId}": {
-      "schema": { "$ref": "#/backend/entities/User" },
-      "description": "Admin role assignments."
+      "schema": "User",
+      "description": "Admin role markers."
     }
   }
 }
