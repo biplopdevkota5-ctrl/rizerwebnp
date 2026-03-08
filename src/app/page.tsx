@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -20,14 +19,13 @@ export default function Home() {
     setMounted(true)
   }, [])
   
-  // Fetch Latest Active Announcement
+  // Fetch Latest Active Announcement - Simplified to avoid index errors/permission triggers for guests
   const announcementsQuery = useMemoFirebase(() => {
     if (!db || !mounted) return null
     return query(
       collection(db, "announcements"), 
-      where("isActive", "==", true), 
-      orderBy("createdAt", "desc"),
-      limit(1)
+      where("isActive", "==", true),
+      limit(5) // Get multiple to sort in memory if needed, safer than complex query for first-load
     )
   }, [db, mounted])
   const { data: rawAnnouncements } = useCollection(announcementsQuery)
@@ -38,6 +36,13 @@ export default function Home() {
     return query(collection(db, "reviews"), where("status", "==", "approved"), limit(6))
   }, [db, mounted])
   const { data: rawReviews } = useCollection(reviewsQuery)
+
+  const sortedAnnouncements = React.useMemo(() => {
+    if (!rawAnnouncements) return []
+    return [...rawAnnouncements].sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+  }, [rawAnnouncements])
 
   const displayReviews = React.useMemo(() => {
     if (!mounted) return []
@@ -61,12 +66,12 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen selection:bg-primary/30 selection:text-primary overflow-x-hidden">
       {/* High-Visibility Admin Announcement Banner */}
-      {rawAnnouncements?.[0] && (
+      {sortedAnnouncements?.[0] && (
         <div className="bg-primary text-primary-foreground py-3 px-4 text-center animate-fade-in relative z-[101] shadow-[0_4px_20px_rgba(88,88,179,0.4)]">
           <div className="container mx-auto flex items-center justify-center gap-3">
             <Sparkles className="w-5 h-5 animate-pulse shrink-0 hidden xs:block" />
             <span className="text-xs sm:text-sm md:text-base font-black uppercase tracking-tight">
-              {rawAnnouncements[0].content}
+              {sortedAnnouncements[0].content}
             </span>
             <Sparkles className="w-5 h-5 animate-pulse shrink-0 hidden xs:block" />
           </div>
