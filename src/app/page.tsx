@@ -51,7 +51,7 @@ export default function Home() {
 
   const displayReviews = reviews?.length ? reviews : defaultTestimonials
 
-  // Prevent hydration mismatch
+  // Prevent hydration mismatch and premature execution
   if (!mounted) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background">
@@ -156,12 +156,11 @@ export default function Home() {
                   )}
                 >
                   <div className="flex gap-1 mb-6">
-                    {Array.from({ length: 5 }).map((_, starIdx) => {
-                      const starVal = starIdx + 1;
+                    {[1, 2, 3, 4, 5].map((starVal) => {
                       const isFull = starVal <= (t.rating || 0);
                       return (
                         <Star 
-                          key={starIdx} 
+                          key={starVal} 
                           className={cn(
                             "w-4 h-4",
                             isFull ? "fill-accent text-accent" : "text-white/20"
