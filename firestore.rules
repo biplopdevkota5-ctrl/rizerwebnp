@@ -19,11 +19,13 @@ service cloud.firestore {
     // --- Public Access Collections ---
 
     match /announcements/{announcementId} {
+      // Explicitly allow public read for home page visibility
       allow read: if true;
       allow write: if isAdmin();
     }
 
     match /reviews/{reviewId} {
+      // Explicitly allow public read for testimonials
       allow read: if true;
       allow create: if isSignedIn();
       allow update, delete: if isAdmin();

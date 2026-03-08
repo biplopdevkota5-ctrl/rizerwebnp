@@ -1,10 +1,9 @@
-
 import Link from "next/link"
 import { Instagram, Github, Mail, Phone, MapPin, Twitter, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Footer() {
-  const WHATSAPP_NUMBER = "9805602394"
+  const WHATSAPP_NUMBER = "9779805602394"
 
   return (
     <footer className="border-t border-border/40 bg-background/90 backdrop-blur-md py-16">
@@ -37,7 +36,7 @@ export function Footer() {
                 <div className="p-2 rounded-full bg-primary/10">
                   <Phone className="w-4 h-4 text-primary" />
                 </div>
-                {WHATSAPP_NUMBER}
+                +977 9805602394
               </li>
               <li className="flex items-center gap-3">
                 <div className="p-2 rounded-full bg-primary/10">

@@ -9,7 +9,7 @@ import { FloatingButton } from "@/components/FloatingButton"
 import { CheckCircle2, Zap, Shield, Globe, Cpu, Sparkles, Star, Megaphone, ArrowRight, RefreshCw } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
-import { collection, query, limit } from "firebase/firestore"
+import { collection, query, limit, where } from "firebase/firestore"
 
 export default function Home() {
   const [mounted, setMounted] = React.useState(false)
@@ -22,24 +22,19 @@ export default function Home() {
   // Fetch Announcements
   const announcementsQuery = useMemoFirebase(() => {
     if (!db) return null
-    return query(collection(db, "announcements"), limit(1))
+    return query(collection(db, "announcements"), where("isActive", "==", true), limit(1))
   }, [db])
   const { data: rawAnnouncements } = useCollection(announcementsQuery)
-
-  const announcements = React.useMemo(() => {
-    return (rawAnnouncements || []).filter(a => a.isActive)
-  }, [rawAnnouncements])
 
   // Fetch Reviews
   const reviewsQuery = useMemoFirebase(() => {
     if (!db) return null
-    return query(collection(db, "reviews"), limit(20))
+    return query(collection(db, "reviews"), where("status", "==", "approved"), limit(6))
   }, [db])
   const { data: rawReviews } = useCollection(reviewsQuery)
 
   const displayReviews = React.useMemo(() => {
-    const approved = (rawReviews || []).filter(r => r.status === "approved")
-    if (approved.length > 0) return approved.slice(0, 6)
+    if (rawReviews && rawReviews.length > 0) return rawReviews
     
     return [
       { userName: "Anish Sharma", rating: 5, text: "RIZERWEBNP transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
@@ -60,12 +55,12 @@ export default function Home() {
     <div className="flex flex-col min-h-screen selection:bg-primary/30 selection:text-primary overflow-x-hidden">
       <Navbar />
       
-      {announcements?.[0] && (
+      {rawAnnouncements?.[0] && (
         <div className="bg-primary/20 backdrop-blur-md border-b border-primary/30 py-3 text-center animate-fade-in relative z-50">
           <div className="container mx-auto px-4 flex items-center justify-center gap-2">
             <Megaphone className="w-4 h-4 text-primary animate-bounce shrink-0" />
             <span className="text-xs sm:text-sm font-bold text-foreground">
-              {announcements[0].content}
+              {rawAnnouncements[0].content}
             </span>
           </div>
         </div>
