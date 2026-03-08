@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -20,23 +19,11 @@ import {
 import { useUser, useAuth } from "@/firebase"
 import { signOut } from "firebase/auth"
 
-const ADMIN_EMAILS = [
-  "biplopdevkota5@gmail.com",
-  "officialhyper993@gmail.com",
-  "dematweb@gmail.com",
-  "devp62569@gmail.com"
-]
-
 export default function MobileMenuPage() {
   const { user } = useUser()
   const auth = useAuth()
   const router = useRouter()
   const WHATSAPP_MESSAGE = encodeURIComponent("Hello, Rizer Web NP. I Need Support.")
-
-  const isAdmin = React.useMemo(() => {
-    if (!user?.email) return false;
-    return ADMIN_EMAILS.some(email => email.toLowerCase() === user.email?.toLowerCase());
-  }, [user])
 
   const handleLogout = async () => {
     await signOut(auth)
@@ -103,14 +90,12 @@ export default function MobileMenuPage() {
                 </div>
               </Link>
               
-              {isAdmin && (
-                <Link href="/admin">
-                  <Button className="w-full rounded-2xl h-14 font-black bg-accent/20 text-accent hover:bg-accent/30 border border-accent/20" variant="ghost">
-                    <ShieldCheck className="w-5 h-5 mr-3" />
-                    Enter Admin Portal
-                  </Button>
-                </Link>
-              )}
+              <Link href="/admin">
+                <Button className="w-full rounded-2xl h-14 font-black bg-accent/20 text-accent hover:bg-accent/30 border border-accent/20" variant="ghost">
+                  <ShieldCheck className="w-5 h-5 mr-3" />
+                  Enter Admin Portal
+                </Button>
+              </Link>
 
               <Button onClick={handleLogout} className="w-full rounded-2xl h-14 font-bold text-destructive hover:bg-destructive/10" variant="ghost">
                 <LogOut className="w-5 h-5 mr-3" />
@@ -118,12 +103,20 @@ export default function MobileMenuPage() {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
-              <Link href="/auth/login" className="w-full">
-                <Button variant="outline" className="w-full h-16 rounded-3xl font-bold border-white/10 bg-white/5 text-lg">Login</Button>
-              </Link>
-              <Link href="/auth/signup" className="w-full">
-                <Button className="w-full h-16 rounded-3xl font-bold shadow-xl shadow-primary/20 text-lg">Join Us</Button>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <Link href="/auth/login" className="w-full">
+                  <Button variant="outline" className="w-full h-16 rounded-3xl font-bold border-white/10 bg-white/5 text-lg">Login</Button>
+                </Link>
+                <Link href="/auth/signup" className="w-full">
+                  <Button className="w-full h-16 rounded-3xl font-bold shadow-xl shadow-primary/20 text-lg">Join Us</Button>
+                </Link>
+              </div>
+              <Link href="/admin">
+                <Button className="w-full rounded-2xl h-14 font-bold border border-white/10 glass" variant="ghost">
+                  <ShieldCheck className="w-5 h-5 mr-3" />
+                  Admin Access
+                </Button>
               </Link>
             </div>
           )}

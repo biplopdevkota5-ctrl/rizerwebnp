@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -10,24 +9,12 @@ import { cn } from "@/lib/utils"
 import { useUser, useAuth } from "@/firebase"
 import { signOut } from "firebase/auth"
 
-const ADMIN_EMAILS = [
-  "biplopdevkota5@gmail.com",
-  "officialhyper993@gmail.com",
-  "dematweb@gmail.com",
-  "devp62569@gmail.com"
-]
-
 export function Navbar() {
   const { user } = useUser()
   const auth = useAuth()
   const pathname = usePathname()
   const router = useRouter()
   
-  const isAdmin = React.useMemo(() => {
-    if (!user?.email) return false;
-    return ADMIN_EMAILS.some(email => email.toLowerCase() === user.email?.toLowerCase());
-  }, [user])
-
   const handleLogout = async () => {
     await signOut(auth)
     router.push('/')
@@ -67,17 +54,8 @@ export function Navbar() {
           <div className="h-6 w-px bg-white/10 mx-2" />
         </div>
 
-        {/* Mobile & Desktop Auth Actions */}
+        {/* Auth & Admin Actions */}
         <div className="flex items-center gap-2">
-          {isAdmin && (
-            <Link href="/admin">
-              <Button variant="ghost" size="sm" className="items-center gap-2 text-accent hover:text-accent/80 hover:bg-accent/10 font-black uppercase text-[10px] tracking-widest mr-1">
-                <ShieldCheck className="w-4 h-4" />
-                <span className="hidden xs:inline">Admin Portal</span>
-              </Button>
-            </Link>
-          )}
-
           {user ? (
             <div className="flex items-center gap-2">
               <Link href="/dashboard" className="text-sm font-bold text-foreground hover:text-primary transition-colors flex items-center gap-2">
@@ -104,6 +82,14 @@ export function Navbar() {
           <Link href="/menu" className="md:hidden">
             <Button variant="ghost" size="icon" className="rounded-full">
               <Menu className="w-6 h-6" />
+            </Button>
+          </Link>
+
+          {/* Admin Portal Button - Visible to Everyone but Password Protected on the page */}
+          <Link href="/admin">
+            <Button variant="ghost" size="icon" className="text-accent hover:text-accent/80 hover:bg-accent/10 rounded-full">
+              <ShieldCheck className="w-6 h-6" />
+              <span className="sr-only">Admin Portal</span>
             </Button>
           </Link>
         </div>

@@ -38,7 +38,7 @@ export function Footer() {
               <span className="font-headline font-bold text-2xl tracking-tight text-primary">RIZER WEB APP</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed font-medium">
-              Empowering individuals and businesses in Nepal with world-class websites at unbeatable prices. Developed by Biplop Devkota in Gaidakot.
+              Empowering individuals and businesses in Nepal with world-class websites at unbeatable prices. Developed by Biplop Devkota at Rizer Studio.
             </p>
           </div>
           
@@ -95,16 +95,14 @@ export function Footer() {
             <p>© {year || "..."} RIZER WEB APP. All rights reserved. Developed with ❤️ in Nepal by Biplop Devkota.</p>
           </div>
           
-          {isAdmin && (
-            <div className="flex justify-center animate-fade-in">
-              <Link href="/admin">
-                <Button variant="outline" size="sm" className="rounded-full bg-accent/10 border-accent/20 text-accent hover:bg-accent hover:text-white transition-all font-black uppercase text-[10px] tracking-widest gap-2 h-10 px-6">
-                  <ShieldCheck className="w-4 h-4" />
-                  Admin Portal
-                </Button>
-              </Link>
-            </div>
-          )}
+          <div className="flex justify-center animate-fade-in">
+            <Link href="/admin">
+              <Button variant="outline" size="sm" className="rounded-full bg-accent/10 border-accent/20 text-accent hover:bg-accent hover:text-white transition-all font-black uppercase text-[10px] tracking-widest gap-2 h-10 px-6">
+                <ShieldCheck className="w-4 h-4" />
+                Admin Portal
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
