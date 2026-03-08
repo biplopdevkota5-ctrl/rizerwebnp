@@ -154,11 +154,11 @@ export default function Home() {
                   )}
                 >
                   <div className="flex gap-1 mb-6">
-                    {[1, 2, 3, 4, 5].map((starVal) => {
-                      const isFull = starVal <= (t.rating || 0);
+                    {[1, 2, 3, 4, 5].map((starIdx) => {
+                      const isFull = starIdx <= (t.rating || 0);
                       return (
                         <Star 
-                          key={starVal} 
+                          key={starIdx} 
                           className={cn(
                             "w-4 h-4",
                             isFull ? "fill-accent text-accent" : "text-white/20"
