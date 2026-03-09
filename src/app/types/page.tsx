@@ -9,18 +9,49 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { WEBSITE_TYPES } from "@/lib/types"
-import { Check, Sparkles, ArrowRight, Shield, Globe, Award, Users } from "lucide-react"
+import { Check, Sparkles, ArrowRight, Shield, Globe, Award, Users, Percent } from "lucide-react"
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
+import { collection } from "firebase/firestore"
 
 export default function WebsiteTypesPage() {
+  const db = useFirestore()
+  const adjQuery = useMemoFirebase(() => db ? collection(db, "website_adjustments") : null, [db])
+  const { data: adjustments } = useCollection(adjQuery)
+
+  const getPriceDisplay = (type: typeof WEBSITE_TYPES[0]) => {
+    const adj = adjustments?.find(a => a.id === type.id)
+    if (!adj || !adj.isActive || !adj.discountPercentage) return type.price
+
+    // Simple calculation for the starting price
+    if (type.id === 'custom') return type.price
+    
+    const parts = type.price.match(/\$(\d+)/)
+    if (!parts) return type.price
+
+    const originalVal = parseInt(parts[1])
+    const discountedVal = Math.floor(originalVal * (1 - adj.discountPercentage / 100))
+    
+    return (
+      <div className="flex flex-col">
+        <span className="text-[10px] text-muted-foreground line-through font-bold">{type.price}</span>
+        <span className="text-accent font-black text-lg">${discountedVal}+</span>
+      </div>
+    )
+  }
+
+  const getTag = (typeId: string) => {
+    const adj = adjustments?.find(a => a.id === typeId)
+    if (!adj || !adj.isActive) return null
+    return adj.customTag || `${adj.discountPercentage}% OFF`
+  }
+
   return (
     <div className="min-h-screen flex flex-col selection:bg-primary/30 selection:text-primary overflow-x-hidden">
       <Navbar />
       <main className="flex-1 py-12 md:py-20 relative">
-        {/* Decorative background gradients */}
         <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-primary/10 to-transparent -z-10" />
         
         <div className="container mx-auto px-4">
-          {/* Header Section */}
           <div className="max-w-4xl mx-auto text-center mb-12 md:mb-20 space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] sm:text-xs font-black uppercase tracking-widest animate-fade-in">
               <Sparkles className="w-3 h-3 sm:w-4 h-4" />
@@ -34,7 +65,6 @@ export default function WebsiteTypesPage() {
             </p>
           </div>
 
-          {/* About Us Section */}
           <section className="mb-20 md:mb-32">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-center">
               <div className="space-y-6 order-2 lg:order-1">
@@ -82,43 +112,52 @@ export default function WebsiteTypesPage() {
             </div>
           </section>
 
-          {/* Website Types List Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {WEBSITE_TYPES.map((type) => (
-              <Card key={type.id} className="group glass border-white/10 hover:border-primary/50 transition-all duration-500 flex flex-col h-full rounded-3xl overflow-hidden shadow-xl">
-                <CardHeader className="pb-4">
-                  <div className="flex justify-between items-start mb-4">
-                    <Badge variant="outline" className="text-primary border-primary/40 font-black text-[10px] uppercase tracking-widest bg-primary/5 px-3">
-                      Package
-                    </Badge>
-                    <span className="text-sm font-black text-accent">{type.price}</span>
-                  </div>
-                  <CardTitle className="font-headline font-bold text-2xl group-hover:text-primary transition-colors text-foreground">
-                    {type.label}
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent className="flex-1 space-y-4">
-                  <div className="space-y-3 pt-2">
-                    {type.features?.map((feature: string, i: number) => (
-                      <div key={i} className="flex items-center gap-3 text-sm text-foreground/80 font-semibold">
-                        <Check className="w-4 h-4 text-accent shrink-0" />
-                        <span>{feature}</span>
+            {WEBSITE_TYPES.map((type) => {
+              const tag = getTag(type.id)
+              return (
+                <Card key={type.id} className="group glass border-white/10 hover:border-primary/50 transition-all duration-500 flex flex-col h-full rounded-3xl overflow-hidden shadow-xl">
+                  <CardHeader className="pb-4">
+                    <div className="flex justify-between items-start mb-4">
+                      <Badge variant="outline" className="text-primary border-primary/40 font-black text-[10px] uppercase tracking-widest bg-primary/5 px-3">
+                        Package
+                      </Badge>
+                      <div className="text-right">
+                        {getPriceDisplay(type)}
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
+                    </div>
+                    <CardTitle className="font-headline font-bold text-2xl group-hover:text-primary transition-colors text-foreground flex items-center gap-2">
+                      {type.label}
+                      {tag && (
+                        <Badge className="bg-accent text-white animate-pulse text-[9px] h-5 rounded-md px-1.5 border-none">
+                          {tag}
+                        </Badge>
+                      )}
+                    </CardTitle>
+                  </CardHeader>
 
-                <CardFooter className="pt-6 pb-6 px-6">
-                  <Link href={`/request?type=${type.id}`} className="w-full">
-                    <Button variant="outline" className="w-full rounded-2xl h-12 text-sm font-bold glass border-white/10 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all shadow-sm">
-                      Request Quote
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </Card>
-            ))}
+                  <CardContent className="flex-1 space-y-4">
+                    <div className="space-y-3 pt-2">
+                      {type.features?.map((feature: string, i: number) => (
+                        <div key={i} className="flex items-center gap-3 text-sm text-foreground/80 font-semibold">
+                          <Check className="w-4 h-4 text-accent shrink-0" />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+
+                  <CardFooter className="pt-6 pb-6 px-6">
+                    <Link href={`/request?type=${type.id}`} className="w-full">
+                      <Button variant="outline" className="w-full rounded-2xl h-12 text-sm font-bold glass border-white/10 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all shadow-sm">
+                        Request Quote
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </Link>
+                  </CardFooter>
+                </Card>
+              )
+            })}
           </div>
           
           <div className="mt-20 md:mt-32 text-center p-10 md:p-20 rounded-[3rem] glass border-white/10 relative overflow-hidden shadow-2xl">

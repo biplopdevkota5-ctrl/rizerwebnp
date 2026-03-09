@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -11,13 +12,14 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/hooks/use-toast"
-import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList, RefreshCw, LogOut, Phone } from "lucide-react"
+import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList, LogOut, Phone, Tag, Percent } from "lucide-react"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
-import { collection, doc, updateDoc, deleteDoc, addDoc, query, orderBy } from "firebase/firestore"
+import { collection, doc, updateDoc, deleteDoc, addDoc, query, orderBy, setDoc } from "firebase/firestore"
 import { IOSSpinner } from "@/components/ui/ios-spinner"
+import { WEBSITE_TYPES } from "@/lib/types"
 
-// Updated Password as requested
 const ADMIN_PASSWORD = "090102030405"
 
 export default function AdminPage() {
@@ -53,6 +55,12 @@ export default function AdminPage() {
   )
   const { data: announcements } = useCollection(announcementsQuery)
 
+  const adjustmentsQuery = useMemoFirebase(() => 
+    (db && mounted && isAuthorized) ? collection(db, "website_adjustments") : null, 
+    [db, mounted, isAuthorized]
+  )
+  const { data: adjustments } = useCollection(adjustmentsQuery)
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     setIsActionLoading(true)
@@ -85,21 +93,12 @@ export default function AdminPage() {
     }
   }
 
-  const handleDeleteRequest = async (id: string) => {
-    if (!db || !confirm("Delete this request?")) return
-    try {
-      await deleteDoc(doc(db, "requests", id))
-      toast({ title: "Deleted", description: "Request removed." })
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  const handleReviewStatus = async (id: string, newStatus: string) => {
+  const handleAdjustmentChange = async (typeId: string, field: string, value: any) => {
     if (!db) return
+    const docRef = doc(db, "website_adjustments", typeId)
     try {
-      await updateDoc(doc(db, "reviews", id), { status: newStatus })
-      toast({ title: "Review Updated", description: "Status changed." })
+      await setDoc(docRef, { [field]: value, updatedAt: new Date().toISOString() }, { merge: true })
+      toast({ title: "Pricing Updated", description: "Changes saved instantly." })
     } catch (err) {
       console.error(err)
     }
@@ -120,16 +119,6 @@ export default function AdminPage() {
       console.error(err)
     } finally {
       setIsActionLoading(false)
-    }
-  }
-
-  const handleDeleteAnnouncement = async (id: string) => {
-    if (!db || !confirm("Permanently delete this announcement?")) return
-    try {
-      await deleteDoc(doc(db, "announcements", id))
-      toast({ title: "Deleted", description: "Announcement removed from history." })
-    } catch (err) {
-      console.error(err)
     }
   }
 
@@ -198,8 +187,9 @@ export default function AdminPage() {
           </div>
 
           <Tabs defaultValue="requests" className="space-y-8">
-            <TabsList className="glass p-1 h-14 rounded-2xl">
+            <TabsList className="glass p-1 h-14 rounded-2xl flex-wrap justify-start">
               <TabsTrigger value="requests" className="rounded-xl px-6"><ClipboardList className="w-4 h-4 mr-2" /> Requests</TabsTrigger>
+              <TabsTrigger value="pricing" className="rounded-xl px-6"><Percent className="w-4 h-4 mr-2" /> Pricing</TabsTrigger>
               <TabsTrigger value="reviews" className="rounded-xl px-6"><Star className="w-4 h-4 mr-2" /> Reviews</TabsTrigger>
               <TabsTrigger value="announcements" className="rounded-xl px-6"><Megaphone className="w-4 h-4 mr-2" /> Notices</TabsTrigger>
             </TabsList>
@@ -246,12 +236,87 @@ export default function AdminPage() {
                             </Select>
                           </TableCell>
                           <TableCell className="text-right pr-8">
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteRequest(req.id)} className="text-destructive hover:bg-destructive/10 rounded-xl">
+                            <Button variant="ghost" size="icon" onClick={async () => {
+                              if(confirm("Delete this request?")) {
+                                try {
+                                  await deleteDoc(doc(db!, "requests", req.id))
+                                  toast({ title: "Deleted", description: "Request removed." })
+                                } catch (e) { console.error(e) }
+                              }
+                            }} className="text-destructive hover:bg-destructive/10 rounded-xl">
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </TableCell>
                         </TableRow>
                       ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="pricing" className="animate-fade-in">
+              <Card className="glass overflow-hidden rounded-[2rem]">
+                <CardHeader>
+                  <CardTitle className="font-headline">Website Type Adjustments</CardTitle>
+                  <CardDescription>Manage active discounts and custom tags for each website package.</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader className="bg-white/5">
+                      <TableRow className="border-white/10">
+                        <TableHead className="pl-8">Package</TableHead>
+                        <TableHead>Discount (%)</TableHead>
+                        <TableHead>Custom Tag</TableHead>
+                        <TableHead className="text-right pr-8">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {WEBSITE_TYPES.map((type) => {
+                        const adj = adjustments?.find(a => a.id === type.id) || { discountPercentage: 0, customTag: "", isActive: false }
+                        return (
+                          <TableRow key={type.id} className="border-white/5 hover:bg-white/5">
+                            <TableCell className="pl-8 py-6">
+                              <div className="font-bold text-lg">{type.label}</div>
+                              <div className="text-[10px] text-muted-foreground uppercase tracking-widest">{type.price}</div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2 max-w-[120px]">
+                                <Input 
+                                  type="number" 
+                                  placeholder="0"
+                                  value={adj.discountPercentage} 
+                                  onChange={(e) => handleAdjustmentChange(type.id, "discountPercentage", Number(e.target.value))}
+                                  className="glass h-10 rounded-xl text-center"
+                                />
+                                <span className="font-bold text-muted-foreground">%</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="relative max-w-[180px]">
+                                <Input 
+                                  placeholder="e.g. HOT DEAL"
+                                  value={adj.customTag} 
+                                  onChange={(e) => handleAdjustmentChange(type.id, "customTag", e.target.value)}
+                                  className="glass h-10 rounded-xl pl-9"
+                                />
+                                <Tag className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-primary opacity-50" />
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right pr-8">
+                              <div className="flex items-center justify-end gap-3">
+                                <span className={adj.isActive ? "text-accent font-bold text-xs" : "text-muted-foreground font-bold text-xs"}>
+                                  {adj.isActive ? "ACTIVE" : "OFF"}
+                                </span>
+                                <Switch 
+                                  checked={adj.isActive} 
+                                  onCheckedChange={(val) => handleAdjustmentChange(type.id, "isActive", val)}
+                                />
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
                     </TableBody>
                   </Table>
                 </CardContent>
@@ -277,7 +342,12 @@ export default function AdminPage() {
                           <TableCell className="pl-8 font-bold">{rev.userName}</TableCell>
                           <TableCell className="max-w-md italic text-muted-foreground">"{rev.text}"</TableCell>
                           <TableCell className="text-right pr-8">
-                            <Select value={rev.status} onValueChange={(val) => handleReviewStatus(rev.id, val)}>
+                            <Select value={rev.status} onValueChange={async (val) => {
+                               try {
+                                 await updateDoc(doc(db!, "reviews", rev.id), { status: val })
+                                 toast({ title: "Review Updated" })
+                               } catch (e) { console.error(e) }
+                            }}>
                               <SelectTrigger className="w-[120px] h-9 glass rounded-xl text-xs ml-auto">
                                 <SelectValue />
                               </SelectTrigger>
@@ -334,7 +404,14 @@ export default function AdminPage() {
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              onClick={() => handleDeleteAnnouncement(ann.id)}
+                              onClick={async () => {
+                                if(confirm("Delete notice?")) {
+                                  try {
+                                    await deleteDoc(doc(db!, "announcements", ann.id))
+                                    toast({ title: "Deleted" })
+                                  } catch (e) { console.error(e) }
+                                }
+                              }}
                               className="text-destructive hover:bg-destructive/10 h-8 w-8 rounded-lg"
                             >
                               <Trash2 className="w-4 h-4" />

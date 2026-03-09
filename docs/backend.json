@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -53,6 +54,18 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "text", "rating", "status", "createdAt"]
+    },
+    "WebsiteAdjustment": {
+      "title": "WebsiteAdjustment",
+      "description": "Pricing adjustments and tags for website types.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "discountPercentage": { "type": "number" },
+        "customTag": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
     }
   },
   "auth": {
@@ -82,6 +95,10 @@
     "/roles_admin/{userId}": {
       "schema": { "$ref": "#/entities/User" },
       "description": "Admin role markers."
+    },
+    "/website_adjustments/{typeId}": {
+      "schema": { "$ref": "#/entities/WebsiteAdjustment" },
+      "description": "Adjustments for pricing and tags per website type."
     }
   }
 }
