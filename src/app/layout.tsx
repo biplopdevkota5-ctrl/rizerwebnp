@@ -1,3 +1,4 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase';
@@ -6,7 +7,7 @@ import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { LoadingScreen } from '@/components/LoadingScreen';
 
 export const metadata: Metadata = {
-  title: 'RIZER STUDIO | Custom Websites for Everyone',
+  title: 'RIZER WEB APP | Custom Websites Nepal',
   description: 'Professional custom website development at affordable prices by Biplop Devkota.',
 };
 

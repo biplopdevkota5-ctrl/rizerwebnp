@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -16,14 +17,7 @@ export function Navbar() {
   const router = useRouter()
   const [logoClicks, setLogoClicks] = React.useState(0)
   const timerRef = React.useRef<NodeJS.Timeout | null>(null)
-  const [isMounted, setIsMounted] = React.useState(false)
 
-  React.useEffect(() => {
-    // Small delay to ensure continuity with LoadingScreen logo transition
-    const timer = setTimeout(() => setIsMounted(true), 3200)
-    return () => clearTimeout(timer)
-  }, [])
-  
   const handleLogout = async () => {
     await signOut(auth)
     router.push('/')
@@ -49,24 +43,16 @@ export function Navbar() {
         <Link 
           href="/" 
           onClick={handleLogoAction}
-          className="flex items-center gap-3 group shrink-0 transition-all active:scale-95 cursor-pointer outline-none"
+          className="flex items-center gap-3 group shrink-0 transition-all active:scale-95"
         >
-          {/* Logo - Matches LoadingScreen final state */}
-          <div className={cn(
-            "w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-black text-lg transition-all duration-1000 shadow-[0_10px_30px_rgba(88,88,179,0.4)]",
-            isMounted ? "opacity-100 scale-100" : "opacity-0 scale-50"
-          )}>
+          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-white font-black text-lg shadow-lg">
             R
           </div>
-          <span className={cn(
-            "font-headline font-black text-xl tracking-tight text-foreground transition-all duration-1000 delay-300",
-            isMounted ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
-          )}>
-            RIZER <span className="text-primary italic">STUDIO</span>
+          <span className="font-headline font-black text-xl tracking-tight text-foreground">
+            RIZER <span className="text-primary uppercase">WEB APP</span>
           </span>
         </Link>
 
-        {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-8">
           {[
             { href: '/types', label: 'Website Types' },
@@ -77,32 +63,26 @@ export function Navbar() {
               key={link.href}
               href={link.href} 
               className={cn(
-                "text-sm font-bold transition-all hover:text-primary py-1 flex items-center gap-2 relative group",
+                "text-sm font-bold transition-all hover:text-primary py-1 flex items-center gap-2 relative",
                 pathname === link.href ? "text-primary" : "text-muted-foreground"
               )}
             >
               {link.icon && <link.icon className="w-4 h-4" />}
               {link.label}
-              <span className={cn(
-                "absolute bottom-0 left-0 w-full h-0.5 bg-primary transition-all duration-300",
-                pathname === link.href ? "opacity-100" : "opacity-0 group-hover:opacity-40"
-              )} />
             </Link>
           ))}
-          <div className="h-6 w-px bg-white/10 mx-2" />
         </div>
 
-        {/* Auth Actions */}
         <div className="flex items-center gap-3">
           {user ? (
             <div className="flex items-center gap-3">
-              <Link href="/dashboard" className="flex items-center gap-3 p-1 pr-4 rounded-full bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-all">
-                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-lg">
+              <Link href="/dashboard" className="flex items-center gap-3 p-1 pr-4 rounded-full bg-primary/5 border border-primary/10">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                   <UserIcon className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-xs font-black uppercase tracking-widest hidden xs:inline">{user.displayName || user.email?.split('@')[0]}</span>
               </Link>
-              <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-full hover:bg-destructive/10 hover:text-destructive">
+              <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-full">
                 <LogOut className="w-5 h-5" />
               </Button>
             </div>
@@ -112,13 +92,13 @@ export function Navbar() {
                 <Button variant="ghost" size="sm" className="font-bold text-sm">Login</Button>
               </Link>
               <Link href="/auth/signup">
-                <Button size="sm" className="font-black rounded-full h-10 px-6 shadow-xl shadow-primary/20 hover:scale-105">Join Us</Button>
+                <Button size="sm" className="font-black rounded-full h-10 px-6 shadow-xl shadow-primary/20">Join Us</Button>
               </Link>
             </div>
           )}
           
           <Link href="/menu" className="md:hidden">
-            <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 glass">
+            <Button variant="ghost" size="icon" className="rounded-full h-10 w-10">
               <Menu className="w-6 h-6" />
             </Button>
           </Link>
