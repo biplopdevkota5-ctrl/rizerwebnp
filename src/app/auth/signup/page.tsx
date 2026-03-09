@@ -41,45 +41,23 @@ export default function SignupPage() {
     toast({ title: "Creating Account", description: "Setting up your workspace..." })
   }
 
-  const handleGoogleSignup = async () => {
+  const handleSocialSignup = async (provider: 'google' | 'facebook' | 'microsoft') => {
     setLoading(true)
     try {
-      await initiateGoogleSignIn(auth)
+      if (provider === 'google') await initiateGoogleSignIn(auth)
+      if (provider === 'facebook') await initiateFacebookSignIn(auth)
+      if (provider === 'microsoft') await initiateMicrosoftSignIn(auth)
     } catch (error: any) {
       setLoading(false)
-      toast({ 
-        title: "Signup Failed", 
-        description: error.message || "Google signup was interrupted.", 
-        variant: "destructive" 
-      })
-    }
-  }
-
-  const handleFacebookSignup = async () => {
-    setLoading(true)
-    try {
-      await initiateFacebookSignIn(auth)
-    } catch (error: any) {
-      setLoading(false)
-      toast({ 
-        title: "Signup Failed", 
-        description: error.message || "Facebook signup was interrupted.", 
-        variant: "destructive" 
-      })
-    }
-  }
-
-  const handleMicrosoftSignup = async () => {
-    setLoading(true)
-    try {
-      await initiateMicrosoftSignIn(auth)
-    } catch (error: any) {
-      setLoading(false)
-      toast({ 
-        title: "Signup Failed", 
-        description: error.message || "Microsoft signup was interrupted.", 
-        variant: "destructive" 
-      })
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast({ title: "Signup Cancelled", description: "The auth window was closed before completion." })
+      } else {
+        toast({ 
+          title: "Signup Failed", 
+          description: error.message || "An error occurred during authentication.", 
+          variant: "destructive" 
+        })
+      }
     }
   }
 
@@ -158,7 +136,7 @@ export default function SignupPage() {
               <Button 
                 variant="outline" 
                 className="w-full h-12 rounded-xl font-bold glass border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-3"
-                onClick={handleGoogleSignup}
+                onClick={() => handleSocialSignup('google')}
                 disabled={loading || authLoading}
               >
                 <Chrome className="w-5 h-5 text-accent" />
@@ -168,7 +146,7 @@ export default function SignupPage() {
                 <Button 
                   variant="outline" 
                   className="w-full h-12 rounded-xl font-bold glass border-white/10 hover:bg-[#1877F2]/10 hover:text-[#1877F2] transition-all flex items-center justify-center gap-3"
-                  onClick={handleFacebookSignup}
+                  onClick={() => handleSocialSignup('facebook')}
                   disabled={loading || authLoading}
                 >
                   <Facebook className="w-5 h-5 text-[#1877F2]" />
@@ -177,7 +155,7 @@ export default function SignupPage() {
                 <Button 
                   variant="outline" 
                   className="w-full h-12 rounded-xl font-bold glass border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-3"
-                  onClick={handleMicrosoftSignup}
+                  onClick={() => handleSocialSignup('microsoft')}
                   disabled={loading || authLoading}
                 >
                   <svg className="w-5 h-5" viewBox="0 0 23 23" xmlns="http://www.w3.org/2000/svg"><path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z" fill="#f25022"/></svg>

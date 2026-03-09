@@ -37,45 +37,23 @@ export default function LoginPage() {
     toast({ title: "Connecting...", description: "Authenticating your credentials." })
   }
 
-  const handleGoogleLogin = async () => {
+  const handleSocialLogin = async (provider: 'google' | 'facebook' | 'microsoft') => {
     setLoading(true)
     try {
-      await initiateGoogleSignIn(auth)
+      if (provider === 'google') await initiateGoogleSignIn(auth)
+      if (provider === 'facebook') await initiateFacebookSignIn(auth)
+      if (provider === 'microsoft') await initiateMicrosoftSignIn(auth)
     } catch (error: any) {
       setLoading(false)
-      toast({ 
-        title: "Login Failed", 
-        description: error.message || "Google sign-in was interrupted.", 
-        variant: "destructive" 
-      })
-    }
-  }
-
-  const handleFacebookLogin = async () => {
-    setLoading(true)
-    try {
-      await initiateFacebookSignIn(auth)
-    } catch (error: any) {
-      setLoading(false)
-      toast({ 
-        title: "Login Failed", 
-        description: error.message || "Facebook sign-in was interrupted.", 
-        variant: "destructive" 
-      })
-    }
-  }
-
-  const handleMicrosoftLogin = async () => {
-    setLoading(true)
-    try {
-      await initiateMicrosoftSignIn(auth)
-    } catch (error: any) {
-      setLoading(false)
-      toast({ 
-        title: "Login Failed", 
-        description: error.message || "Microsoft sign-in was interrupted.", 
-        variant: "destructive" 
-      })
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast({ title: "Login Cancelled", description: "The login window was closed before completion." })
+      } else {
+        toast({ 
+          title: "Login Failed", 
+          description: error.message || "An error occurred during authentication.", 
+          variant: "destructive" 
+        })
+      }
     }
   }
 
@@ -143,7 +121,7 @@ export default function LoginPage() {
               <Button 
                 variant="outline" 
                 className="w-full h-12 rounded-xl font-bold glass border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-3"
-                onClick={handleGoogleLogin}
+                onClick={() => handleSocialLogin('google')}
                 disabled={loading || authLoading}
               >
                 <Chrome className="w-5 h-5 text-primary" />
@@ -153,7 +131,7 @@ export default function LoginPage() {
                 <Button 
                   variant="outline" 
                   className="w-full h-12 rounded-xl font-bold glass border-white/10 hover:bg-[#1877F2]/10 hover:text-[#1877F2] transition-all flex items-center justify-center gap-3"
-                  onClick={handleFacebookLogin}
+                  onClick={() => handleSocialLogin('facebook')}
                   disabled={loading || authLoading}
                 >
                   <Facebook className="w-5 h-5 text-[#1877F2]" />
@@ -162,7 +140,7 @@ export default function LoginPage() {
                 <Button 
                   variant="outline" 
                   className="w-full h-12 rounded-xl font-bold glass border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-3"
-                  onClick={handleMicrosoftLogin}
+                  onClick={() => handleSocialLogin('microsoft')}
                   disabled={loading || authLoading}
                 >
                   <svg className="w-5 h-5" viewBox="0 0 23 23" xmlns="http://www.w3.org/2000/svg"><path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z" fill="#f25022"/></svg>
