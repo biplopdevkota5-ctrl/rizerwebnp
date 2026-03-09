@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { WEBSITE_TYPES } from "@/lib/types"
-import { Check, Sparkles, ArrowRight, Shield, Globe, Award, Users, Percent } from "lucide-react"
+import { Check, Sparkles, ArrowRight, Shield, Globe, Award, Users } from "lucide-react"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection } from "firebase/firestore"
 
@@ -25,7 +25,8 @@ export default function WebsiteTypesPage() {
   const getPriceDisplay = (type: typeof WEBSITE_TYPES[0]) => {
     const adj = adjustments?.find(a => a.id === type.id)
     
-    if (!adj || !adj.isActive || !adj.discountPercentage) {
+    // Check if adjustment exists, is active, and has a discount
+    if (!adj || !adj.isActive || !adj.discountPercentage || adj.discountPercentage <= 0) {
       return (
         <span className="text-foreground font-black text-xl md:text-2xl">{type.price}</span>
       )
@@ -35,6 +36,7 @@ export default function WebsiteTypesPage() {
       return <span className="text-foreground font-black text-xl md:text-2xl">{type.price}</span>
     }
     
+    // Extract numerical value from price string (e.g., "$119 - $200" -> 119)
     const parts = type.price.match(/\$(\d+)/)
     if (!parts) return <span className="text-foreground font-black text-xl md:text-2xl">{type.price}</span>
 

@@ -20,6 +20,7 @@ import { collection, doc, updateDoc, deleteDoc, addDoc, query, orderBy, setDoc }
 import { IOSSpinner } from "@/components/ui/ios-spinner"
 import { WEBSITE_TYPES } from "@/lib/types"
 import { useSound } from "@/hooks/use-sound"
+import { cn } from "@/lib/utils"
 
 const ADMIN_PASSWORD = "090102030405"
 
@@ -103,7 +104,8 @@ export default function AdminPage() {
     if (!db) return
     const docRef = doc(db, "website_adjustments", typeId)
     try {
-      await setDoc(docRef, { [field]: value, updatedAt: new Date().toISOString() }, { merge: true })
+      const finalValue = field === 'discountPercentage' ? (Number(value) || 0) : value;
+      await setDoc(docRef, { [field]: finalValue, updatedAt: new Date().toISOString() }, { merge: true })
       if (typeof value === 'boolean') play('success')
     } catch (err) {
       console.error(err)
@@ -216,10 +218,10 @@ export default function AdminPage() {
                   <Table className="min-w-[800px]">
                     <TableHeader className="bg-white/5">
                       <TableRow className="border-white/10 hover:bg-transparent">
-                        <TableHead className="pl-8 py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Client Information</TableHead>
-                        <TableHead className="py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Build Type</TableHead>
-                        <TableHead className="py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Status Update</TableHead>
-                        <TableHead className="text-right pr-8 py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Management</TableHead>
+                        <TableHead className="pl-8 py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Client</TableHead>
+                        <TableHead className="py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Type</TableHead>
+                        <TableHead className="py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Status</TableHead>
+                        <TableHead className="text-right pr-8 py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -252,7 +254,12 @@ export default function AdminPage() {
                             </Select>
                           </TableCell>
                           <TableCell className="text-right pr-8">
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteRequest(req.id)} className="text-destructive hover:bg-destructive/10 rounded-xl h-12 w-12 transition-all">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => handleDeleteRequest(req.id)} 
+                              className="text-destructive hover:bg-destructive/10 rounded-xl h-12 w-12 transition-all border border-transparent hover:border-destructive/20"
+                            >
                               <Trash2 className="w-5 h-5" />
                             </Button>
                           </TableCell>
@@ -295,7 +302,7 @@ export default function AdminPage() {
                                   type="number" 
                                   placeholder="0"
                                   value={adj.discountPercentage} 
-                                  onChange={(e) => handleAdjustmentChange(type.id, "discountPercentage", Number(e.target.value))}
+                                  onChange={(e) => handleAdjustmentChange(type.id, "discountPercentage", e.target.value)}
                                   className="glass h-12 rounded-xl text-center font-black text-lg"
                                 />
                                 <span className="font-black text-muted-foreground text-xl">%</span>
@@ -321,7 +328,7 @@ export default function AdminPage() {
                                   {adj.isActive ? "LIVE" : "DORMANT"}
                                 </span>
                                 <Switch 
-                                  checked={adj.isActive} 
+                                  checked={adj.isActive || false} 
                                   onCheckedChange={(val) => handleAdjustmentChange(type.id, "isActive", val)}
                                   className="data-[state=checked]:bg-accent"
                                 />
