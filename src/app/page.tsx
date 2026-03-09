@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { FloatingButton } from "@/components/FloatingButton"
-import { CheckCircle2, Zap, Shield, Globe, Cpu, Sparkles, Star, ArrowRight, RefreshCw, Megaphone } from "lucide-react"
+import { CheckCircle2, Zap, Shield, Globe, Cpu, Sparkles, Star, ArrowRight, Megaphone } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, query, limit, where, orderBy } from "firebase/firestore"
@@ -63,27 +64,27 @@ export default function Home() {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative pt-16 pb-20 md:pt-32 md:pb-40 overflow-hidden">
+        <section className="relative pt-16 pb-20 md:pt-32 md:pb-40 lg:pt-48 lg:pb-60 overflow-hidden">
           <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
+            <div className="max-w-5xl mx-auto text-center space-y-8 md:space-y-12 animate-fade-in">
               <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] shadow-xl animate-float">
                 <Sparkles className="w-4 h-4 text-accent" />
                 <span>Modern Web Development for Nepal 🇳🇵</span>
               </div>
-              <h1 className="text-5xl sm:text-6xl md:text-8xl font-headline font-bold leading-[1] tracking-tighter text-foreground">
+              <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-headline font-bold leading-[1] tracking-tighter text-foreground">
                 Create Your <span className="text-primary italic animate-pulse">Dream Web</span> at Cheap Price
               </h1>
-              <p className="text-lg sm:text-2xl text-muted-foreground max-w-2xl mx-auto font-body font-medium leading-relaxed opacity-80">
+              <p className="text-lg sm:text-2xl lg:text-3xl text-muted-foreground max-w-3xl mx-auto font-body font-medium leading-relaxed opacity-80 px-4">
                 Premium quality designs, glassmorphism effects, and ultra-smooth animations. Get your professional website today.
               </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-5 pt-6">
+              <div className="flex flex-col sm:flex-row justify-center gap-5 pt-6 px-4">
                 <Link href="/request" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full h-16 rounded-full font-black text-xl hover:scale-105 transition-all active:scale-95 shadow-2xl shadow-primary/40">
+                  <Button size="lg" className="w-full sm:min-w-[240px] h-16 md:h-20 rounded-full font-black text-xl hover:scale-105 transition-all active:scale-95 shadow-2xl shadow-primary/40">
                     Request Website
                   </Button>
                 </Link>
                 <Link href="/types" className="w-full sm:w-auto">
-                  <Button size="lg" variant="outline" className="w-full h-16 rounded-full glass border-white/20 font-black text-xl hover:scale-105 transition-all active:scale-95 backdrop-blur-3xl">
+                  <Button size="lg" variant="outline" className="w-full sm:min-w-[240px] h-16 md:h-20 rounded-full glass border-white/20 font-black text-xl hover:scale-105 transition-all active:scale-95 backdrop-blur-3xl">
                     View Packages
                   </Button>
                 </Link>
@@ -92,18 +93,18 @@ export default function Home() {
           </div>
           
           {/* Animated Ambient Background */}
-          <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] -translate-x-1/2 opacity-30 animate-pulse" />
-          <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[120px] translate-x-1/2 opacity-30 animate-pulse" />
+          <div className="absolute top-1/4 left-0 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-primary/20 rounded-full blur-[80px] md:blur-[120px] -translate-x-1/2 opacity-30 animate-pulse" />
+          <div className="absolute bottom-1/4 right-0 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-accent/20 rounded-full blur-[80px] md:blur-[120px] translate-x-1/2 opacity-30 animate-pulse" />
         </section>
 
         {/* Features Section */}
-        <section className="py-24 md:py-32 bg-black/5 relative">
+        <section className="py-20 md:py-32 bg-black/5 relative">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16 md:mb-24 space-y-4">
-              <h2 className="text-4xl md:text-6xl font-headline font-bold text-foreground">Why RIZERWEBNP?</h2>
-              <p className="text-muted-foreground text-xl max-w-2xl mx-auto font-medium">We merge high-end visual aesthetics with industry-standard performance.</p>
+              <h2 className="text-4xl md:text-6xl lg:text-7xl font-headline font-bold text-foreground">Why RIZERWEBNP?</h2>
+              <p className="text-muted-foreground text-xl lg:text-2xl max-w-2xl mx-auto font-medium">We merge high-end visual aesthetics with industry-standard performance.</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
               {[
                 { icon: Zap, title: "Ultra Fast", desc: "Built with Next.js 15 for lightning-fast performance and perfect SEO scores." },
                 { icon: Globe, title: "Global UX", desc: "Websites that compete with international standards in design and usability." },
@@ -112,12 +113,12 @@ export default function Home() {
                 { icon: CheckCircle2, title: "Affordable", desc: "Professional web builds starting at prices that fit your budget." },
                 { icon: Sparkles, title: "Glass UI", desc: "Modern Glassmorphism and animations tailored to your brand identity." },
               ].map((feature, i) => (
-                <div key={i} className="p-10 rounded-[2.5rem] glass glass-shimmer hover-lift border-white/5 group shadow-2xl">
-                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-8 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                <div key={i} className="p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] glass glass-shimmer hover-lift border-white/5 group shadow-2xl transition-all">
+                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6 md:mb-8 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500">
                     <feature.icon className="w-7 h-7" />
                   </div>
-                  <h3 className="text-2xl font-headline font-bold mb-4 text-foreground">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed font-medium">{feature.desc}</p>
+                  <h3 className="text-2xl md:text-3xl font-headline font-bold mb-4 text-foreground">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed font-medium md:text-lg">{feature.desc}</p>
                 </div>
               ))}
             </div>
@@ -125,19 +126,19 @@ export default function Home() {
         </section>
 
         {/* Testimonials */}
-        <section id="testimonials-section" className="py-24 md:py-32 relative">
+        <section id="testimonials-section" className="py-20 md:py-32 relative">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16 md:mb-24 space-y-4">
-              <h2 className="text-4xl md:text-6xl font-headline font-bold text-foreground">Trusted by Clients</h2>
-              <p className="text-muted-foreground text-xl max-w-2xl mx-auto font-medium italic">Real experiences from those who built with Rizer Studio.</p>
+              <h2 className="text-4xl md:text-6xl lg:text-7xl font-headline font-bold text-foreground">Trusted by Clients</h2>
+              <p className="text-muted-foreground text-xl lg:text-2xl max-w-2xl mx-auto font-medium italic px-4">Real experiences from those who built with Rizer Studio.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
               {displayReviews.map((t: any, i) => (
                 <div 
                   key={t.id || i} 
-                  className="p-10 rounded-[2.5rem] glass hover-lift border-white/5 group relative shadow-2xl"
+                  className="p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] glass hover-lift border-white/5 group relative shadow-2xl transition-all"
                 >
-                  <div className="flex gap-1 mb-8">
+                  <div className="flex gap-1 mb-6 md:mb-8">
                     {[1, 2, 3, 4, 5].map((s) => (
                       <Star 
                         key={s} 
@@ -145,15 +146,15 @@ export default function Home() {
                       />
                     ))}
                   </div>
-                  <p className="text-foreground/90 font-medium italic mb-10 leading-relaxed text-xl">
+                  <p className="text-foreground/90 font-medium italic mb-8 md:mb-10 leading-relaxed text-lg md:text-xl lg:text-2xl">
                     "{t.text}"
                   </p>
-                  <div className="flex items-center gap-5 pt-8 border-t border-white/10">
+                  <div className="flex items-center gap-5 pt-6 md:pt-8 border-t border-white/10">
                     <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center font-black text-primary border border-primary/20 text-lg uppercase">
                       {t.userName?.[0] || "?"}
                     </div>
                     <div>
-                      <h4 className="font-bold text-foreground text-lg">{t.userName}</h4>
+                      <h4 className="font-bold text-foreground text-lg md:text-xl">{t.userName}</h4>
                       <p className="text-xs text-accent font-black uppercase tracking-widest">Verified Client</p>
                     </div>
                   </div>
@@ -164,15 +165,15 @@ export default function Home() {
         </section>
 
         {/* Call to Action */}
-        <section className="py-24 md:py-40">
-          <div className="container mx-auto px-4">
-            <div className="rounded-[3rem] bg-primary p-12 md:p-24 text-center text-primary-foreground space-y-10 overflow-hidden relative shadow-[0_48px_96px_-24px_rgba(88,88,179,0.5)] group">
-              <div className="relative z-10 max-w-3xl mx-auto space-y-8">
-                <h2 className="text-4xl md:text-7xl font-headline font-bold leading-tight tracking-tighter">Ready to Launch Your Digital Home?</h2>
-                <p className="text-xl md:text-2xl font-medium opacity-90 max-w-2xl mx-auto leading-relaxed">Join the next generation of businesses in Nepal with a high-performance custom website.</p>
-                <div className="pt-8">
+        <section className="py-20 md:py-32 lg:py-48 px-4">
+          <div className="container mx-auto max-w-7xl">
+            <div className="rounded-[2.5rem] md:rounded-[4rem] bg-primary p-10 md:p-20 lg:p-32 text-center text-primary-foreground space-y-8 md:space-y-12 overflow-hidden relative shadow-[0_48px_96px_-24px_rgba(88,88,179,0.5)] group">
+              <div className="relative z-10 max-w-4xl mx-auto space-y-8 md:space-y-10">
+                <h2 className="text-4xl md:text-7xl lg:text-8xl font-headline font-bold leading-tight tracking-tighter">Ready to Launch Your Digital Home?</h2>
+                <p className="text-lg md:text-2xl lg:text-3xl font-medium opacity-90 max-w-2xl mx-auto leading-relaxed px-4">Join the next generation of businesses in Nepal with a high-performance custom website.</p>
+                <div className="pt-6 md:pt-10">
                   <Link href="/request">
-                    <Button size="lg" variant="secondary" className="h-20 px-14 rounded-full font-black text-2xl hover:scale-110 transition-all active:scale-95 shadow-3xl bg-white text-primary">
+                    <Button size="lg" variant="secondary" className="w-full sm:w-auto h-20 px-14 rounded-full font-black text-2xl hover:scale-110 transition-all active:scale-95 shadow-3xl bg-white text-primary">
                       Build My Website Now
                       <ArrowRight className="ml-3 w-7 h-7" />
                     </Button>
@@ -181,8 +182,8 @@ export default function Home() {
               </div>
               
               {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
-              <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
+              <div className="absolute top-0 right-0 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-white/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-accent/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
             </div>
           </div>
         </section>

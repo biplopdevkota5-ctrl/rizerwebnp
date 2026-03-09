@@ -104,7 +104,6 @@ export default function AdminPage() {
     const docRef = doc(db, "website_adjustments", typeId)
     try {
       await setDoc(docRef, { [field]: value, updatedAt: new Date().toISOString() }, { merge: true })
-      // Silent update for better UX on text inputs, but maybe play sound for toggle
       if (typeof value === 'boolean') play('success')
     } catch (err) {
       console.error(err)
@@ -187,61 +186,61 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <main className="flex-1 py-12">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <main className="flex-1 py-8 md:py-16">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="mb-10 md:mb-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="space-y-1">
-              <h1 className="text-4xl font-headline font-bold flex items-center gap-3">
-                <ShieldCheck className="w-8 h-8 text-primary" />
+              <h1 className="text-3xl md:text-5xl font-headline font-bold flex items-center gap-3">
+                <ShieldCheck className="w-8 h-8 md:w-10 md:h-10 text-primary" />
                 Admin Panel
               </h1>
-              <p className="text-muted-foreground font-medium">Managing Rizer Studio Projects</p>
+              <p className="text-muted-foreground font-medium md:text-lg">Managing Rizer Studio Projects</p>
             </div>
-            <Button variant="outline" onClick={handleLogout} className="rounded-full h-10 px-6 glass">
+            <Button variant="outline" onClick={handleLogout} className="rounded-full h-12 px-8 glass shadow-lg">
               <LogOut className="w-4 h-4 mr-2" />
               Exit Console
             </Button>
           </div>
 
-          <Tabs defaultValue="requests" className="space-y-8">
-            <TabsList className="glass p-1 h-14 rounded-2xl flex-wrap justify-start">
-              <TabsTrigger value="requests" className="rounded-xl px-6"><ClipboardList className="w-4 h-4 mr-2" /> Requests</TabsTrigger>
-              <TabsTrigger value="pricing" className="rounded-xl px-6"><Percent className="w-4 h-4 mr-2" /> Pricing</TabsTrigger>
-              <TabsTrigger value="reviews" className="rounded-xl px-6"><Star className="w-4 h-4 mr-2" /> Reviews</TabsTrigger>
-              <TabsTrigger value="announcements" className="rounded-xl px-6"><Megaphone className="w-4 h-4 mr-2" /> Notices</TabsTrigger>
+          <Tabs defaultValue="requests" className="space-y-10">
+            <TabsList className="glass p-1 h-auto md:h-16 rounded-2xl flex-wrap justify-start gap-1">
+              <TabsTrigger value="requests" className="rounded-xl px-4 md:px-6 h-10 md:h-full"><ClipboardList className="w-4 h-4 mr-2" /> Requests</TabsTrigger>
+              <TabsTrigger value="pricing" className="rounded-xl px-4 md:px-6 h-10 md:h-full"><Percent className="w-4 h-4 mr-2" /> Pricing</TabsTrigger>
+              <TabsTrigger value="reviews" className="rounded-xl px-4 md:px-6 h-10 md:h-full"><Star className="w-4 h-4 mr-2" /> Reviews</TabsTrigger>
+              <TabsTrigger value="announcements" className="rounded-xl px-4 md:px-6 h-10 md:h-full"><Megaphone className="w-4 h-4 mr-2" /> Notices</TabsTrigger>
             </TabsList>
 
             <TabsContent value="requests" className="animate-fade-in">
-              <Card className="glass overflow-hidden rounded-[2rem]">
-                <CardContent className="p-0">
-                  <Table>
+              <Card className="glass overflow-hidden rounded-[2rem] shadow-2xl">
+                <CardContent className="p-0 overflow-x-auto">
+                  <Table className="min-w-[800px]">
                     <TableHeader className="bg-white/5">
-                      <TableRow className="border-white/10">
-                        <TableHead className="pl-8">Client</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right pr-8">Actions</TableHead>
+                      <TableRow className="border-white/10 hover:bg-transparent">
+                        <TableHead className="pl-8 py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Client Information</TableHead>
+                        <TableHead className="py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Build Type</TableHead>
+                        <TableHead className="py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Status Update</TableHead>
+                        <TableHead className="text-right pr-8 py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Management</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {requestsLoading ? (
-                        <TableRow><TableCell colSpan={4} className="text-center py-20"><IOSSpinner size="lg" className="mx-auto" /></TableCell></TableRow>
+                        <TableRow><TableCell colSpan={4} className="text-center py-32"><IOSSpinner size="lg" className="mx-auto" /></TableCell></TableRow>
                       ) : !requests || requests.length === 0 ? (
-                        <TableRow><TableCell colSpan={4} className="text-center py-20 text-muted-foreground">No build requests found.</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={4} className="text-center py-32 text-muted-foreground font-medium">No active build requests found.</TableCell></TableRow>
                       ) : requests.map((req) => (
-                        <TableRow key={req.id} className="border-white/5 hover:bg-white/5">
-                          <TableCell className="pl-8 py-6">
-                            <div className="font-bold text-lg">{req.fullName || "Anonymous Client"}</div>
-                            <div className="text-[10px] text-muted-foreground uppercase tracking-widest">{req.email}</div>
-                            <div className="flex items-center gap-1.5 text-[11px] text-primary font-bold mt-1">
-                              <Phone className="w-3 h-3" />
+                        <TableRow key={req.id} className="border-white/5 hover:bg-white/5 transition-colors">
+                          <TableCell className="pl-8 py-8">
+                            <div className="font-bold text-xl mb-1">{req.fullName || "Anonymous Client"}</div>
+                            <div className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">{req.email}</div>
+                            <div className="flex items-center gap-2 text-[12px] text-primary font-bold mt-2 bg-primary/10 w-fit px-3 py-1 rounded-full border border-primary/20">
+                              <Phone className="w-3.5 h-3.5" />
                               {req.phone || req.whatsapp || 'N/A'}
                             </div>
                           </TableCell>
-                          <TableCell className="capitalize font-bold">{req.websiteType}</TableCell>
+                          <TableCell className="capitalize font-black text-foreground/80">{req.websiteType}</TableCell>
                           <TableCell>
                             <Select value={req.status || 'pending'} onValueChange={(val) => handleUpdateStatus(req.id, val)}>
-                              <SelectTrigger className="w-[140px] h-10 glass rounded-xl text-xs font-bold">
+                              <SelectTrigger className="w-[160px] h-11 glass rounded-xl text-[13px] font-bold">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent className="glass">
@@ -253,8 +252,8 @@ export default function AdminPage() {
                             </Select>
                           </TableCell>
                           <TableCell className="text-right pr-8">
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteRequest(req.id)} className="text-destructive hover:bg-destructive/10 rounded-xl">
-                              <Trash2 className="w-4 h-4" />
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteRequest(req.id)} className="text-destructive hover:bg-destructive/10 rounded-xl h-12 w-12 transition-all">
+                              <Trash2 className="w-5 h-5" />
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -266,61 +265,65 @@ export default function AdminPage() {
             </TabsContent>
 
             <TabsContent value="pricing" className="animate-fade-in">
-              <Card className="glass overflow-hidden rounded-[2rem]">
-                <CardHeader>
-                  <CardTitle className="font-headline">Pricing & Tag Management</CardTitle>
-                  <CardDescription>Adjust discounts and labels. Changes apply instantly to the Website Types page.</CardDescription>
+              <Card className="glass overflow-hidden rounded-[2rem] shadow-2xl">
+                <CardHeader className="p-8 md:p-12 bg-white/5">
+                  <CardTitle className="font-headline text-2xl md:text-3xl font-bold">Pricing & Tag Management</CardTitle>
+                  <CardDescription className="text-lg font-medium opacity-70">Adjust discounts and promotional labels. Changes apply instantly to the website packages.</CardDescription>
                 </CardHeader>
-                <CardContent className="p-0">
-                  <Table>
+                <CardContent className="p-0 overflow-x-auto">
+                  <Table className="min-w-[900px]">
                     <TableHeader className="bg-white/5">
-                      <TableRow className="border-white/10">
-                        <TableHead className="pl-8">Package</TableHead>
-                        <TableHead>Discount (%)</TableHead>
-                        <TableHead>Custom Tag</TableHead>
-                        <TableHead className="text-right pr-8">Status</TableHead>
+                      <TableRow className="border-white/10 hover:bg-transparent">
+                        <TableHead className="pl-8 py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Package Category</TableHead>
+                        <TableHead className="py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Discount (%)</TableHead>
+                        <TableHead className="py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Promo Label</TableHead>
+                        <TableHead className="text-right pr-8 py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Visibility</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {WEBSITE_TYPES.map((type) => {
                         const adj = adjustments?.find(a => a.id === type.id) || { discountPercentage: 0, customTag: "", isActive: false }
                         return (
-                          <TableRow key={type.id} className="border-white/5 hover:bg-white/5">
-                            <TableCell className="pl-8 py-6">
-                              <div className="font-bold text-lg">{type.label}</div>
-                              <div className="text-[10px] text-muted-foreground uppercase tracking-widest">Base: {type.price}</div>
+                          <TableRow key={type.id} className="border-white/5 hover:bg-white/5 transition-colors">
+                            <TableCell className="pl-8 py-8">
+                              <div className="font-bold text-xl mb-1">{type.label}</div>
+                              <div className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">Base Pricing: {type.price}</div>
                             </TableCell>
                             <TableCell>
-                              <div className="flex items-center gap-2 max-w-[120px]">
+                              <div className="flex items-center gap-3 max-w-[140px]">
                                 <Input 
                                   type="number" 
                                   placeholder="0"
                                   value={adj.discountPercentage} 
                                   onChange={(e) => handleAdjustmentChange(type.id, "discountPercentage", Number(e.target.value))}
-                                  className="glass h-10 rounded-xl text-center"
+                                  className="glass h-12 rounded-xl text-center font-black text-lg"
                                 />
-                                <span className="font-bold text-muted-foreground">%</span>
+                                <span className="font-black text-muted-foreground text-xl">%</span>
                               </div>
                             </TableCell>
                             <TableCell>
-                              <div className="relative max-w-[180px]">
+                              <div className="relative max-w-[200px]">
                                 <Input 
                                   placeholder="e.g. HOT DEAL"
                                   value={adj.customTag} 
                                   onChange={(e) => handleAdjustmentChange(type.id, "customTag", e.target.value)}
-                                  className="glass h-10 rounded-xl pl-9"
+                                  className="glass h-12 rounded-xl pl-10 font-bold"
                                 />
-                                <Tag className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-primary opacity-50" />
+                                <Tag className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-primary opacity-50" />
                               </div>
                             </TableCell>
                             <TableCell className="text-right pr-8">
-                              <div className="flex items-center justify-end gap-3">
-                                <span className={adj.isActive ? "text-accent font-bold text-xs" : "text-muted-foreground font-bold text-xs"}>
-                                  {adj.isActive ? "ACTIVE" : "OFF"}
+                              <div className="flex items-center justify-end gap-4">
+                                <span className={cn(
+                                  "font-black text-[11px] tracking-widest",
+                                  adj.isActive ? "text-accent" : "text-muted-foreground"
+                                )}>
+                                  {adj.isActive ? "LIVE" : "DORMANT"}
                                 </span>
                                 <Switch 
                                   checked={adj.isActive} 
                                   onCheckedChange={(val) => handleAdjustmentChange(type.id, "isActive", val)}
+                                  className="data-[state=checked]:bg-accent"
                                 />
                               </div>
                             </TableCell>
@@ -334,23 +337,32 @@ export default function AdminPage() {
             </TabsContent>
 
             <TabsContent value="reviews" className="animate-fade-in">
-              <Card className="glass overflow-hidden rounded-[2rem]">
-                <CardContent className="p-0">
-                  <Table>
+              <Card className="glass overflow-hidden rounded-[2rem] shadow-2xl">
+                <CardContent className="p-0 overflow-x-auto">
+                  <Table className="min-w-[800px]">
                     <TableHeader className="bg-white/5">
-                      <TableRow className="border-white/10">
-                        <TableHead className="pl-8">Author</TableHead>
-                        <TableHead>Content</TableHead>
-                        <TableHead className="text-right pr-8">Status</TableHead>
+                      <TableRow className="border-white/10 hover:bg-transparent">
+                        <TableHead className="pl-8 py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Review Author</TableHead>
+                        <TableHead className="py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Feedback Content</TableHead>
+                        <TableHead className="text-right pr-8 py-6 uppercase tracking-wider text-[11px] font-black opacity-60">Approval Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {!reviews || reviews.length === 0 ? (
-                        <TableRow><TableCell colSpan={3} className="text-center py-20 text-muted-foreground">No reviews yet.</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={3} className="text-center py-32 text-muted-foreground font-medium">No client reviews submitted yet.</TableCell></TableRow>
                       ) : reviews.map((rev) => (
-                        <TableRow key={rev.id} className="border-white/5 hover:bg-white/5">
-                          <TableCell className="pl-8 font-bold">{rev.userName}</TableCell>
-                          <TableCell className="max-w-md italic text-muted-foreground">"{rev.text}"</TableCell>
+                        <TableRow key={rev.id} className="border-white/5 hover:bg-white/5 transition-colors">
+                          <TableCell className="pl-8 py-8">
+                            <div className="font-bold text-lg">{rev.userName}</div>
+                            <div className="flex gap-1 mt-1">
+                              {[1, 2, 3, 4, 5].map(s => (
+                                <Star key={s} className={cn("w-3 h-3", s <= rev.rating ? "fill-accent text-accent" : "text-white/10")} />
+                              ))}
+                            </div>
+                          </TableCell>
+                          <TableCell className="max-w-md py-8">
+                            <p className="italic text-muted-foreground leading-relaxed">"{rev.text}"</p>
+                          </TableCell>
                           <TableCell className="text-right pr-8">
                             <Select value={rev.status} onValueChange={async (val) => {
                                try {
@@ -359,7 +371,7 @@ export default function AdminPage() {
                                  toast({ title: "Review Updated" })
                                } catch (e) { console.error(e) }
                             }}>
-                              <SelectTrigger className="w-[120px] h-9 glass rounded-xl text-xs ml-auto">
+                              <SelectTrigger className="w-[140px] h-10 glass rounded-xl text-xs font-black ml-auto">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent className="glass">
@@ -378,55 +390,59 @@ export default function AdminPage() {
             </TabsContent>
 
             <TabsContent value="announcements" className="animate-fade-in">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Card className="glass rounded-[2rem]">
-                  <CardHeader><CardTitle>New Notice</CardTitle></CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="space-y-2">
-                      <Label>Announcement Text</Label>
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <Card className="lg:col-span-2 glass rounded-[2.5rem] shadow-2xl h-fit">
+                  <CardHeader className="p-8"><CardTitle className="font-headline text-2xl">Publish New Notice</CardTitle></CardHeader>
+                  <CardContent className="p-8 pt-0 space-y-8">
+                    <div className="space-y-3">
+                      <Label className="font-bold text-sm">Announcement Message</Label>
                       <Input 
-                        placeholder="e.g. New Year Discount!" 
+                        placeholder="e.g. Season Sale: 30% OFF on all builds!" 
                         value={announcementInput} 
                         onChange={e => setAnnouncementInput(e.target.value)}
-                        className="glass h-12 rounded-xl"
+                        className="glass h-14 rounded-2xl font-medium px-6 text-lg"
                       />
                     </div>
-                    <Button onClick={handleAddAnnouncement} className="w-full h-12 rounded-xl font-bold" disabled={isActionLoading}>
-                      {isActionLoading ? <IOSSpinner size="sm" /> : "Post Notice"}
+                    <Button onClick={handleAddAnnouncement} className="w-full h-16 rounded-2xl font-black text-xl shadow-2xl shadow-primary/30" disabled={isActionLoading}>
+                      {isActionLoading ? <IOSSpinner size="sm" /> : "Post Announcement"}
                     </Button>
                   </CardContent>
                 </Card>
-                <Card className="glass rounded-[2rem] overflow-hidden">
-                  <CardHeader><CardTitle>History</CardTitle></CardHeader>
+                
+                <Card className="lg:col-span-3 glass rounded-[2.5rem] shadow-2xl overflow-hidden">
+                  <CardHeader className="p-8 bg-white/5"><CardTitle className="font-headline text-2xl">Broadcast History</CardTitle></CardHeader>
                   <CardContent className="p-0">
                     <div className="divide-y divide-white/5">
                       {!announcements || announcements.length === 0 ? (
-                        <div className="p-10 text-center text-muted-foreground">No announcement history.</div>
+                        <div className="p-20 text-center text-muted-foreground font-medium italic">No announcement history found.</div>
                       ) : announcements.map(ann => (
-                        <div key={ann.id} className="p-4 flex justify-between items-center hover:bg-white/5 transition-colors">
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium">{ann.content}</span>
-                            <span className="text-[10px] text-muted-foreground">{new Date(ann.createdAt).toLocaleDateString()}</span>
+                        <div key={ann.id} className="p-6 md:p-8 flex justify-between items-center hover:bg-white/5 transition-colors">
+                          <div className="flex flex-col gap-1.5">
+                            <span className="text-lg font-bold leading-tight">{ann.content}</span>
+                            <span className="text-[11px] text-muted-foreground font-black uppercase tracking-widest">{new Date(ann.createdAt).toLocaleDateString()}</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Badge className={ann.isActive ? "bg-accent" : "bg-muted"}>
+                          <div className="flex items-center gap-4">
+                            <Badge className={cn(
+                              "h-7 px-4 rounded-lg font-black text-[10px] tracking-widest uppercase",
+                              ann.isActive ? "bg-accent text-white" : "bg-white/10 text-muted-foreground"
+                            )}>
                               {ann.isActive ? "Active" : "Archived"}
                             </Badge>
                             <Button 
                               variant="ghost" 
                               size="icon" 
                               onClick={async () => {
-                                if(confirm("Delete notice?")) {
+                                if(confirm("Permanently delete this notice?")) {
                                   try {
                                     await deleteDoc(doc(db!, "announcements", ann.id))
                                     play('error')
-                                    toast({ title: "Deleted" })
+                                    toast({ title: "Deleted", description: "Notice removed from database." })
                                   } catch (e) { console.error(e) }
                                 }
                               }}
-                              className="text-destructive hover:bg-destructive/10 h-8 w-8 rounded-lg"
+                              className="text-destructive hover:bg-destructive/10 h-12 w-12 rounded-xl transition-all"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-5 h-5" />
                             </Button>
                           </div>
                         </div>
