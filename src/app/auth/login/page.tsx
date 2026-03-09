@@ -11,8 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
 import { Navbar } from "@/components/Navbar"
-import { useAuth, useUser, initiateEmailSignIn, initiateGoogleSignIn, initiateGithubSignIn, initiateMicrosoftSignIn } from "@/firebase"
-import { LogIn, Chrome, Github } from "lucide-react"
+import { useAuth, useUser, initiateEmailSignIn, initiateGoogleSignIn, initiateMicrosoftSignIn } from "@/firebase"
+import { LogIn, Chrome } from "lucide-react"
 import { IOSSpinner } from "@/components/ui/ios-spinner"
 
 export default function LoginPage() {
@@ -37,11 +37,10 @@ export default function LoginPage() {
     toast({ title: "Connecting...", description: "Authenticating your credentials." })
   }
 
-  const handleSocialLogin = async (provider: 'google' | 'github' | 'microsoft') => {
+  const handleSocialLogin = async (provider: 'google' | 'microsoft') => {
     setLoading(true)
     try {
       if (provider === 'google') await initiateGoogleSignIn(auth)
-      if (provider === 'github') await initiateGithubSignIn(auth)
       if (provider === 'microsoft') await initiateMicrosoftSignIn(auth)
     } catch (error: any) {
       setLoading(false)
@@ -113,11 +112,11 @@ export default function LoginPage() {
                 <Separator className="w-full" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground font-bold">Or</span>
+                <span className="bg-background px-2 text-muted-foreground font-bold">Or Continue With</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <Button 
                 variant="outline" 
                 className="w-full h-12 rounded-xl font-bold glass border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-3"
@@ -127,26 +126,15 @@ export default function LoginPage() {
                 <Chrome className="w-5 h-5 text-primary" />
                 Google
               </Button>
-              <div className="grid grid-cols-2 gap-3">
-                <Button 
-                  variant="outline" 
-                  className="w-full h-12 rounded-xl font-bold glass border-white/10 hover:bg-black/10 hover:text-white transition-all flex items-center justify-center gap-3"
-                  onClick={() => handleSocialLogin('github')}
-                  disabled={loading || authLoading}
-                >
-                  <Github className="w-5 h-5 text-foreground" />
-                  GitHub
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full h-12 rounded-xl font-bold glass border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-3"
-                  onClick={() => handleSocialLogin('microsoft')}
-                  disabled={loading || authLoading}
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 23 23" xmlns="http://www.w3.org/2000/svg"><path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z" fill="#f25022"/></svg>
-                  Microsoft
-                </Button>
-              </div>
+              <Button 
+                variant="outline" 
+                className="w-full h-12 rounded-xl font-bold glass border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-3"
+                onClick={() => handleSocialLogin('microsoft')}
+                disabled={loading || authLoading}
+              >
+                <svg className="w-5 h-5" viewBox="0 0 23 23" xmlns="http://www.w3.org/2000/svg"><path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z" fill="#f25022"/></svg>
+                Microsoft
+              </Button>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-6 p-8 pt-0">

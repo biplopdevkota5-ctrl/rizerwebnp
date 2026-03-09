@@ -6,7 +6,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
-  GithubAuthProvider,
   OAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
@@ -29,14 +28,6 @@ export function initiateEmailSignIn(authInstance: Auth, email: string, password:
 /** Initiate Google sign-in (non-blocking). */
 export function initiateGoogleSignIn(authInstance: Auth): Promise<void> {
   const provider = new GoogleAuthProvider();
-  return signInWithPopup(authInstance, provider).then(() => {}).catch((err) => {
-    throw err;
-  });
-}
-
-/** Initiate GitHub sign-in (non-blocking). */
-export function initiateGithubSignIn(authInstance: Auth): Promise<void> {
-  const provider = new GithubAuthProvider();
   return signInWithPopup(authInstance, provider).then(() => {}).catch((err) => {
     throw err;
   });
