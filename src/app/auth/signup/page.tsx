@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
 import { Navbar } from "@/components/Navbar"
-import { useAuth, useUser, initiateEmailSignUp, initiateGoogleSignIn, initiateFacebookSignIn } from "@/firebase"
+import { useAuth, useUser, initiateEmailSignUp, initiateGoogleSignIn, initiateFacebookSignIn, initiateMicrosoftSignIn } from "@/firebase"
 import { UserPlus, Chrome, Facebook } from "lucide-react"
 import { IOSSpinner } from "@/components/ui/ios-spinner"
 
@@ -69,6 +69,20 @@ export default function SignupPage() {
     }
   }
 
+  const handleMicrosoftSignup = async () => {
+    setLoading(true)
+    try {
+      await initiateMicrosoftSignIn(auth)
+    } catch (error: any) {
+      setLoading(false)
+      toast({ 
+        title: "Signup Failed", 
+        description: error.message || "Microsoft signup was interrupted.", 
+        variant: "destructive" 
+      })
+    }
+  }
+
   if (user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
@@ -87,8 +101,8 @@ export default function SignupPage() {
             <div className="w-16 h-16 bg-accent/20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl">
               <UserPlus className="w-8 h-8 text-accent" />
             </div>
-            <CardTitle className="font-headline text-3xl font-bold">Get Started</CardTitle>
-            <CardDescription className="font-medium">Join RIZER STUDIO and build your site.</CardDescription>
+            <CardTitle className="font-headline text-3xl font-bold uppercase tracking-tight">RIZER <span className="text-primary italic">STUDIO</span></CardTitle>
+            <CardDescription className="font-medium">Join us and build your digital empire.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-8 px-8">
             <form onSubmit={handleSignup} className="space-y-4">
@@ -96,7 +110,7 @@ export default function SignupPage() {
                 <Label htmlFor="name">Full Name</Label>
                 <Input 
                   id="name" 
-                  placeholder="Biplop Devkota" 
+                  placeholder="Your Name" 
                   required 
                   value={formData.name} 
                   onChange={(e) => setFormData({...formData, name: e.target.value})} 
@@ -112,18 +126,6 @@ export default function SignupPage() {
                   required 
                   value={formData.email} 
                   onChange={(e) => setFormData({...formData, email: e.target.value})} 
-                  className="glass h-12 rounded-xl focus:ring-accent/50" 
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input 
-                  id="phone" 
-                  type="tel" 
-                  placeholder="98XXXXXXXX" 
-                  required 
-                  value={formData.phone} 
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})} 
                   className="glass h-12 rounded-xl focus:ring-accent/50" 
                 />
               </div>
@@ -152,25 +154,36 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               <Button 
                 variant="outline" 
-                className="w-full h-14 rounded-2xl font-bold glass border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-3"
+                className="w-full h-12 rounded-xl font-bold glass border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-3"
                 onClick={handleGoogleSignup}
                 disabled={loading || authLoading}
               >
                 <Chrome className="w-5 h-5 text-accent" />
                 Google
               </Button>
-              <Button 
-                variant="outline" 
-                className="w-full h-14 rounded-2xl font-bold glass border-white/10 hover:bg-[#1877F2]/10 hover:text-[#1877F2] transition-all flex items-center justify-center gap-3"
-                onClick={handleFacebookSignup}
-                disabled={loading || authLoading}
-              >
-                <Facebook className="w-5 h-5 text-[#1877F2]" />
-                Facebook
-              </Button>
+              <div className="grid grid-cols-2 gap-3">
+                <Button 
+                  variant="outline" 
+                  className="w-full h-12 rounded-xl font-bold glass border-white/10 hover:bg-[#1877F2]/10 hover:text-[#1877F2] transition-all flex items-center justify-center gap-3"
+                  onClick={handleFacebookSignup}
+                  disabled={loading || authLoading}
+                >
+                  <Facebook className="w-5 h-5 text-[#1877F2]" />
+                  Facebook
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full h-12 rounded-xl font-bold glass border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-3"
+                  onClick={handleMicrosoftSignup}
+                  disabled={loading || authLoading}
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 23 23" xmlns="http://www.w3.org/2000/svg"><path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z" fill="#f25022"/></svg>
+                  Microsoft
+                </Button>
+              </div>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-6 p-8 pt-0">

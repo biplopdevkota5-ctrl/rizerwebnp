@@ -7,6 +7,7 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   FacebookAuthProvider,
+  OAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
 
@@ -36,6 +37,14 @@ export function initiateGoogleSignIn(authInstance: Auth): Promise<void> {
 /** Initiate Facebook sign-in (non-blocking). */
 export function initiateFacebookSignIn(authInstance: Auth): Promise<void> {
   const provider = new FacebookAuthProvider();
+  return signInWithPopup(authInstance, provider).then(() => {}).catch((err) => {
+    throw err;
+  });
+}
+
+/** Initiate Microsoft sign-in (non-blocking). */
+export function initiateMicrosoftSignIn(authInstance: Auth): Promise<void> {
+  const provider = new OAuthProvider('microsoft.com');
   return signInWithPopup(authInstance, provider).then(() => {}).catch((err) => {
     throw err;
   });
