@@ -19,6 +19,7 @@ import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, doc, updateDoc, deleteDoc, addDoc, query, orderBy, setDoc } from "firebase/firestore"
 import { IOSSpinner } from "@/components/ui/ios-spinner"
 import { WEBSITE_TYPES } from "@/lib/types"
+import { useSound } from "@/hooks/use-sound"
 
 const ADMIN_PASSWORD = "090102030405"
 
@@ -29,6 +30,7 @@ export default function AdminPage() {
   const [announcementInput, setAnnouncementInput] = React.useState("")
   const [isActionLoading, setIsActionLoading] = React.useState(false)
   const { toast } = useToast()
+  const { play } = useSound()
   const db = useFirestore()
 
   React.useEffect(() => {
@@ -69,9 +71,11 @@ export default function AdminPage() {
       if (password === ADMIN_PASSWORD) {
         setIsAuthorized(true)
         localStorage.setItem("rizer_admin_session", "active")
-        toast({ title: "Authorized", description: "Welcome to Rizer Studio Management." })
+        play('success')
+        toast({ title: "Authorized", description: "Welcome back, Manager." })
       } else {
-        toast({ title: "Denied", description: "Invalid management password.", variant: "destructive" })
+        play('error')
+        toast({ title: "Denied", description: "Invalid management key.", variant: "destructive" })
       }
       setIsActionLoading(false)
     }, 1000)
@@ -80,6 +84,7 @@ export default function AdminPage() {
   const handleLogout = () => {
     setIsAuthorized(false)
     localStorage.removeItem("rizer_admin_session")
+    play('click')
     toast({ title: "Logged Out", description: "Session ended." })
   }
 
@@ -87,7 +92,8 @@ export default function AdminPage() {
     if (!db) return
     try {
       await updateDoc(doc(db, "requests", id), { status: newStatus })
-      toast({ title: "Updated", description: "Request status modified successfully." })
+      play('success')
+      toast({ title: "Updated", description: "Status modified." })
     } catch (err) {
       console.error(err)
     }
@@ -98,10 +104,20 @@ export default function AdminPage() {
     const docRef = doc(db, "website_adjustments", typeId)
     try {
       await setDoc(docRef, { [field]: value, updatedAt: new Date().toISOString() }, { merge: true })
-      toast({ title: "Pricing Updated", description: "Changes saved instantly." })
+      // Silent update for better UX on text inputs, but maybe play sound for toggle
+      if (typeof value === 'boolean') play('success')
     } catch (err) {
       console.error(err)
     }
+  }
+
+  const handleDeleteRequest = async (id: string) => {
+    if (!db || !confirm("Delete this request forever?")) return
+    try {
+      await deleteDoc(doc(db, "requests", id))
+      play('error')
+      toast({ title: "Deleted", description: "Request removed from admin view." })
+    } catch (e) { console.error(e) }
   }
 
   const handleAddAnnouncement = async () => {
@@ -114,7 +130,8 @@ export default function AdminPage() {
         createdAt: new Date().toISOString()
       })
       setAnnouncementInput("")
-      toast({ title: "Live", description: "Notice published to homepage." })
+      play('success')
+      toast({ title: "Live", description: "Notice published." })
     } catch (err) {
       console.error(err)
     } finally {
@@ -214,7 +231,7 @@ export default function AdminPage() {
                       ) : requests.map((req) => (
                         <TableRow key={req.id} className="border-white/5 hover:bg-white/5">
                           <TableCell className="pl-8 py-6">
-                            <div className="font-bold text-lg">{req.fullName}</div>
+                            <div className="font-bold text-lg">{req.fullName || "Anonymous Client"}</div>
                             <div className="text-[10px] text-muted-foreground uppercase tracking-widest">{req.email}</div>
                             <div className="flex items-center gap-1.5 text-[11px] text-primary font-bold mt-1">
                               <Phone className="w-3 h-3" />
@@ -223,7 +240,7 @@ export default function AdminPage() {
                           </TableCell>
                           <TableCell className="capitalize font-bold">{req.websiteType}</TableCell>
                           <TableCell>
-                            <Select value={req.status} onValueChange={(val) => handleUpdateStatus(req.id, val)}>
+                            <Select value={req.status || 'pending'} onValueChange={(val) => handleUpdateStatus(req.id, val)}>
                               <SelectTrigger className="w-[140px] h-10 glass rounded-xl text-xs font-bold">
                                 <SelectValue />
                               </SelectTrigger>
@@ -236,14 +253,7 @@ export default function AdminPage() {
                             </Select>
                           </TableCell>
                           <TableCell className="text-right pr-8">
-                            <Button variant="ghost" size="icon" onClick={async () => {
-                              if(confirm("Delete this request?")) {
-                                try {
-                                  await deleteDoc(doc(db!, "requests", req.id))
-                                  toast({ title: "Deleted", description: "Request removed." })
-                                } catch (e) { console.error(e) }
-                              }
-                            }} className="text-destructive hover:bg-destructive/10 rounded-xl">
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteRequest(req.id)} className="text-destructive hover:bg-destructive/10 rounded-xl">
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </TableCell>
@@ -258,8 +268,8 @@ export default function AdminPage() {
             <TabsContent value="pricing" className="animate-fade-in">
               <Card className="glass overflow-hidden rounded-[2rem]">
                 <CardHeader>
-                  <CardTitle className="font-headline">Website Type Adjustments</CardTitle>
-                  <CardDescription>Manage active discounts and custom tags for each website package.</CardDescription>
+                  <CardTitle className="font-headline">Pricing & Tag Management</CardTitle>
+                  <CardDescription>Adjust discounts and labels. Changes apply instantly to the Website Types page.</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
                   <Table>
@@ -278,7 +288,7 @@ export default function AdminPage() {
                           <TableRow key={type.id} className="border-white/5 hover:bg-white/5">
                             <TableCell className="pl-8 py-6">
                               <div className="font-bold text-lg">{type.label}</div>
-                              <div className="text-[10px] text-muted-foreground uppercase tracking-widest">{type.price}</div>
+                              <div className="text-[10px] text-muted-foreground uppercase tracking-widest">Base: {type.price}</div>
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2 max-w-[120px]">
@@ -345,6 +355,7 @@ export default function AdminPage() {
                             <Select value={rev.status} onValueChange={async (val) => {
                                try {
                                  await updateDoc(doc(db!, "reviews", rev.id), { status: val })
+                                 play('success')
                                  toast({ title: "Review Updated" })
                                } catch (e) { console.error(e) }
                             }}>
@@ -408,6 +419,7 @@ export default function AdminPage() {
                                 if(confirm("Delete notice?")) {
                                   try {
                                     await deleteDoc(doc(db!, "announcements", ann.id))
+                                    play('error')
                                     toast({ title: "Deleted" })
                                   } catch (e) { console.error(e) }
                                 }

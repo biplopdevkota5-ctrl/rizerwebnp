@@ -15,26 +15,40 @@ import { collection } from "firebase/firestore"
 
 export default function WebsiteTypesPage() {
   const db = useFirestore()
-  const adjQuery = useMemoFirebase(() => db ? collection(db, "website_adjustments") : null, [db])
+  
+  const adjQuery = useMemoFirebase(() => 
+    db ? collection(db, "website_adjustments") : null, 
+    [db]
+  )
   const { data: adjustments } = useCollection(adjQuery)
 
   const getPriceDisplay = (type: typeof WEBSITE_TYPES[0]) => {
     const adj = adjustments?.find(a => a.id === type.id)
-    if (!adj || !adj.isActive || !adj.discountPercentage) return type.price
-
-    // Simple calculation for the starting price
-    if (type.id === 'custom') return type.price
     
+    // No adjustment found or not active or no discount set
+    if (!adj || !adj.isActive || !adj.discountPercentage) {
+      return (
+        <span className="text-foreground font-black text-xl">{type.price}</span>
+      )
+    }
+
+    // Calculation for the starting price
+    // If it's a "Varies" or doesn't have a $ amount, return as is
+    if (type.id === 'custom' || !type.price.includes('$')) {
+      return <span className="text-foreground font-black text-xl">{type.price}</span>
+    }
+    
+    // Simple parser for ranges like "$119 - $200"
     const parts = type.price.match(/\$(\d+)/)
-    if (!parts) return type.price
+    if (!parts) return <span className="text-foreground font-black text-xl">{type.price}</span>
 
     const originalVal = parseInt(parts[1])
     const discountedVal = Math.floor(originalVal * (1 - adj.discountPercentage / 100))
     
     return (
-      <div className="flex flex-col">
+      <div className="flex flex-col items-end">
         <span className="text-[10px] text-muted-foreground line-through font-bold">{type.price}</span>
-        <span className="text-accent font-black text-lg">${discountedVal}+</span>
+        <span className="text-accent font-black text-xl">${discountedVal}+</span>
       </div>
     )
   }
