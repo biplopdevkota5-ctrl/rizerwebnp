@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
-import { Sparkles, Send, MessageCircle, Star, RefreshCw } from "lucide-react"
+import { Sparkles, Send, MessageCircle, Star } from "lucide-react"
 import { WEBSITE_TYPES } from "@/lib/types"
 import { aiDesignSuggestion } from "@/ai/flows/ai-design-suggestion-flow"
 import { useFirestore, useUser } from "@/firebase"
@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 import { sendDiscordNotification } from "@/app/actions/notifications"
+import { IOSSpinner } from "@/components/ui/ios-spinner"
 
 const WHATSAPP_NUM = "9805602394"
 const DEFAULT_WHATSAPP_MSG = encodeURIComponent("Hello, Rizer Web NP. I Need Support.")
@@ -252,7 +253,7 @@ function RequestFormContent() {
                   <div className="flex items-center justify-between mb-2">
                     <Label htmlFor="designStyle" className="font-bold">Design Style & Idea</Label>
                     <Button type="button" variant="ghost" size="sm" onClick={handleAiSuggestion} disabled={aiLoading} className="text-primary hover:bg-primary/10 font-black text-xs uppercase tracking-wider">
-                      {aiLoading ? "AI Thinking..." : <><Sparkles className="w-3 h-3 mr-2" /> AI Suggest Design</>}
+                      {aiLoading ? <IOSSpinner size="sm" /> : <><Sparkles className="w-3 h-3 mr-2" /> AI Suggest Design</>}
                     </Button>
                   </div>
                   <Textarea id="designStyle" className="min-h-[150px] glass rounded-2xl p-4" placeholder="Describe the aesthetic (e.g. dark, minimalist, futuristic)..." value={formData.designStyle} onChange={e => setFormData({...formData, designStyle: e.target.value})} />
@@ -262,8 +263,7 @@ function RequestFormContent() {
 
             <div className="pt-6 flex flex-col sm:flex-row gap-4">
               <Button type="submit" size="lg" className="flex-1 h-14 rounded-2xl text-lg font-black shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-all" disabled={loading}>
-                <Send className="w-5 h-5 mr-3" />
-                {loading ? "Processing..." : "Submit Project"}
+                {loading ? <IOSSpinner size="sm" /> : <><Send className="w-5 h-5 mr-3" /> Submit Project</>}
               </Button>
               <Button type="button" variant="outline" size="lg" className="flex-1 h-14 rounded-2xl text-lg glass border-white/10 font-bold shadow-xl hover:scale-[1.02] transition-all" onClick={() => window.open(`https://wa.me/977${WHATSAPP_NUM}?text=${DEFAULT_WHATSAPP_MSG}`, '_blank')}>
                 <MessageCircle className="w-5 h-5 mr-3 text-[#25D366]" />
@@ -330,7 +330,7 @@ export default function RequestPage() {
       <main className="flex-1 py-12">
         <Suspense fallback={
           <div className="flex-1 flex items-center justify-center py-20">
-            <RefreshCw className="w-10 h-10 animate-spin text-primary opacity-50" />
+            <IOSSpinner size="lg" />
           </div>
         }>
           <RequestFormContent />

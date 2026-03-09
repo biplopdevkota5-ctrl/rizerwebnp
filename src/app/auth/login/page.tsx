@@ -11,7 +11,8 @@ import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
 import { Navbar } from "@/components/Navbar"
 import { useAuth, useUser, initiateEmailSignIn, initiateGoogleSignIn } from "@/firebase"
-import { LogIn, RefreshCw, Chrome } from "lucide-react"
+import { LogIn, Chrome } from "lucide-react"
+import { IOSSpinner } from "@/components/ui/ios-spinner"
 
 export default function LoginPage() {
   const [email, setEmail] = React.useState("")
@@ -22,7 +23,6 @@ export default function LoginPage() {
   const auth = useAuth()
   const { user, isUserLoading: authLoading } = useUser()
 
-  // Snap redirect as soon as auth state changes to a user
   React.useEffect(() => {
     if (user) {
       router.replace('/dashboard')
@@ -32,8 +32,6 @@ export default function LoginPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    
-    // Fire and forget - the useEffect above handles the redirect
     initiateEmailSignIn(auth, email, password)
     toast({ title: "Connecting...", description: "Authenticating your credentials." })
   }
@@ -41,9 +39,7 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setLoading(true)
     try {
-      // Use the new helper for cleaner logic
       await initiateGoogleSignIn(auth)
-      // Redirect happens via useEffect
     } catch (error: any) {
       setLoading(false)
       toast({ 
@@ -54,12 +50,11 @@ export default function LoginPage() {
     }
   }
 
-  // If already logged in, show a simple transition instead of the whole form
   if (user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <RefreshCw className="w-10 h-10 animate-spin text-primary" />
-        <p className="mt-4 font-bold text-primary">Redirecting to dashboard...</p>
+        <IOSSpinner size="lg" />
+        <p className="mt-4 font-bold text-primary animate-pulse">Redirecting to dashboard...</p>
       </div>
     )
   }
@@ -102,7 +97,7 @@ export default function LoginPage() {
                 />
               </div>
               <Button type="submit" className="w-full h-14 rounded-2xl font-black text-lg shadow-2xl hover:scale-[1.02] transition-all" disabled={loading || authLoading}>
-                {loading ? <RefreshCw className="w-5 h-5 animate-spin mr-2" /> : "Sign In Now"}
+                {loading ? <IOSSpinner size="sm" /> : "Sign In Now"}
               </Button>
             </form>
 

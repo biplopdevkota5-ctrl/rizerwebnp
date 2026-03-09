@@ -11,7 +11,8 @@ import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
 import { Navbar } from "@/components/Navbar"
 import { useAuth, useUser, initiateEmailSignUp, initiateGoogleSignIn } from "@/firebase"
-import { UserPlus, RefreshCw, Chrome } from "lucide-react"
+import { UserPlus, Chrome } from "lucide-react"
+import { IOSSpinner } from "@/components/ui/ios-spinner"
 
 export default function SignupPage() {
   const [formData, setFormData] = React.useState({
@@ -26,7 +27,6 @@ export default function SignupPage() {
   const auth = useAuth()
   const { user, isUserLoading: authLoading } = useUser()
 
-  // Redirect instantly on auth
   React.useEffect(() => {
     if (user) {
       router.replace('/dashboard')
@@ -36,7 +36,6 @@ export default function SignupPage() {
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-
     initiateEmailSignUp(auth, formData.email, formData.password)
     toast({ title: "Creating Account", description: "Setting up your workspace..." })
   }
@@ -58,8 +57,8 @@ export default function SignupPage() {
   if (user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <RefreshCw className="w-10 h-10 animate-spin text-accent" />
-        <p className="mt-4 font-bold text-accent">Preparing your dashboard...</p>
+        <IOSSpinner size="lg" />
+        <p className="mt-4 font-bold text-accent animate-pulse">Preparing your dashboard...</p>
       </div>
     )
   }
@@ -125,7 +124,7 @@ export default function SignupPage() {
                 />
               </div>
               <Button type="submit" variant="secondary" className="w-full h-14 rounded-2xl font-black text-lg shadow-2xl hover:scale-[1.02] transition-all" disabled={loading || authLoading}>
-                {loading ? <RefreshCw className="w-5 h-5 animate-spin mr-2" /> : "Create Free Account"}
+                {loading ? <IOSSpinner size="sm" /> : "Create Free Account"}
               </Button>
             </form>
 

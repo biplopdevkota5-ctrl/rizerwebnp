@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -16,6 +15,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Trash2, ShieldCheck, Megaphone, Star, ClipboardList, RefreshCw, LogOut, Phone } from "lucide-react"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, doc, updateDoc, deleteDoc, addDoc, query, orderBy } from "firebase/firestore"
+import { IOSSpinner } from "@/components/ui/ios-spinner"
 
 // Updated Password as requested
 const ADMIN_PASSWORD = "090102030405"
@@ -25,6 +25,7 @@ export default function AdminPage() {
   const [isAuthorized, setIsAuthorized] = React.useState(false)
   const [password, setPassword] = React.useState("")
   const [announcementInput, setAnnouncementInput] = React.useState("")
+  const [isActionLoading, setIsActionLoading] = React.useState(false)
   const { toast } = useToast()
   const db = useFirestore()
 
@@ -34,7 +35,6 @@ export default function AdminPage() {
     if (saved === "active") setIsAuthorized(true)
   }, [])
 
-  // Stable queries that only activate when authorized to prevent permission error popups
   const requestsQuery = useMemoFirebase(() => 
     (db && mounted && isAuthorized) ? query(collection(db, "requests"), orderBy("createdAt", "desc")) : null, 
     [db, mounted, isAuthorized]
@@ -55,13 +55,18 @@ export default function AdminPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthorized(true)
-      localStorage.setItem("rizer_admin_session", "active")
-      toast({ title: "Authorized", description: "Welcome to Rizer Studio Management." })
-    } else {
-      toast({ title: "Denied", description: "Invalid management password.", variant: "destructive" })
-    }
+    setIsActionLoading(true)
+    
+    setTimeout(() => {
+      if (password === ADMIN_PASSWORD) {
+        setIsAuthorized(true)
+        localStorage.setItem("rizer_admin_session", "active")
+        toast({ title: "Authorized", description: "Welcome to Rizer Studio Management." })
+      } else {
+        toast({ title: "Denied", description: "Invalid management password.", variant: "destructive" })
+      }
+      setIsActionLoading(false)
+    }, 1000)
   }
 
   const handleLogout = () => {
@@ -102,6 +107,7 @@ export default function AdminPage() {
 
   const handleAddAnnouncement = async () => {
     if (!db || !announcementInput) return
+    setIsActionLoading(true)
     try {
       await addDoc(collection(db, "announcements"), {
         content: announcementInput,
@@ -112,6 +118,8 @@ export default function AdminPage() {
       toast({ title: "Live", description: "Notice published to homepage." })
     } catch (err) {
       console.error(err)
+    } finally {
+      setIsActionLoading(false)
     }
   }
 
@@ -125,7 +133,11 @@ export default function AdminPage() {
     }
   }
 
-  if (!mounted) return null
+  if (!mounted) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <IOSSpinner size="lg" />
+    </div>
+  )
 
   if (!isAuthorized) {
     return (
@@ -146,7 +158,7 @@ export default function AdminPage() {
                   <Label htmlFor="password">Management Key</Label>
                   <Input 
                     id="password" 
-                    type="password" // Hidden input as requested
+                    type="password"
                     value={password} 
                     onChange={e => setPassword(e.target.value)} 
                     placeholder="Enter key..."
@@ -154,7 +166,9 @@ export default function AdminPage() {
                     required 
                   />
                 </div>
-                <Button type="submit" className="w-full h-12 rounded-xl font-bold">Enter Portal</Button>
+                <Button type="submit" className="w-full h-12 rounded-xl font-bold" disabled={isActionLoading}>
+                  {isActionLoading ? <IOSSpinner size="sm" /> : "Enter Portal"}
+                </Button>
               </form>
             </CardContent>
           </Card>
@@ -204,7 +218,7 @@ export default function AdminPage() {
                     </TableHeader>
                     <TableBody>
                       {requestsLoading ? (
-                        <TableRow><TableCell colSpan={4} className="text-center py-20"><RefreshCw className="w-8 h-8 animate-spin mx-auto opacity-20" /></TableCell></TableRow>
+                        <TableRow><TableCell colSpan={4} className="text-center py-20"><IOSSpinner size="lg" className="mx-auto" /></TableCell></TableRow>
                       ) : !requests || requests.length === 0 ? (
                         <TableRow><TableCell colSpan={4} className="text-center py-20 text-muted-foreground">No build requests found.</TableCell></TableRow>
                       ) : requests.map((req) => (
@@ -296,7 +310,9 @@ export default function AdminPage() {
                         className="glass h-12 rounded-xl"
                       />
                     </div>
-                    <Button onClick={handleAddAnnouncement} className="w-full h-12 rounded-xl font-bold">Post Notice</Button>
+                    <Button onClick={handleAddAnnouncement} className="w-full h-12 rounded-xl font-bold" disabled={isActionLoading}>
+                      {isActionLoading ? <IOSSpinner size="sm" /> : "Post Notice"}
+                    </Button>
                   </CardContent>
                 </Card>
                 <Card className="glass rounded-[2rem] overflow-hidden">
@@ -318,7 +334,7 @@ export default function AdminPage() {
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              onClick={() => handleDeleteAnnouncement(ann.id)} // Added delete functionality
+                              onClick={() => handleDeleteAnnouncement(ann.id)}
                               className="text-destructive hover:bg-destructive/10 h-8 w-8 rounded-lg"
                             >
                               <Trash2 className="w-4 h-4" />
