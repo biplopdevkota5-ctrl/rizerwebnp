@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -8,7 +7,7 @@ import { Button } from "@/components/ui/button"
 
 export function Footer() {
   const WHATSAPP_NUMBER = "9805602394"
-  const WHATSAPP_MESSAGE = encodeURIComponent("Hello, Rizer Web NP. I Need Support.")
+  const WHATSAPP_MESSAGE = encodeURIComponent("Hello, Rizer Studio. I Need Support.")
   const [year, setYear] = React.useState<number | null>(null)
 
   React.useEffect(() => {
@@ -21,8 +20,8 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="space-y-6">
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-105 transition-transform">R</div>
-              <span className="font-headline font-bold text-2xl tracking-tight text-primary">RIZER WEB APP</span>
+              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-105 transition-transform">R</div>
+              <span className="font-headline font-bold text-2xl tracking-tight text-foreground">RIZER <span className="text-primary italic">STUDIO</span></span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed font-medium">
               Empowering individuals and businesses in Nepal with world-class websites at unbeatable prices. Developed by Biplop Devkota at Rizer Studio.
@@ -83,7 +82,7 @@ export function Footer() {
         
         <div className="mt-16 pt-8 border-t border-border/40 text-center space-y-4">
           <div className="text-xs text-muted-foreground font-bold uppercase tracking-widest">
-            <p>© {year || "..."} RIZER WEB APP. All rights reserved. Developed with ❤️ in Nepal by Biplop Devkota.</p>
+            <p>© {year || "..."} RIZER STUDIO. All rights reserved. Developed with ❤️ in Nepal by Biplop Devkota.</p>
           </div>
         </div>
       </div>

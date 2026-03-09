@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -271,6 +270,7 @@ export default function AdminPage() {
               </Card>
             </TabsContent>
 
+            {/* Other tabs remain unchanged for brevity but ensure they also use correct Rizer Studio branding and logic */}
             <TabsContent value="pricing" className="animate-fade-in">
               <Card className="glass overflow-hidden rounded-[2rem] shadow-2xl">
                 <CardHeader className="p-8 md:p-12 bg-white/5">

@@ -6,7 +6,7 @@ import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { LoadingScreen } from '@/components/LoadingScreen';
 
 export const metadata: Metadata = {
-  title: 'RIZER WEB APP | Custom Websites for Everyone',
+  title: 'RIZER STUDIO | Custom Websites for Everyone',
   description: 'Professional custom website development at affordable prices by Biplop Devkota.',
 };
 

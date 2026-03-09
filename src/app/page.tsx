@@ -40,7 +40,7 @@ export default function Home() {
     if (rawReviews && rawReviews.length > 0) return rawReviews
     
     return [
-      { id: "1", userName: "Anish Sharma", rating: 5, text: "RIZERWEBNP transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
+      { id: "1", userName: "Anish Sharma", rating: 5, text: "RIZER STUDIO transformed my local shop into a global brand. The process was so easy and the UI is amazing!" },
       { id: "2", userName: "Sita Gurung", rating: 5, text: "My portfolio looks futuristic and high-end. Biplop is a true professional developer who understands design." },
       { id: "3", userName: "Rahul KC", rating: 5, text: "Unbeatable price for such a premium feel. Highly recommend the custom features and animations!" },
     ]
@@ -70,8 +70,8 @@ export default function Home() {
                 <Sparkles className="w-4 h-4 text-accent" />
                 <span>Next-Gen Web Studio Nepal 🇳🇵</span>
               </div>
-              <h1 className="text-5xl sm:text-7xl md:text-9xl lg:text-[10rem] font-headline font-bold leading-[0.9] tracking-tighter text-foreground drop-shadow-2xl">
-                Elevate Your <span className="text-primary italic block md:inline">Digital Identity</span>
+              <h1 className="text-5xl sm:text-7xl md:text-9xl lg:text-[10rem] font-headline font-bold leading-[0.9] tracking-tighter text-foreground drop-shadow-2xl uppercase">
+                Elevate Your <span className="text-primary italic block md:inline">Identity</span>
               </h1>
               <p className="text-lg sm:text-2xl lg:text-3xl text-muted-foreground max-w-4xl mx-auto font-body font-medium leading-relaxed opacity-80 px-6">
                 Premium aesthetics, high-performance architecture, and immersive animations. We build websites that don't just exist—they inspire.
@@ -84,7 +84,7 @@ export default function Home() {
                 </Link>
                 <Link href="/types" className="w-full sm:w-auto">
                   <Button size="lg" variant="outline" className="w-full sm:min-w-[260px] h-20 md:h-24 rounded-full glass border-white/20 font-black text-2xl hover:scale-105 transition-all active:scale-95 backdrop-blur-3xl">
-                    View Studio Packages
+                    View Packages
                   </Button>
                 </Link>
               </div>
@@ -101,7 +101,7 @@ export default function Home() {
         <section className="py-24 md:py-40 relative">
           <div className="container mx-auto px-4">
             <div className="text-center mb-20 md:mb-32 space-y-6">
-              <h2 className="text-4xl md:text-7xl lg:text-8xl font-headline font-bold text-foreground">Why RIZER STUDIO?</h2>
+              <h2 className="text-4xl md:text-7xl lg:text-8xl font-headline font-bold text-foreground uppercase">Why RIZER STUDIO?</h2>
               <p className="text-muted-foreground text-xl lg:text-3xl max-w-3xl mx-auto font-medium opacity-70">Merging high-end visual storytelling with enterprise performance.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
@@ -169,7 +169,7 @@ export default function Home() {
           <div className="container mx-auto max-w-7xl">
             <div className="rounded-[4rem] md:rounded-[6rem] bg-primary p-12 md:p-24 lg:p-36 text-center text-primary-foreground space-y-12 md:space-y-16 overflow-hidden relative shadow-[0_60px_120px_-30px_rgba(88,88,179,0.5)] group">
               <div className="relative z-10 max-w-5xl mx-auto space-y-10 md:space-y-14">
-                <h2 className="text-5xl md:text-8xl lg:text-[10rem] font-headline font-bold leading-[0.85] tracking-tighter">Ready to Build the Future?</h2>
+                <h2 className="text-5xl md:text-8xl lg:text-[10rem] font-headline font-bold leading-[0.85] tracking-tighter uppercase">Ready to Build the Future?</h2>
                 <p className="text-xl md:text-3xl lg:text-4xl font-medium opacity-90 max-w-3xl mx-auto leading-relaxed px-6">Join the next generation of digital-first brands in Nepal.</p>
                 <div className="pt-10">
                   <Link href="/request">
