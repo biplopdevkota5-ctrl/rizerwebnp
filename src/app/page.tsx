@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -52,10 +51,10 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen selection:bg-primary/30 selection:text-primary overflow-x-hidden">
       {activeAnnouncement && (
-        <div className="bg-primary text-primary-foreground py-4 px-4 text-center text-xs sm:text-sm font-black animate-fade-in sticky top-0 z-[110] border-b border-white/10 shadow-2xl">
+        <div className="bg-primary/95 backdrop-blur-xl text-primary-foreground py-4 px-4 text-center text-xs sm:text-sm font-black animate-fade-in sticky top-0 z-[110] border-b border-white/10 shadow-2xl">
           <div className="container mx-auto flex items-center justify-center gap-3">
             <Megaphone className="w-5 h-5 shrink-0 text-accent animate-bounce" />
-            <span className="tracking-tight uppercase">{activeAnnouncement.content}</span>
+            <span className="tracking-widest uppercase">{activeAnnouncement.content}</span>
           </div>
         </div>
       )}
@@ -64,61 +63,62 @@ export default function Home() {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative pt-16 pb-20 md:pt-32 md:pb-40 lg:pt-48 lg:pb-60 overflow-hidden">
+        <section className="relative pt-24 pb-20 md:pt-40 md:pb-48 lg:pt-56 lg:pb-64 overflow-hidden">
           <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-5xl mx-auto text-center space-y-8 md:space-y-12 animate-fade-in">
-              <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] shadow-xl animate-float">
+            <div className="max-w-6xl mx-auto text-center space-y-10 md:space-y-16 animate-fade-in">
+              <div className="inline-flex items-center gap-3 px-8 py-3 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] shadow-[0_0_40px_-10px_rgba(88,88,179,0.3)] animate-float glass">
                 <Sparkles className="w-4 h-4 text-accent" />
-                <span>Modern Web Development for Nepal 🇳🇵</span>
+                <span>Next-Gen Web Studio Nepal 🇳🇵</span>
               </div>
-              <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-headline font-bold leading-[1] tracking-tighter text-foreground">
-                Create Your <span className="text-primary italic animate-pulse">Dream Web</span> at Cheap Price
+              <h1 className="text-5xl sm:text-7xl md:text-9xl lg:text-[10rem] font-headline font-bold leading-[0.9] tracking-tighter text-foreground drop-shadow-2xl">
+                Elevate Your <span className="text-primary italic block md:inline">Digital Identity</span>
               </h1>
-              <p className="text-lg sm:text-2xl lg:text-3xl text-muted-foreground max-w-3xl mx-auto font-body font-medium leading-relaxed opacity-80 px-4">
-                Premium quality designs, glassmorphism effects, and ultra-smooth animations. Get your professional website today.
+              <p className="text-lg sm:text-2xl lg:text-3xl text-muted-foreground max-w-4xl mx-auto font-body font-medium leading-relaxed opacity-80 px-6">
+                Premium aesthetics, high-performance architecture, and immersive animations. We build websites that don't just exist—they inspire.
               </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-5 pt-6 px-4">
+              <div className="flex flex-col sm:flex-row justify-center gap-6 pt-8 px-6">
                 <Link href="/request" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:min-w-[240px] h-16 md:h-20 rounded-full font-black text-xl hover:scale-105 transition-all active:scale-95 shadow-2xl shadow-primary/40">
-                    Request Website
+                  <Button size="lg" className="w-full sm:min-w-[260px] h-20 md:h-24 rounded-full font-black text-2xl hover:scale-105 transition-all active:scale-95 shadow-[0_30px_60px_-15px_rgba(88,88,179,0.5)]">
+                    Start Building
                   </Button>
                 </Link>
                 <Link href="/types" className="w-full sm:w-auto">
-                  <Button size="lg" variant="outline" className="w-full sm:min-w-[240px] h-16 md:h-20 rounded-full glass border-white/20 font-black text-xl hover:scale-105 transition-all active:scale-95 backdrop-blur-3xl">
-                    View Packages
+                  <Button size="lg" variant="outline" className="w-full sm:min-w-[260px] h-20 md:h-24 rounded-full glass border-white/20 font-black text-2xl hover:scale-105 transition-all active:scale-95 backdrop-blur-3xl">
+                    View Studio Packages
                   </Button>
                 </Link>
               </div>
             </div>
           </div>
           
-          {/* Animated Ambient Background */}
-          <div className="absolute top-1/4 left-0 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-primary/20 rounded-full blur-[80px] md:blur-[120px] -translate-x-1/2 opacity-30 animate-pulse" />
-          <div className="absolute bottom-1/4 right-0 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-accent/20 rounded-full blur-[80px] md:blur-[120px] translate-x-1/2 opacity-30 animate-pulse" />
+          {/* Animated Ambient Elements */}
+          <div className="absolute top-1/4 left-0 w-[400px] md:w-[800px] h-[400px] md:h-[800px] bg-primary/10 rounded-full blur-[100px] md:blur-[180px] -translate-x-1/2 opacity-20 animate-pulse" />
+          <div className="absolute bottom-1/4 right-0 w-[400px] md:w-[800px] h-[400px] md:h-[800px] bg-accent/10 rounded-full blur-[100px] md:blur-[180px] translate-x-1/2 opacity-20 animate-pulse" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] pointer-events-none" />
         </section>
 
         {/* Features Section */}
-        <section className="py-20 md:py-32 bg-black/5 relative">
+        <section className="py-24 md:py-40 relative">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-16 md:mb-24 space-y-4">
-              <h2 className="text-4xl md:text-6xl lg:text-7xl font-headline font-bold text-foreground">Why RIZERWEBNP?</h2>
-              <p className="text-muted-foreground text-xl lg:text-2xl max-w-2xl mx-auto font-medium">We merge high-end visual aesthetics with industry-standard performance.</p>
+            <div className="text-center mb-20 md:mb-32 space-y-6">
+              <h2 className="text-4xl md:text-7xl lg:text-8xl font-headline font-bold text-foreground">Why RIZER STUDIO?</h2>
+              <p className="text-muted-foreground text-xl lg:text-3xl max-w-3xl mx-auto font-medium opacity-70">Merging high-end visual storytelling with enterprise performance.</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
               {[
-                { icon: Zap, title: "Ultra Fast", desc: "Built with Next.js 15 for lightning-fast performance and perfect SEO scores." },
-                { icon: Globe, title: "Global UX", desc: "Websites that compete with international standards in design and usability." },
-                { icon: Shield, title: "Secure Code", desc: "Enterprise-grade security rules and authentication for every single project." },
-                { icon: Cpu, title: "AI Enhanced", desc: "Using advanced AI tools to help you visualize and design your project better." },
-                { icon: CheckCircle2, title: "Affordable", desc: "Professional web builds starting at prices that fit your budget." },
-                { icon: Sparkles, title: "Glass UI", desc: "Modern Glassmorphism and animations tailored to your brand identity." },
+                { icon: Zap, title: "Next.js 15 Fast", desc: "Engineered for lightning speeds and perfect 100/100 Lighthouse performance scores." },
+                { icon: Globe, title: "Global UX", desc: "Our designs compete with international standards, bringing elite quality to Nepal." },
+                { icon: Shield, title: "Fortified Security", desc: "Bank-level authentication and Firestore security rules built into every project." },
+                { icon: Cpu, title: "AI-Powered", desc: "Leveraging custom GenAI models to help you refine your project vision and style." },
+                { icon: CheckCircle2, title: "Competitive", desc: "High-end builds at prices that respect your budget without compromising quality." },
+                { icon: Sparkles, title: "Cinematic UI", desc: "Advanced glassmorphism and motion graphics tailored to your brand identity." },
               ].map((feature, i) => (
-                <div key={i} className="p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] glass glass-shimmer hover-lift border-white/5 group shadow-2xl transition-all">
-                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6 md:mb-8 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500">
-                    <feature.icon className="w-7 h-7" />
+                <div key={i} className="p-10 md:p-14 rounded-[3rem] glass glass-shimmer hover-lift border-white/5 group shadow-2xl transition-all">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center text-primary mb-10 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-700 shadow-xl">
+                    <feature.icon className="w-8 h-8" />
                   </div>
-                  <h3 className="text-2xl md:text-3xl font-headline font-bold mb-4 text-foreground">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed font-medium md:text-lg">{feature.desc}</p>
+                  <h3 className="text-3xl md:text-4xl font-headline font-bold mb-6 text-foreground">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed font-medium md:text-xl opacity-80">{feature.desc}</p>
                 </div>
               ))}
             </div>
@@ -126,36 +126,36 @@ export default function Home() {
         </section>
 
         {/* Testimonials */}
-        <section id="testimonials-section" className="py-20 md:py-32 relative">
+        <section id="testimonials-section" className="py-24 md:py-40 bg-white/[0.02] relative">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-16 md:mb-24 space-y-4">
-              <h2 className="text-4xl md:text-6xl lg:text-7xl font-headline font-bold text-foreground">Trusted by Clients</h2>
-              <p className="text-muted-foreground text-xl lg:text-2xl max-w-2xl mx-auto font-medium italic px-4">Real experiences from those who built with Rizer Studio.</p>
+            <div className="text-center mb-20 md:mb-32 space-y-6">
+              <h2 className="text-4xl md:text-7xl lg:text-8xl font-headline font-bold text-foreground">Client Success</h2>
+              <p className="text-muted-foreground text-xl lg:text-3xl max-w-3xl mx-auto font-medium italic opacity-70">Verified experiences from the RIZER community.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
               {displayReviews.map((t: any, i) => (
                 <div 
                   key={t.id || i} 
-                  className="p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] glass hover-lift border-white/5 group relative shadow-2xl transition-all"
+                  className="p-10 md:p-14 rounded-[3rem] glass hover-lift border-white/5 group relative shadow-2xl transition-all"
                 >
-                  <div className="flex gap-1 mb-6 md:mb-8">
+                  <div className="flex gap-2 mb-10">
                     {[1, 2, 3, 4, 5].map((s) => (
                       <Star 
                         key={s} 
-                        className={cn("w-5 h-5 transition-all", s <= (t.rating || 0) ? "fill-accent text-accent scale-110" : "text-white/10")} 
+                        className={cn("w-6 h-6 transition-all", s <= (t.rating || 0) ? "fill-accent text-accent scale-110" : "text-white/10")} 
                       />
                     ))}
                   </div>
-                  <p className="text-foreground/90 font-medium italic mb-8 md:mb-10 leading-relaxed text-lg md:text-xl lg:text-2xl">
+                  <p className="text-foreground/90 font-medium italic mb-12 leading-relaxed text-xl md:text-2xl">
                     "{t.text}"
                   </p>
-                  <div className="flex items-center gap-5 pt-6 md:pt-8 border-t border-white/10">
-                    <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center font-black text-primary border border-primary/20 text-lg uppercase">
+                  <div className="flex items-center gap-6 pt-10 border-t border-white/10">
+                    <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center font-black text-primary border border-primary/20 text-xl uppercase shadow-lg">
                       {t.userName?.[0] || "?"}
                     </div>
                     <div>
-                      <h4 className="font-bold text-foreground text-lg md:text-xl">{t.userName}</h4>
-                      <p className="text-xs text-accent font-black uppercase tracking-widest">Verified Client</p>
+                      <h4 className="font-bold text-foreground text-xl md:text-2xl">{t.userName}</h4>
+                      <p className="text-[10px] text-accent font-black uppercase tracking-[0.2em] opacity-80">Verified Client</p>
                     </div>
                   </div>
                 </div>
@@ -165,25 +165,25 @@ export default function Home() {
         </section>
 
         {/* Call to Action */}
-        <section className="py-20 md:py-32 lg:py-48 px-4">
+        <section className="py-24 md:py-48 lg:py-64 px-4">
           <div className="container mx-auto max-w-7xl">
-            <div className="rounded-[2.5rem] md:rounded-[4rem] bg-primary p-10 md:p-20 lg:p-32 text-center text-primary-foreground space-y-8 md:space-y-12 overflow-hidden relative shadow-[0_48px_96px_-24px_rgba(88,88,179,0.5)] group">
-              <div className="relative z-10 max-w-4xl mx-auto space-y-8 md:space-y-10">
-                <h2 className="text-4xl md:text-7xl lg:text-8xl font-headline font-bold leading-tight tracking-tighter">Ready to Launch Your Digital Home?</h2>
-                <p className="text-lg md:text-2xl lg:text-3xl font-medium opacity-90 max-w-2xl mx-auto leading-relaxed px-4">Join the next generation of businesses in Nepal with a high-performance custom website.</p>
-                <div className="pt-6 md:pt-10">
+            <div className="rounded-[4rem] md:rounded-[6rem] bg-primary p-12 md:p-24 lg:p-36 text-center text-primary-foreground space-y-12 md:space-y-16 overflow-hidden relative shadow-[0_60px_120px_-30px_rgba(88,88,179,0.5)] group">
+              <div className="relative z-10 max-w-5xl mx-auto space-y-10 md:space-y-14">
+                <h2 className="text-5xl md:text-8xl lg:text-[10rem] font-headline font-bold leading-[0.85] tracking-tighter">Ready to Build the Future?</h2>
+                <p className="text-xl md:text-3xl lg:text-4xl font-medium opacity-90 max-w-3xl mx-auto leading-relaxed px-6">Join the next generation of digital-first brands in Nepal.</p>
+                <div className="pt-10">
                   <Link href="/request">
-                    <Button size="lg" variant="secondary" className="w-full sm:w-auto h-20 px-14 rounded-full font-black text-2xl hover:scale-110 transition-all active:scale-95 shadow-3xl bg-white text-primary">
-                      Build My Website Now
-                      <ArrowRight className="ml-3 w-7 h-7" />
+                    <Button size="lg" variant="secondary" className="w-full sm:w-auto h-24 px-16 rounded-full font-black text-3xl hover:scale-110 transition-all active:scale-95 shadow-2xl bg-white text-primary">
+                      Let's Create
+                      <ArrowRight className="ml-4 w-10 h-10" />
                     </Button>
                   </Link>
                 </div>
               </div>
               
               {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-white/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
-              <div className="absolute bottom-0 left-0 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-accent/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
+              <div className="absolute top-0 right-0 w-[400px] md:w-[800px] h-[400px] md:h-[800px] bg-white/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 animate-pulse" />
+              <div className="absolute bottom-0 left-0 w-[400px] md:w-[800px] h-[400px] md:h-[800px] bg-accent/20 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2 animate-pulse" />
             </div>
           </div>
         </section>

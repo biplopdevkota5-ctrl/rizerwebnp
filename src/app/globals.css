@@ -61,9 +61,9 @@
 }
 
 @layer components {
-  /* Enhanced solid glass for better contrast */
+  /* Super Glass Effect */
   .glass {
-    @apply bg-card/80 backdrop-blur-xl border border-white/10 shadow-2xl;
+    @apply bg-card/60 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] ring-1 ring-white/10;
   }
 
   /* Shimmering effect for cards */
@@ -76,31 +76,36 @@
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.05),
+      rgba(255, 255, 255, 0.08),
       transparent
     );
     animation: shimmer 3s infinite;
   }
 
   .hover-lift {
-    @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/20;
+    @apply transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_50px_-10px_rgba(88,88,179,0.3)] hover:scale-[1.02];
   }
 }
 
 .gradient-bg {
-  background: radial-gradient(circle at top left, hsla(240, 39%, 52%, 0.15), transparent 40%),
-              radial-gradient(circle at bottom right, hsla(207, 83%, 63%, 0.15), transparent 40%),
-              linear-gradient(to bottom, transparent, rgba(0,0,0,0.2));
+  background: radial-gradient(circle at 20% 30%, hsla(240, 39%, 52%, 0.15), transparent 50%),
+              radial-gradient(circle at 80% 70%, hsla(207, 83%, 63%, 0.15), transparent 50%),
+              linear-gradient(to bottom, transparent, rgba(0,0,0,0.3));
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes logo-slide-up {
+  0% { transform: translate(-50%, -50%) scale(1.5); left: 50%; top: 50%; }
+  100% { transform: translate(0, 0) scale(1); left: 1.5rem; top: 1rem; }
 }
 
 @keyframes logo-pulse {
   0% { transform: scale(1); filter: drop-shadow(0 0 0px hsla(240, 39%, 52%, 0)); }
-  50% { transform: scale(1.08); filter: drop-shadow(0 0 30px hsla(240, 39%, 52%, 0.6)); }
+  50% { transform: scale(1.1); filter: drop-shadow(0 0 40px hsla(240, 39%, 52%, 0.7)); }
   100% { transform: scale(1); filter: drop-shadow(0 0 0px hsla(240, 39%, 52%, 0)); }
 }
 
@@ -109,8 +114,8 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(2deg); }
 }
 
 @keyframes ios-spinner {
@@ -119,15 +124,15 @@
 }
 
 .animate-fade-in {
-  animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fade-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-logo-pulse {
-  animation: logo-pulse 2.5s infinite ease-in-out;
+  animation: logo-pulse 3s infinite ease-in-out;
 }
 
 .animate-float {
-  animation: float 4s infinite ease-in-out;
+  animation: float 6s infinite ease-in-out;
 }
 
 .ios-spinner-bar {
@@ -138,11 +143,11 @@
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 ::-webkit-scrollbar-track {
   @apply bg-background;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-primary/20 rounded-full hover:bg-primary/40 transition-colors;
+  @apply bg-primary/30 rounded-full hover:bg-primary/50 transition-colors border-2 border-background;
 }
