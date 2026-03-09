@@ -48,8 +48,8 @@ export function Navbar() {
           <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-white font-black text-lg shadow-lg">
             R
           </div>
-          <span className="font-headline font-black text-xl tracking-tight text-foreground">
-            RIZER <span className="text-primary uppercase">WEB APP</span>
+          <span className="font-headline font-black text-xl tracking-tight text-foreground uppercase">
+            RIZER <span className="text-primary italic">STUDIO</span>
           </span>
         </Link>
 

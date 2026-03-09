@@ -8,7 +8,6 @@ export function LoadingScreen() {
   const [isVisible, setIsVisible] = React.useState(true)
 
   React.useEffect(() => {
-    // Stage: Fade out after loading
     const timer = setTimeout(() => {
       setIsVisible(false)
     }, 3000)
@@ -33,7 +32,7 @@ export function LoadingScreen() {
         
         <div className="space-y-2">
           <h2 className="text-2xl sm:text-3xl font-headline font-bold tracking-tight text-foreground uppercase">
-            RIZER <span className="text-primary">WEB APP</span>
+            RIZER <span className="text-primary italic">STUDIO</span>
           </h2>
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-60">
             Digital Solutions for Nepal

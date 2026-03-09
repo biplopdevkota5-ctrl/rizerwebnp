@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -10,8 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
 import { Navbar } from "@/components/Navbar"
-import { useAuth, useUser, initiateEmailSignUp, initiateGoogleSignIn } from "@/firebase"
-import { UserPlus, Chrome } from "lucide-react"
+import { useAuth, useUser, initiateEmailSignUp, initiateGoogleSignIn, initiateFacebookSignIn } from "@/firebase"
+import { UserPlus, Chrome, Facebook } from "lucide-react"
 import { IOSSpinner } from "@/components/ui/ios-spinner"
 
 export default function SignupPage() {
@@ -49,6 +50,20 @@ export default function SignupPage() {
       toast({ 
         title: "Signup Failed", 
         description: error.message || "Google signup was interrupted.", 
+        variant: "destructive" 
+      })
+    }
+  }
+
+  const handleFacebookSignup = async () => {
+    setLoading(true)
+    try {
+      await initiateFacebookSignIn(auth)
+    } catch (error: any) {
+      setLoading(false)
+      toast({ 
+        title: "Signup Failed", 
+        description: error.message || "Facebook signup was interrupted.", 
         variant: "destructive" 
       })
     }
@@ -137,15 +152,26 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <Button 
-              variant="outline" 
-              className="w-full h-14 rounded-2xl font-bold glass border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-3"
-              onClick={handleGoogleSignup}
-              disabled={loading || authLoading}
-            >
-              <Chrome className="w-5 h-5 text-accent" />
-              Join with Google
-            </Button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Button 
+                variant="outline" 
+                className="w-full h-14 rounded-2xl font-bold glass border-white/10 hover:bg-white/5 transition-all flex items-center justify-center gap-3"
+                onClick={handleGoogleSignup}
+                disabled={loading || authLoading}
+              >
+                <Chrome className="w-5 h-5 text-accent" />
+                Google
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full h-14 rounded-2xl font-bold glass border-white/10 hover:bg-[#1877F2]/10 hover:text-[#1877F2] transition-all flex items-center justify-center gap-3"
+                onClick={handleFacebookSignup}
+                disabled={loading || authLoading}
+              >
+                <Facebook className="w-5 h-5 text-[#1877F2]" />
+                Facebook
+              </Button>
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-6 p-8 pt-0">
             <div className="text-center space-y-2">

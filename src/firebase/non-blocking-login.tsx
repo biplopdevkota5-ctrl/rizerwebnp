@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Auth,
@@ -5,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
+  FacebookAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
 
@@ -26,9 +28,15 @@ export function initiateEmailSignIn(authInstance: Auth, email: string, password:
 /** Initiate Google sign-in (non-blocking). */
 export function initiateGoogleSignIn(authInstance: Auth): Promise<void> {
   const provider = new GoogleAuthProvider();
-  // We return the promise but don't necessarily await it in the UI to keep it snappy.
   return signInWithPopup(authInstance, provider).then(() => {}).catch((err) => {
-    // Errors will be caught by the component or the global listener if implemented.
+    throw err;
+  });
+}
+
+/** Initiate Facebook sign-in (non-blocking). */
+export function initiateFacebookSignIn(authInstance: Auth): Promise<void> {
+  const provider = new FacebookAuthProvider();
+  return signInWithPopup(authInstance, provider).then(() => {}).catch((err) => {
     throw err;
   });
 }
