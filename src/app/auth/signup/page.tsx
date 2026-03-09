@@ -88,7 +88,7 @@ export default function SignupPage() {
               <UserPlus className="w-8 h-8 text-accent" />
             </div>
             <CardTitle className="font-headline text-3xl font-bold">Get Started</CardTitle>
-            <CardDescription className="font-medium">Join our community and build your site.</CardDescription>
+            <CardDescription className="font-medium">Join RIZER STUDIO and build your site.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-8 px-8">
             <form onSubmit={handleSignup} className="space-y-4">

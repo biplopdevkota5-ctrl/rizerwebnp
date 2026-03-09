@@ -84,7 +84,7 @@ export default function LoginPage() {
               <LogIn className="w-8 h-8 text-primary" />
             </div>
             <CardTitle className="font-headline text-3xl font-bold">Welcome Back</CardTitle>
-            <CardDescription className="font-medium">Sign in to manage your website projects.</CardDescription>
+            <CardDescription className="font-medium">Sign in to manage your RIZER STUDIO builds.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-8 px-8">
             <form onSubmit={handleLogin} className="space-y-6">
